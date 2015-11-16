@@ -37,8 +37,6 @@ var writeFile = function writeFile(fs, mime, Task){
     };
 };
 
-var compile
-
 var writeElm = function writeElm(fs, mime, crypto, compiler, Task){
 
     var compile = function(file, outFile, onClose){
