@@ -2,3 +2,5 @@ elm-stuff/
 .DS_Store
 node_modules/
 elm.js
+main.js
+instance/**/*.js
