@@ -6,7 +6,9 @@ import Http.Response exposing (emptyRes, Response)
 import Http.Response.Write exposing
   ( writeHtml, writeJson
   , writeElm, writeFile
-  , writeNode)
+  , writeNode, writeRedirect)
+
+import Client.App exposing (index, successView)
 
 import Task exposing (..)
 import Signal exposing (..)
@@ -18,14 +20,21 @@ server = mailbox (emptyReq, emptyRes)
 route : (Request, Response) -> Task x ()
 route (req, res) =
   case req.method of
-    GET -> case req.url of
-      "/" ->
-        writeFile "/index.html" res
-      url ->
-        writeFile url res
+    GET ->
+      case req.url of
+        "/" ->
+          writeNode index res
+        "/success" ->
+          writeNode successView res
+        url ->
+          writeFile url res
 
     POST ->
-      succeed ()
+      case req.url of
+        "/apply" ->
+          writeRedirect "/success" res
+        _ ->
+          succeed ()
 
     NOOP ->
       succeed ()

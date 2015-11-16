@@ -1,7 +1,9 @@
 module Http.Response
   ( Response, StatusCode, Header
   , emptyRes
+  , okCode, redirectCode
   , textHtml, applicationJson
+  , redirectHeader
   , onCloseRes, onFinishRes
   ) where
 
@@ -27,19 +29,35 @@ emptyRes =
 
 {-| Html Header {"Content-Type":"text/html"}-}
 textHtml : Header
-textHtml = ("Content-Type", "text/html")
+textHtml =
+    ("Content-Type", "text/html")
 
 {-| Json Header {"Content-Type":"application/json"}-}
 applicationJson : Header
-applicationJson = ("Content-Type", "application/json")
+applicationJson =
+    ("Content-Type", "application/json")
 
 
 {-| "Close" events as a Signal for Response objects.
 [Node docs](https://nodejs.org/api/http.html#http_event_close_1) -}
 onCloseRes : Response -> Signal ()
-onCloseRes = on "close"
+onCloseRes =
+    on "close"
 
 {-| "Finsh" events as a Signal for Reponse objects.
 [Node docs](https://nodejs.org/api/http.html#http_event_finish) -}
 onFinishRes : Response -> Signal ()
-onFinishRes = on "finish"
+onFinishRes =
+    on "finish"
+
+redirectCode : StatusCode
+redirectCode =
+    302
+
+okCode : StatusCode
+okCode =
+    200
+
+redirectHeader : String -> Header
+redirectHeader url =
+    ("Location", url)
