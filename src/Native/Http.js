@@ -24,8 +24,6 @@ var setBody = function getBody(request, encoding) {
         encoding = "utf8";
     }
 
-    request.setEncoding(encoding);
-
     var body = '';
 
     request.on('data', function (chunk) {
@@ -33,18 +31,35 @@ var setBody = function getBody(request, encoding) {
     });
 
     request.on('end', function () {
+        console.log("body", body);
         request.body = body;
     });
 };
 
-var createServer = function createServer(fs, http, Tuple2, Task) {
+var setForm = function setForm(multiparty, Task) {
+    return function(request){
+        return Task.asyncFunction(function(callback){
+            var form = new multiparty.Form();
+
+            form.parse(request, function(err, fields, files) {
+                request.form = {
+                    fields: fields,
+                    files: files,
+                    ctor: "Form"
+                };
+                return callback(Task.succeed(request));
+            });
+        });
+    };
+};
+
+var createServer = function createServer(fs, http, multiparty, Tuple2, Task) {
     return function (address) {
         make_compile_dir(fs, __dirname + "/" + COMPILED_DIR);
 
         var send = address._0;
         var server = http.createServer(function (request, response) {
             request.method = wrap_with_type(request.method);
-            setBody(request);
 
             return Task.perform(send(Tuple2(request, response)));
         });
@@ -103,6 +118,23 @@ var getQueryField = function(Just, Nothing) {
     };
 };
 
+var getFormField = function(Just, Nothing) {
+    return function(fieldName, form) {
+        console.log("form", form);
+        return getQueryField(Just, Nothing)(fieldName, form.fields);
+    };
+};
+
+var getFormFiles = function(toList) {
+    return function(form) {
+        if (form.files instanceof Array){
+            return toList(form.files);
+        }
+
+        return toList([]);
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Http = localRuntime.Native.Http || {};
@@ -116,9 +148,11 @@ var make = function make(localRuntime) {
     var fs = require('fs');
     var mime = require('mime');
     var querystring = require('querystring');
+    var multiparty = require('multiparty');
 
     var Task = Elm.Native.Task.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
+    var List = Elm.Native.List.make(localRuntime);
     var Signal = Elm.Native.Signal.make(localRuntime);
     var Maybe = Elm.Maybe.make(localRuntime);
     var Result = Elm.Result.make(localRuntime);
@@ -131,11 +165,14 @@ var make = function make(localRuntime) {
     var Tuple2 = Utils['Tuple2'];
 
     return {
-        'createServer': createServer(fs, http, Tuple2, Task),
+        'createServer': createServer(fs, http, multiparty, Tuple2, Task),
         'listen': F3(listen(Task)),
         'on': F2(on(Signal, Tuple0)),
         'parseQuery': parseQuery(Result.Ok, Result.Err, querystring),
-        'getQueryField': F2(getQueryField(Just, Nothing))
+        'getQueryField': F2(getQueryField(Just, Nothing)),
+        'getFormField': F2(getFormField(Just, Nothing)),
+        'getFormFiles': getFormFiles(List.fromArray),
+        'setForm': setForm(multiparty, Task)
     };
 };
 Elm.Native.Http = {};

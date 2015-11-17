@@ -1,7 +1,7 @@
 module Client.App where
 
 import Html exposing (form, label, input, text, div, Html)
-import Html.Attributes exposing (for, id, type', name, action, method)
+import Html.Attributes exposing (for, id, type', name, action, method, enctype, value)
 import Json.Encode as Encode
 
 
@@ -16,6 +16,7 @@ index =
     form
         [ action "/apply"
         , method "POST"
+        , enctype "multipart/form-data"
         ]
         [ label
             [ for "email" ]
@@ -24,6 +25,7 @@ index =
             [ type' "text"
             , name "email"
             , id "email"
+            , value "sdfghjk"
             ]
             [ ]
         ,label
@@ -33,7 +35,13 @@ index =
             [ type' "text"
             , name "name"
             , id "name"
+            , value "zxcvbnm"
             ]
+            [ ]
+        , input
+            [ type' "file"
+            , name "file"
+            , id "file" ]
             [ ]
         ,input
             [ type' "submit"

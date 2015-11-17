@@ -1,8 +1,11 @@
 module Http.Request
   ( Method(..), Query(..)
+  , Form, FormFile
   , Request, emptyReq
   , onCloseReq
   , parseQuery, getQueryField
+  , getFormFiles, getFormField
+  , setForm
   ) where
 
 {-| Stuff for dealing with requests
@@ -19,6 +22,7 @@ module Http.Request
 import Native.Http
 
 import Http.Listeners exposing (on)
+import Task exposing (Task)
 
 {-| Standard Http Methods, useful for routing -}
 type Method
@@ -31,13 +35,19 @@ type Method
 type Query =
   Query
 
+type FormFile =
+  FormFile
+
+type Form =
+  Form
 
 {-| Node.js native Request object
 [Node Docs](https://nodejs.org/api/http.html#http_http_incomingmessage) -}
 type alias Request =
   { url : String
   , method : Method
-  , body: String }
+  , body: String
+  , form: Form }
 
 
 {-| `emptyReq` is a dummy Native Request object incase you need it, as the initial value of
@@ -46,7 +56,8 @@ emptyReq : Request
 emptyReq =
   { url = ""
   , method = NOOP
-  , body = "" }
+  , body = ""
+  , form = Form }
 
 
 {-| "Close" events as a Signal for Request objects.
@@ -62,3 +73,15 @@ parseQuery =
 getQueryField : String -> Query -> Maybe a
 getQueryField =
   Native.Http.getQueryField
+
+getFormField : String -> Form -> Maybe a
+getFormField =
+  Native.Http.getFormField
+
+getFormFiles : Form -> List FormFile
+getFormFiles =
+  Native.Http.getFormFiles
+
+setForm : Request -> Task a Request
+setForm =
+  Native.Http.setForm

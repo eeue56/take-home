@@ -1,7 +1,12 @@
 module Main where
 
 import Http.Server exposing (..)
-import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField)
+import Http.Request exposing (emptyReq
+  , Request, Method(..)
+  , parseQuery, getQueryField
+  , getFormField, getFormFiles
+  , setForm
+  )
 import Http.Response exposing (emptyRes, Response)
 import Http.Response.Write exposing
   ( writeHtml, writeJson
@@ -19,6 +24,16 @@ import Result
 server : Mailbox (Request, Response)
 server = mailbox (emptyReq, emptyRes)
 
+generateSuccessPage : Response -> Request -> Task a ()
+generateSuccessPage res req =
+  let
+    view =
+      getFormField "name" req.form
+        |> Maybe.withDefault "anon"
+        |> successView
+    in
+      writeNode view res
+
 route : (Request, Response) -> Task x ()
 route (req, res) =
   case req.method of
@@ -32,18 +47,8 @@ route (req, res) =
     POST ->
       case req.url of
         "/apply" ->
-          let
-            body =
-              case parseQuery req.body of
-                Err _ -> Http.Request.Query
-                Ok v -> v
-
-            view =
-              getQueryField "name" body
-                |> Maybe.withDefault "anon"
-                |> successView
-          in
-            writeNode view res
+          setForm req
+            |> (flip andThen) (generateSuccessPage res)
         _ ->
           succeed ()
 
