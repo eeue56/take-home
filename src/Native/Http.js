@@ -19,6 +19,24 @@ var make_compile_dir = function(fs, dir){
     }
 };
 
+var setBody = function getBody(request, encoding) {
+    if (typeof encoding === "undefined" || encoding === null){
+        encoding = "utf8";
+    }
+
+    request.setEncoding(encoding);
+
+    var body = '';
+
+    request.on('data', function (chunk) {
+        body += chunk;
+    });
+
+    request.on('end', function () {
+        request.body = body;
+    });
+};
+
 var createServer = function createServer(fs, http, Tuple2, Task) {
     return function (address) {
         make_compile_dir(fs, __dirname + "/" + COMPILED_DIR);
@@ -26,6 +44,8 @@ var createServer = function createServer(fs, http, Tuple2, Task) {
         var send = address._0;
         var server = http.createServer(function (request, response) {
             request.method = wrap_with_type(request.method);
+            setBody(request);
+
             return Task.perform(send(Tuple2(request, response)));
         });
         return Task.asyncFunction(function (callback) {
@@ -55,6 +75,34 @@ var on = function on(Signal) {
         });
     };
 };
+
+var parseQuery = function (Ok, Err, querystring){
+    return function(query){
+        var item = null;
+        try {
+            item = querystring.parse(query);
+        } catch (err) {}
+
+        if (typeof item !== "object"){
+            return Err("Failed to parse item");
+        }
+
+        return Ok(item);
+    };
+};
+
+var getQueryField = function(Just, Nothing) {
+    return function(fieldName, queryDict){
+        var item = queryDict[fieldName];
+
+        if (typeof item === "undefined" || item === null){
+            return Nothing;
+        }
+
+        return Just(item);
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Http = localRuntime.Native.Http || {};
@@ -67,17 +115,27 @@ var make = function make(localRuntime) {
     var http = require('http');
     var fs = require('fs');
     var mime = require('mime');
+    var querystring = require('querystring');
 
     var Task = Elm.Native.Task.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
     var Signal = Elm.Native.Signal.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
+    var Result = Elm.Result.make(localRuntime);
+
+
+    var Nothing = Maybe.Nothing;
+    var Just = Maybe.Just;
+
     var Tuple0 = Utils['Tuple0'];
     var Tuple2 = Utils['Tuple2'];
 
     return {
         'createServer': createServer(fs, http, Tuple2, Task),
         'listen': F3(listen(Task)),
-        'on': F2(on(Signal, Tuple0))
+        'on': F2(on(Signal, Tuple0)),
+        'parseQuery': parseQuery(Result.Ok, Result.Err, querystring),
+        'getQueryField': F2(getQueryField(Just, Nothing))
     };
 };
 Elm.Native.Http = {};

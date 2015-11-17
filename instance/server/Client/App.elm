@@ -5,11 +5,11 @@ import Html.Attributes exposing (for, id, type', name, action, method)
 import Json.Encode as Encode
 
 
-successView : Html
-successView =
+successView : String -> Html
+successView name =
     div
         []
-        [ text "Your take home will be with you shortly!"]
+        [ text ("Your take home will be with you shortly, " ++ name)]
 
 index : Html
 index =
