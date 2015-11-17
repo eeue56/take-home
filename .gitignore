@@ -4,3 +4,4 @@ node_modules/
 elm.js
 main.js
 instance/**/*.js
+run_with_credentials.sh

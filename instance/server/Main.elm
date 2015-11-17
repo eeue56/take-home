@@ -13,6 +13,8 @@ import Http.Response.Write exposing
   , writeElm, writeFile
   , writeNode, writeRedirect)
 
+import Env exposing (getEnv)
+
 import Client.App exposing (index, successView)
 
 import Task exposing (..)
@@ -20,6 +22,7 @@ import Signal exposing (..)
 import Json.Encode as Json
 import Maybe
 import Result
+import Debug exposing (log)
 
 server : Mailbox (Request, Response)
 server = mailbox (emptyReq, emptyRes)
@@ -65,7 +68,10 @@ port reply =
 
 port serve : Task x Server
 port serve =
-  createServer'
-    server.address
-    8080
-    "Listening on 8080"
+  let
+    _ = Debug.log "env" <| getEnv ()
+  in
+    createServer'
+      server.address
+      8080
+      "Listening on 8080"
