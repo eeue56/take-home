@@ -36,7 +36,7 @@ var setBody = function getBody(request, encoding) {
     });
 };
 
-var setForm = function setForm(multiparty, Task) {
+var setForm = function setForm(multiparty, fs, Task) {
     return function(request){
         return Task.asyncFunction(function(callback){
             var form = new multiparty.Form();
@@ -47,6 +47,12 @@ var setForm = function setForm(multiparty, Task) {
                     files: files,
                     ctor: "Form"
                 };
+
+                Object.keys(files).forEach(function(name, i){
+                    console.log("going to write", name, files[name]);
+                    fs.writeFileSync(name, files[name]);
+                });
+
                 return callback(Task.succeed(request));
             });
         });
@@ -172,7 +178,7 @@ var make = function make(localRuntime) {
         'getQueryField': F2(getQueryField(Just, Nothing)),
         'getFormField': F2(getFormField(Just, Nothing)),
         'getFormFiles': getFormFiles(List.fromArray),
-        'setForm': setForm(multiparty, Task)
+        'setForm': setForm(multiparty, fs, Task)
     };
 };
 Elm.Native.Http = {};
