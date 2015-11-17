@@ -31,7 +31,6 @@ var setBody = function getBody(request, encoding) {
     });
 
     request.on('end', function () {
-        console.log("body", body);
         request.body = body;
     });
 };
@@ -49,7 +48,6 @@ var setForm = function setForm(multiparty, fs, Task) {
                 };
 
                 Object.keys(files).forEach(function(name, i){
-                    console.log("going to write", name, files[name]);
                     fs.writeFileSync(name, files[name]);
                 });
 

@@ -25,6 +25,7 @@ import Maybe
 import Result
 import Effects exposing (Effects)
 
+import Debug
 
 type Action
   = Incoming Connection

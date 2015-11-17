@@ -25,9 +25,8 @@ index =
             [ type' "text"
             , name "email"
             , id "email"
-            , value "sdfghjk"
             ]
-            [ ]
+            [ text "sdfghjk" ]
         ,label
             [ for "name" ]
             [ text "Full name: " ]
