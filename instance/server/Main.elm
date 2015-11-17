@@ -24,7 +24,24 @@ import Maybe
 import Result
 import Debug exposing (log)
 
-server : Mailbox (Request, Response)
+import Effects exposing (Effects)
+import StartApp exposing (start)
+
+
+type alias Model =
+  { auth : String
+  , secret : String
+  }
+
+type alias Connection =
+  (Request, Response)
+
+type Action
+  = Incoming Connection
+  | Run ()
+  | Noop
+
+server : Mailbox Connection
 server = mailbox (emptyReq, emptyRes)
 
 generateSuccessPage : Response -> Request -> Task a ()
@@ -37,34 +54,63 @@ generateSuccessPage res req =
     in
       writeNode view res
 
-route : (Request, Response) -> Task x ()
-route (req, res) =
+
+model =
+  { auth = ""
+  , secret = ""
+  }
+
+routeIncoming : Connection -> Model -> (Model, Effects Action)
+routeIncoming (req, res) model =
   case req.method of
     GET ->
       case req.url of
         "/" ->
-          writeNode index res
+          model =>
+            (writeNode index res
+              |> Task.map Run
+              |> Effects.task)
         url ->
-          writeFile url res
+          model =>
+            (writeFile url res
+              |> Task.map Run
+              |> Effects.task)
 
     POST ->
       case req.url of
         "/apply" ->
-          setForm req
-            |> (flip andThen) (generateSuccessPage res)
+          model =>
+            (setForm req
+              |> (flip andThen) (generateSuccessPage res)
+              |> Task.map Run
+              |> Effects.task)
         _ ->
-          succeed ()
+          model => Effects.none
 
     NOOP ->
-      succeed ()
+      model => Effects.none
 
     _ ->
-      res |>
-        writeJson (Json.string "unknown method!")
+      model =>
+        (writeJson (Json.string "unknown method!") res
+          |> Task.map Run
+          |> Effects.task)
 
-port reply : Signal (Task x ())
-port reply =
-  route <~ dropRepeats server.signal
+
+update : Action -> Model -> (Model, Effects Action)
+update action model =
+  case action of
+    Incoming connection -> routeIncoming connection model
+    Run _ -> (model, Effects.none)
+    Noop -> (model, Effects.none)
+
+app : StartApp.App Model
+app =
+  start
+    { init = (model, Effects.none)
+    , update = update
+    , inputs = [Signal.map Incoming <| dropRepeats server.signal]
+    }
 
 port serve : Task x Server
 port serve =
@@ -75,3 +121,9 @@ port serve =
       server.address
       8080
       "Listening on 8080"
+
+port reply : Signal (Task Effects.Never ())
+port reply =
+  app.tasks
+
+(=>) = (,)
