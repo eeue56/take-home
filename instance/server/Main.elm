@@ -14,25 +14,66 @@ import Signal exposing (dropRepeats, Mailbox, mailbox)
 
 import Router exposing (..)
 import Model exposing (..)
+
 import StartApp exposing (start)
+import Env
+
+import Dict
 import Task exposing (..)
 import Effects exposing (Effects)
-
+import Maybe.Extra exposing ((?))
 
 model =
-  { auth = ""
+  { key = ""
   , secret = ""
+  , bucket = ""
+  }
+
+
+envToModel env =
+  { key =
+      Dict.get "S3_AUTH" env ? ""
+
+  , secret =
+      Dict.get "S3_SECRET" env ? ""
+
+  , bucket =
+      Dict.get "S3_BUCKET" env ? ""
   }
 
 server : Mailbox Connection
 server = mailbox (emptyReq, emptyRes)
 
-app : StartApp.App Model
+
+init : Task Effects.Never StartAppAction
+init =
+  Env.getEnv ()
+    |> Task.map (\env -> Init (envToModel env))
+
+translateModel : (Model, Effects.Effects Action) -> (Maybe Model, Effects.Effects StartAppAction)
+translateModel (model, action) =
+  (Just model, Effects.map Update action)
+
+updateWrapper : StartAppAction -> Maybe Model -> (Maybe Model, Effects.Effects StartAppAction)
+updateWrapper startAppAction maybeModel =
+  case (startAppAction, maybeModel) of
+
+    (Update actualAction, Just actualModel) ->
+      update actualAction actualModel
+        |> translateModel
+
+    (Init actualModel, _) ->
+      (Just actualModel, Effects.none)
+
+    _ ->
+      (maybeModel, Effects.none)
+
+app : StartApp.App (Maybe Model)
 app =
   start
-    { init = (model, Effects.none)
-    , update = update
-    , inputs = [Signal.map Incoming <| dropRepeats server.signal]
+    { init = (Nothing, Effects.task init)
+    , update = updateWrapper
+    , inputs = [Signal.map (Update << Incoming) <| dropRepeats server.signal]
     }
 
 

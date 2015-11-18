@@ -1,6 +1,8 @@
-var getEnv = function(jsObjectToElmDict) {
+var getEnv = function(jsObjectToElmDict, Task) {
     return function() {
-        return jsObjectToElmDict(process.env);
+        return Task.asyncFunction(function(callback){
+            return callback(Task.succeed(jsObjectToElmDict(process.env)));
+        });
     };
 };
 
@@ -15,9 +17,10 @@ var make = function make(localRuntime) {
 
     var Converters = Elm.Native.Converters.make(localRuntime);
     var jsObjectToElmDict = Converters.jsObjectToElmDict;
+    var Task = Elm.Native.Task.make(localRuntime);
 
     return {
-        getEnv: getEnv(jsObjectToElmDict)
+        getEnv: getEnv(jsObjectToElmDict, Task)
     };
 };
 

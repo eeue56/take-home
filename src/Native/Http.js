@@ -41,9 +41,15 @@ var setForm = function setForm(multiparty, fs, Task) {
             var form = new multiparty.Form();
 
             form.parse(request, function(err, fields, files) {
+                var vals = [];
+
+                Object.keys(files).forEach(function(name, i){
+                    vals.push(files[name][0]);
+                });
+
                 request.form = {
                     fields: fields,
-                    files: files,
+                    files: vals,
                     ctor: "Form"
                 };
 
@@ -124,18 +130,18 @@ var getQueryField = function(Just, Nothing) {
 
 var getFormField = function(Just, Nothing) {
     return function(fieldName, form) {
-        console.log("form", form);
         return getQueryField(Just, Nothing)(fieldName, form.fields);
     };
 };
 
 var getFormFiles = function(toList) {
     return function(form) {
-        if (form.files instanceof Array){
-            return toList(form.files);
+        try {
+            var convertedFiles = toList(form.files);
+            return convertedFiles;
+        } catch (err){
+            return toList([]);
         }
-
-        return toList([]);
     };
 };
 

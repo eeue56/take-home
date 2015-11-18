@@ -35,8 +35,11 @@ type Method
 type Query =
   Query
 
-type FormFile =
-  FormFile
+type alias FormFile =
+  { fieldName: String
+  , originalFilename : String
+  , path: String
+  , size: Int }
 
 type Form =
   Form

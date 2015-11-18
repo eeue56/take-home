@@ -15,7 +15,6 @@ import Http.Request exposing (emptyReq
 import Http.Response exposing (Response)
 
 import Model exposing (Connection, Model)
-
 import Client.App exposing (index, successView)
 
 import Task exposing (..)
@@ -25,6 +24,8 @@ import Maybe
 import Result
 import Effects exposing (Effects)
 import Dict
+import String
+
 import Env
 import Knox
 import Converters
@@ -36,26 +37,47 @@ type Action
   | Run ()
   | Noop
 
+type StartAppAction
+  = Init Model
+  | Update Action
 
-generateSuccessPage : Response -> Request -> Task a ()
-generateSuccessPage res req =
+
+uploadFile : String -> String -> Model -> Task a (Result String String)
+uploadFile fileName fileNameOnServer model =
+  Knox.createClient { key = model.key, secret = model.secret, bucket = model.bucket }
+    |> Knox.putFile fileName fileNameOnServer
+
+
+generateSuccessPage : Response -> Request -> Model -> Task a ()
+generateSuccessPage res req model =
   let
-    env = Env.getEnv ()
-    key = Maybe.withDefault "" <| Dict.get "S3_AUTH" env
-    secret = Maybe.withDefault "" <| Dict.get "S3_SECRET" env
-    bucket = Maybe.withDefault "" <| Dict.get "S3_BUCKET" env
-
-    client = Knox.createClient { key = key, secret = secret, bucket = bucket }
-
-
-    view =
+    name =
       getFormField "name" req.form
         |> Maybe.withDefault "anon"
-        |> successView
 
-    _ = Debug.log "" <| Converters.jsObjectToElmDict req.form
+    email =
+      getFormField "email" req.form
+        |> Maybe.withDefault "anon"
+
+    view =
+      successView name
+
+    handleFiles =
+      case getFormFiles req.form of
+        [] -> Debug.log "no files" <| Task.succeed (Err "no file")
+        x::_ ->
+          let
+            newPath =
+              String.join "/"
+                [ name
+                , email
+                , x.originalFilename
+                ]
+          in
+            uploadFile x.path newPath model
+
   in
-      Knox.putFile "README.md" "/test" client `andThen` (\_ -> writeNode view res)
+    handleFiles `andThen` (\_ -> writeNode view res)
 
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
@@ -78,7 +100,7 @@ routeIncoming (req, res) model =
         "/apply" ->
           model =>
             (setForm req
-              |> (flip andThen) (generateSuccessPage res)
+              |> (flip andThen) (\req -> generateSuccessPage res req model)
               |> Task.map Run
               |> Effects.task)
         _ ->
@@ -100,7 +122,6 @@ update action model =
     Incoming connection -> routeIncoming connection model
     Run _ -> (model, Effects.none)
     Noop -> (model, Effects.none)
-
 
 
 (=>) = (,)

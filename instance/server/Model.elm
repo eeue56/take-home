@@ -4,8 +4,9 @@ import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 
 type alias Model =
-  { auth : String
+  { key : String
   , secret : String
+  , bucket : String
   }
 
 type alias Connection =
