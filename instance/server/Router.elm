@@ -24,6 +24,10 @@ import Json.Encode as Json
 import Maybe
 import Result
 import Effects exposing (Effects)
+import Dict
+import Env
+import Knox
+import Converters
 
 import Debug
 
@@ -36,12 +40,22 @@ type Action
 generateSuccessPage : Response -> Request -> Task a ()
 generateSuccessPage res req =
   let
+    env = Env.getEnv ()
+    key = Maybe.withDefault "" <| Dict.get "S3_AUTH" env
+    secret = Maybe.withDefault "" <| Dict.get "S3_SECRET" env
+    bucket = Maybe.withDefault "" <| Dict.get "S3_BUCKET" env
+
+    client = Knox.createClient { key = key, secret = secret, bucket = bucket }
+
+
     view =
       getFormField "name" req.form
         |> Maybe.withDefault "anon"
         |> successView
-    in
-      writeNode view res
+
+    _ = Debug.log "" <| Converters.jsObjectToElmDict req.form
+  in
+      Knox.putFile "README.md" "/test" client `andThen` (\_ -> writeNode view res)
 
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
