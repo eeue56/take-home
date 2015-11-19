@@ -1,3 +1,12 @@
+
+function encodeSpecialCharacters(filename) {
+  // Note: these characters are valid in URIs, but S3 does not like them for
+  // some reason.
+  return encodeURI(filename).replace(/[!'()#*+? ]/g, function (char) {
+    return '%' + char.charCodeAt(0).toString(16);
+  });
+}
+
 var createClient = function(knox) {
     return function(config) {
         return knox.createClient(config);
@@ -6,16 +15,31 @@ var createClient = function(knox) {
 
 var putFile = function(knox, Task, Ok, Err) {
     return function(localFileName, serverFileName, client){
-
         return Task.asyncFunction(function(callback){
-            client.putFile(localFileName, serverFileName, function(err, res){
-                if (err){
-                    return callback(Task.succeed(Err("Failed to upload!")));
+            client.putFile(
+                localFileName,
+                encodeSpecialCharacters(serverFileName),
+                { 'x-amz-acl': 'public-read' },
+                function(err, res){
+                    if (err){
+                        return callback(Task.succeed(Err("Failed to upload!")));
+                    }
+                    res.resume();
+
+                    return callback(
+                        Task.succeed(
+                            urlify(knox)(serverFileName, client)
+                        )
+                    );
                 }
-                res.resume();
-                return callback(Task.succeed(Ok("File uploaded")));
-            });
+            );
         });
+    };
+};
+
+var urlify = function(knox) {
+    return function(url, client){
+        return client.http(url);
     };
 };
 
@@ -35,7 +59,8 @@ var make = function make(localRuntime) {
 
     return {
         createClient: createClient(knox),
-        putFile: F3(putFile(knox, Task, Result.Ok, Result.Err))
+        putFile: F3(putFile(knox, Task, Result.Ok, Result.Err)),
+        urlify: F2(urlify(knox))
     };
 };
 
