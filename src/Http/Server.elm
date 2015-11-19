@@ -29,6 +29,7 @@ import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 import Http.Listeners exposing (on)
 
+import Uuid
 import Native.Http
 
 {-| Port number for the server to listen -}
@@ -85,6 +86,17 @@ listen = Native.Http.listen
 {-| Generate a random url
 Either time based or random
 -}
-randomUrl : Bool -> String -> String
-randomUrl =
-  Native.Http.randomUrl
+randomUrl : Bool -> String -> Task x String
+randomUrl isTimeBased base =
+  let
+    baseTask =
+      if isTimeBased then
+        Uuid.v1
+      else
+        Uuid.v4
+
+    uuidToUrl uuid =
+      base ++ "/" ++ uuid
+  in
+    baseTask
+      |> Task.map uuidToUrl

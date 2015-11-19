@@ -76,16 +76,7 @@ generateSignupPage res req model =
     name =
       getFormField "name" req.form
         |> Maybe.withDefault "anon"
-
-    email : String
-    email =
-      getFormField "email" req.form
-        |> Maybe.withDefault "anon"
-
-    url =
-      randomUrl False model.baseUrl
-
-    view =
-      successfulSignupView name url
   in
-    writeNode view res
+    randomUrl False model.baseUrl
+      |> Task.map (successfulSignupView name)
+      |> (flip Task.andThen) (\node -> writeNode node res)
