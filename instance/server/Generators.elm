@@ -69,7 +69,7 @@ generateSuccessPage res req model =
   in
     handleFiles `andThen` (\url -> writeNode (view url) res)
 
-generateSignupPage : Response -> Request -> Model -> Task a ()
+generateSignupPage : Response -> Request -> Model -> Task x ()
 generateSignupPage res req model =
   let
     name : String
