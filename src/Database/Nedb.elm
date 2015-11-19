@@ -19,6 +19,13 @@ createClient : Config -> Client
 createClient =
     Native.Database.Nedb.createClient
 
+{-| Create a client using the given filename for a json file
+as an options object
+-}
+createClientFromConfigFile : String -> Client
+createClientFromConfigFile =
+    Native.Database.Nedb.createClientFromConfigFile
+
 {-| Insert documents into the client database
 
 -}

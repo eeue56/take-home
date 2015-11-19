@@ -1,10 +1,38 @@
 var databaseApi = function(Database) {
+    var loadConfig = function(jsObjectToElmDict, Task){
+        return function(fileName){
+            return Task.asyncFunction(function(callback){
+
+                try {
+                    var config = require(fileName);
+                } catch (err) {
+                    return callback(Task.fail("Failed to load file: " + fileName));
+                }
+
+                return callback(
+                    Task.succeed(
+                        jsObjectToElmDict(config)
+                    )
+                );
+            });
+        };
+    };
+
     var createClient = function() {
         return function(config) {
             return new Database(config);
         };
     };
 
+    var createClientFromConfigFile = function() {
+        return function(fileName) {
+            var config = require(fileName);
+            return new Database(config);
+        };
+    };
+
+    // note: insert will timeout if you haven't first called loadDatabase!
+    // not really much I can do about this
     var insert = function(toArray, Task) {
         return function(docsCollection, client) {
             var docs = toArray(docsCollection);
@@ -22,7 +50,9 @@ var databaseApi = function(Database) {
     };
 
     return {
+        loadConfig, loadConfig,
         createClient: createClient,
+        createClientFromConfigFile: createClientFromConfigFile,
         insert: insert
     }
 };
@@ -40,13 +70,17 @@ var make = function make(localRuntime) {
 
     var Task = Elm.Native.Task.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
+    var Converters = Elm.Native.Converters.make(localRuntime);
+    var jsObjectToElmDict = Converters.jsObjectToElmDict;
 
     if (localRuntime.Native.Database.Nedb.values) {
         return localRuntime.Native.Database.Nedb.values;
     }
 
     return {
+        loadConfig: nedbApi.loadConfig(jsObjectToElmDict, Task),
         createClient: nedbApi.createClient(),
+        createClientFromConfigFile: nedbApi.createClientFromConfigFile(),
         insert: F2(nedbApi.insert(List.toArray, Task))
     };
 };

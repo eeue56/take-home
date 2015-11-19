@@ -9,7 +9,7 @@ import Http.Response.Write exposing
 
 import Http.Request exposing (emptyReq)
 import Http.Response exposing (emptyRes)
-import Http.Server.StartApp exposing (start)
+import Http.Server.StartApp exposing (App, start)
 
 import Database.Nedb as Database
 
@@ -33,7 +33,7 @@ model =
   , secret = ""
   , bucket = ""
   , baseUrl = ""
-  , database = Database.createClient {}
+  , database = Database.createClientFromConfigFile "./db_config.json"
   }
 
 
@@ -51,7 +51,7 @@ envToModel env =
       Dict.get "BASE_URL" env ? ""
 
   , database =
-      Database.createClient {}
+      model.database
   }
 
 server : Mailbox Connection
@@ -81,7 +81,7 @@ updateWrapper startAppAction maybeModel =
     _ ->
       (maybeModel, Effects.none)
 
-app : StartApp.App (Maybe Model)
+app : App (Maybe Model)
 app =
   start
     { init = (Nothing, Effects.task init)
