@@ -53,7 +53,7 @@ server = mailbox (emptyReq, emptyRes)
 
 init : Task Effects.Never StartAppAction
 init =
-  Env.getEnv ()
+  Env.getCurrent
     |> Task.map (\env -> Init (envToModel env))
 
 translateModel : (Model, Effects.Effects Action) -> (Maybe Model, Effects.Effects StartAppAction)
