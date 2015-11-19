@@ -170,7 +170,6 @@ var make = function make(localRuntime) {
     var querystring = require('querystring');
 
     var multiparty = require('multiparty');
-    var uuid = require('node-uuid');
 
 
     var Task = Elm.Native.Task.make(localRuntime);
@@ -195,8 +194,7 @@ var make = function make(localRuntime) {
         'getQueryField': F2(getQueryField(Just, Nothing)),
         'getFormField': F2(getFormField(Just, Nothing)),
         'getFormFiles': getFormFiles(List.fromArray),
-        'setForm': setForm(multiparty, fs, Task),
-        'randomUrl': F2(randomUrl(uuid))
+        'setForm': setForm(multiparty, fs, Task)
     };
 };
 Elm.Native.Http = {};
