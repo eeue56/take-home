@@ -15,6 +15,8 @@ import Http.Request exposing (emptyReq
 import Http.Response exposing (Response)
 import Http.Server exposing (randomUrl)
 
+import Knox
+import Database.Nedb as Database
 
 import Client.App exposing (successView, successfulSignupView)
 import Model exposing (Connection, Model)
@@ -25,10 +27,7 @@ import Result exposing (Result)
 import Effects exposing (Effects)
 import Dict
 import Task exposing (Task, andThen)
-
 import String
-
-import Knox
 
 
 --uploadFile : String -> String -> Knox.Client -> Task (Result String String) String
@@ -69,6 +68,20 @@ generateSuccessPage res req model =
   in
     handleFiles `andThen` (\url -> writeNode (view url) res)
 
+insertUserIntoDatabase : Request -> Model -> Task a String
+insertUserIntoDatabase req model =
+  let
+    name =
+      getFormField "name" req.form
+        |> Maybe.withDefault "anon"
+
+    email =
+      getFormField "email" req.form
+        |> Maybe.withDefault "anon"
+  in
+    Database.insert [{ name = name, email = email }] model.database
+
+
 generateSignupPage : Response -> Request -> Model -> Task x ()
 generateSignupPage res req model =
   let
@@ -77,6 +90,7 @@ generateSignupPage res req model =
       getFormField "name" req.form
         |> Maybe.withDefault "anon"
   in
-    randomUrl False model.baseUrl
+    insertUserIntoDatabase req model
+      |> (flip Task.andThen) (\_ -> randomUrl False model.baseUrl)
       |> Task.map (successfulSignupView name)
       |> (flip Task.andThen) (\node -> writeNode node res)
