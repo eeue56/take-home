@@ -21,7 +21,10 @@ import Env
 import Dict
 import Task exposing (..)
 import Effects exposing (Effects)
-import Maybe.Extra exposing ((?))
+
+-- TODO use Maybe.Extra for this
+(?) : Maybe a -> a -> a
+(?) mx x = Maybe.withDefault x mx
 
 model =
   { key = ""
