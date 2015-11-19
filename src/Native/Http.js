@@ -145,6 +145,15 @@ var getFormFiles = function(toList) {
     };
 };
 
+var randomUrl = function(uuid){
+    return function(isTimeBased, base){
+        if (isTimeBased){
+            return base + "/" + uuid.v1();
+        }
+        return base + "/" + uuid.v4();
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Http = localRuntime.Native.Http || {};
@@ -156,9 +165,13 @@ var make = function make(localRuntime) {
 
     var http = require('http');
     var fs = require('fs');
+
     var mime = require('mime');
     var querystring = require('querystring');
+
     var multiparty = require('multiparty');
+    var uuid = require('node-uuid');
+
 
     var Task = Elm.Native.Task.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
@@ -182,7 +195,8 @@ var make = function make(localRuntime) {
         'getQueryField': F2(getQueryField(Just, Nothing)),
         'getFormField': F2(getFormField(Just, Nothing)),
         'getFormFiles': getFormFiles(List.fromArray),
-        'setForm': setForm(multiparty, fs, Task)
+        'setForm': setForm(multiparty, fs, Task),
+        'randomUrl': F2(randomUrl(uuid))
     };
 };
 Elm.Native.Http = {};

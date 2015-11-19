@@ -1,7 +1,8 @@
 module Http.Server
   ( createServer, createServer', listen
   , Port, Server
-  , onRequest, onClose) where
+  , onRequest, onClose
+  , randomUrl) where
 
 {-| Simple bindings to Node.js's Http.Server
 
@@ -80,3 +81,10 @@ createServer' address port' text  =
 -}
 listen : Port -> String -> Server -> Task x Server
 listen = Native.Http.listen
+
+{-| Generate a random url
+Either time based or random
+-}
+randomUrl : Bool -> String -> String
+randomUrl =
+  Native.Http.randomUrl
