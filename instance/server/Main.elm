@@ -10,17 +10,19 @@ import Http.Response.Write exposing
 import Http.Request exposing (emptyReq)
 import Http.Response exposing (emptyRes)
 
+import Database.Nedb as Database
+
+import Env
+import StartApp exposing (start)
+
 import Signal exposing (dropRepeats, Mailbox, mailbox)
+import Dict
+import Task exposing (..)
+import Effects exposing (Effects)
 
 import Router exposing (..)
 import Model exposing (..)
 
-import StartApp exposing (start)
-import Env
-
-import Dict
-import Task exposing (..)
-import Effects exposing (Effects)
 
 -- TODO use Maybe.Extra for this
 (?) : Maybe a -> a -> a
@@ -30,6 +32,8 @@ model =
   { key = ""
   , secret = ""
   , bucket = ""
+  , baseUrl = ""
+  , database = Database.createClient {}
   }
 
 
@@ -45,6 +49,9 @@ envToModel env =
 
   , baseUrl =
       Dict.get "BASE_URL" env ? ""
+
+  , database =
+      Database.createClient {}
   }
 
 server : Mailbox Connection
