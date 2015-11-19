@@ -6,15 +6,24 @@ module Http.Response.Write
   , end) where
 
 
-import Native.Http.Response.Write
-import Task exposing (Task, andThen)
-import VirtualDom exposing (Node)
-import Json.Encode as Json
 import Http.Response exposing (
   textHtml, applicationJson,
   okCode, redirectCode,
   redirectHeader,
   Header, Response, StatusCode)
+
+import Native.Http.Response.Write
+
+import Http.Response exposing (
+  textHtml, applicationJson,
+  okCode, redirectCode,
+  redirectHeader,
+  Header, Response, StatusCode)
+
+import Native.Http.Response.Write
+import Task exposing (Task, andThen)
+import VirtualDom exposing (Node)
+import Json.Encode as Json
 
 {-| Write Headers to a Response
 [Node Docs](https://nodejs.org/api/http.html#http_response_writehead_statuscode_statusmessage_headers) -}
