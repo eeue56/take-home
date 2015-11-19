@@ -7,6 +7,7 @@ type alias Model =
   { key : String
   , secret : String
   , bucket : String
+  , baseUrl : String
   }
 
 type alias Connection =

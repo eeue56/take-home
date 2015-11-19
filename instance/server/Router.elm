@@ -15,19 +15,18 @@ import Http.Request exposing (emptyReq
 import Http.Response exposing (Response)
 
 import Model exposing (Connection, Model)
-import Client.App exposing (index, successView)
+import Client.App exposing (index, signUpForTakeHomeView)
+import Generators exposing (generateSuccessPage, generateSignupPage)
 
 import Task exposing (..)
 import Signal exposing (..)
 import Json.Encode as Json
 import Maybe
-import Result
+import Result exposing (Result)
 import Effects exposing (Effects)
 import Dict
-import String
 
 import Env
-import Knox
 import Converters
 
 import Debug
@@ -42,42 +41,6 @@ type StartAppAction
   | Update Action
 
 
-uploadFile : String -> String -> Model -> Task a (Result String String)
-uploadFile fileName fileNameOnServer model =
-  Knox.createClient { key = model.key, secret = model.secret, bucket = model.bucket }
-    |> Knox.putFile fileName fileNameOnServer
-
-
-generateSuccessPage : Response -> Request -> Model -> Task a ()
-generateSuccessPage res req model =
-  let
-    name =
-      getFormField "name" req.form
-        |> Maybe.withDefault "anon"
-
-    email =
-      getFormField "email" req.form
-        |> Maybe.withDefault "anon"
-
-    view =
-      successView name
-
-    handleFiles =
-      case getFormFiles req.form of
-        [] -> Debug.log "no files" <| Task.succeed (Err "no file")
-        x::_ ->
-          let
-            newPath =
-              String.join "/"
-                [ name
-                , email
-                , x.originalFilename
-                ]
-          in
-            uploadFile x.path newPath model
-
-  in
-    handleFiles `andThen` (\_ -> writeNode view res)
 
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
@@ -86,7 +49,7 @@ routeIncoming (req, res) model =
       case req.url of
         "/" ->
           model =>
-            (writeNode index res
+            (writeNode signUpForTakeHomeView res
               |> Task.map Run
               |> Effects.task)
         url ->
@@ -103,6 +66,14 @@ routeIncoming (req, res) model =
               |> (flip andThen) (\req -> generateSuccessPage res req model)
               |> Task.map Run
               |> Effects.task)
+
+        "/signup" ->
+          model =>
+            (setForm req
+              |> (flip andThen) (\req -> generateSignupPage res req model)
+              |> Task.map Run
+              |> Effects.task)
+
         _ ->
           model => Effects.none
 

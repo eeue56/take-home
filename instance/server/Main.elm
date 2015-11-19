@@ -39,6 +39,9 @@ envToModel env =
 
   , bucket =
       Dict.get "S3_BUCKET" env ? ""
+
+  , baseUrl =
+      Dict.get "BASE_URL" env ? ""
   }
 
 server : Mailbox Connection
