@@ -27,8 +27,11 @@ import Maybe
 import Result exposing (Result)
 import Effects exposing (Effects, Never(..))
 import Dict
-import Task exposing (Task, andThen)
+import Task exposing (Task)
 import String
+
+andThen = (flip Task.andThen)
+onError = (flip Task.onError)
 
 
 --uploadFile : String -> String -> Knox.Client -> Task (Result String String) String
@@ -67,9 +70,10 @@ generateSuccessPage res req model =
           uploadFile x.path (newPath x.originalFilename) client
 
   in
-    handleFiles `andThen` (\url -> writeNode (view url) res)
+    handleFiles
+      |> andThen (\url -> writeNode (view url) res)
 
-insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe b) (String, String)
+insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe b) String
 insertUserIntoDatabase name email url database =
   let
     user =
@@ -77,7 +81,7 @@ insertUserIntoDatabase name email url database =
       , email = email
       }
 
-    handleInsertErrors : List a -> Task (Maybe a) (String, String)
+    handleInsertErrors : List a -> Task (Maybe a) String
     handleInsertErrors userList =
       case userList of
         [] ->
@@ -88,14 +92,14 @@ insertUserIntoDatabase name email url database =
               , uniqueUrl = url }
           in
             User.insertIntoDatabase userWithUrl database
-              |> (flip Task.onError) (\_ -> Task.fail Nothing)
-              |> Task.map (\id -> (url, id))
+              |> onError (\_ -> Task.fail Nothing)
+              |> Task.map (\_ -> url)
         x::_ ->
           Task.fail (Just x)
   in
     User.getUser user database
-      |> (flip Task.onError) (\_ -> Task.fail Nothing)
-      |> (flip Task.andThen) handleInsertErrors
+      |> onError (\_ -> Task.fail Nothing)
+      |> andThen handleInsertErrors
 
 
 generateSignupPage : Response -> Request -> Model -> Task String ()
@@ -107,13 +111,16 @@ generateSignupPage res req model =
     email =
       getFormField "email" req.form
         |> Maybe.withDefault "anon"
+
+    getUrl =
+      randomUrl False model.baseUrl
   in
-    randomUrl False model.baseUrl
-      |> (flip Task.andThen) (\url -> insertUserIntoDatabase name email url model.database)
-      |> Task.map (\(url, _) -> successfulSignupView name url)
-      |> (flip Task.onError) (\maybeUser ->
+    getUrl
+      |> andThen (\url -> insertUserIntoDatabase name email url model.database)
+      |> Task.map (\url -> successfulSignupView name url)
+      |> onError (\maybeUser ->
         case maybeUser of
           Just user -> Task.succeed (failedSignupView user.uniqueUrl)
           Nothing -> Task.fail "no such user"
         )
-      |> (flip Task.andThen) (\node -> writeNode node res)
+      |> andThen (\node -> writeNode node res)
