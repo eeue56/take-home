@@ -15,7 +15,7 @@ import Http.Request exposing (emptyReq
 import Http.Response exposing (Response)
 
 import Model exposing (Connection, Model)
-import Client.App exposing (index, signUpForTakeHomeView)
+import Client.App exposing (index, signUpForTakeHomeView, genericErrorView)
 import Generators exposing (generateSuccessPage, generateSignupPage)
 
 import Task exposing (..)
@@ -40,55 +40,63 @@ type StartAppAction
   = Init Model
   | Update Action
 
+handleError : Response -> Task a () -> Task a ()
+handleError res errTask =
+  errTask
+    |> (flip Task.onError) (\_ -> writeNode genericErrorView res)
 
 
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
-  case req.method of
-    GET ->
-      case req.url of
-        "/" ->
-          model =>
-            (writeNode signUpForTakeHomeView res
-              |> Task.map Run
-              |> Effects.task)
-        url ->
-          model =>
-            (writeFile url res
-              |> Task.map Run
-              |> Effects.task)
+  let
+    actuallyHandleError : Task a () -> Task a ()
+    actuallyHandleError =
+      handleError res
+  in
+    case req.method of
+      GET ->
+        case req.url of
+          "/" ->
+            model =>
+              (writeNode signUpForTakeHomeView res
+                |> actuallyHandleError
+                |> Task.map Run
+                |> Effects.task)
+          url ->
+            model =>
+              (writeFile url res
+                |> actuallyHandleError
+                |> Task.map Run
+                |> Effects.task)
 
-    POST ->
-      case req.url of
-        "/apply" ->
-          model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateSuccessPage res req model)
-              |> Task.map Run
-              |> Effects.task)
+      POST ->
+        case req.url of
+          "/apply" ->
+            model =>
+              (setForm req
+                |> (flip andThen) (\req -> generateSuccessPage res req model)
+                |> actuallyHandleError
+                |> Task.map Run
+                |> Effects.task)
 
-        "/signup" ->
-          model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateSignupPage res req model)
-              |> Task.toMaybe
-              |> Task.map (\maybeGenerated ->
-                case maybeGenerated of
-                  Just _ -> Run ()
-                  Nothing -> Noop)
-              |> Effects.task)
+          "/signup" ->
+            model =>
+              (setForm req
+                |> (flip andThen) (\req -> generateSignupPage res req model)
+                |> Task.map Run
+                |> Effects.task)
 
-        _ ->
-          model => Effects.none
+          _ ->
+            model => Effects.none
 
-    NOOP ->
-      model => Effects.none
+      NOOP ->
+        model => Effects.none
 
-    _ ->
-      model =>
-        (writeJson (Json.string "unknown method!") res
-          |> Task.map Run
-          |> Effects.task)
+      _ ->
+        model =>
+          (writeJson (Json.string "unknown method!") res
+            |> Task.map Run
+            |> Effects.task)
 
 
 update : Action -> Model -> (Model, Effects Action)

@@ -4,6 +4,9 @@ import Html exposing (form, label, input, text, div, a, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
 import Json.Encode as Encode
 
+genericErrorView : Html
+genericErrorView =
+    text "Something went wrong!"
 
 successView : String -> String -> Html
 successView name url =

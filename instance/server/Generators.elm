@@ -97,7 +97,7 @@ insertUserIntoDatabase req model =
           Database.insert [user] model.database)
 
 
-generateSignupPage : Response -> Request -> Model -> Task String ()
+generateSignupPage : Response -> Request -> Model -> Task a ()
 generateSignupPage res req model =
   let
     name : String
