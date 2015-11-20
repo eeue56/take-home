@@ -72,7 +72,13 @@ signUpForTakeHomeView =
 
 failedSignupView : String -> Html
 failedSignupView url =
-    text ("You've already signed up!" ++ url)
+    div
+        []
+        [ text "You've already signed up!"
+        , a
+            [ href url ]
+            [ text url ]
+        ]
 
 successfulSignupView : String -> String -> Html
 successfulSignupView name uniqueUrl =
