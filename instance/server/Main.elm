@@ -41,8 +41,6 @@ model =
   }
 
 
-
-
 envToModel env =
   { key =
       Dict.get myConfig.accessKey env ? ""

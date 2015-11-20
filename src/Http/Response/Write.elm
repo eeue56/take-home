@@ -13,14 +13,6 @@ import Http.Response exposing (
   Header, Response, StatusCode)
 
 import Native.Http.Response.Write
-
-import Http.Response exposing (
-  textHtml, applicationJson,
-  okCode, redirectCode,
-  redirectHeader,
-  Header, Response, StatusCode)
-
-import Native.Http.Response.Write
 import Task exposing (Task, andThen)
 import VirtualDom exposing (Node)
 import Json.Encode as Json
