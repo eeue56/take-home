@@ -18,13 +18,13 @@ import Http.Server exposing (randomUrl)
 import Knox
 import Database.Nedb as Database
 
-import Client.App exposing (successView, successfulSignupView)
+import Client.App exposing (successView, successfulSignupView, failedSignupView)
 import Model exposing (Connection, Model)
 
 import Debug
 import Maybe
 import Result exposing (Result)
-import Effects exposing (Effects)
+import Effects exposing (Effects, Never(..))
 import Dict
 import Task exposing (Task, andThen)
 import String
@@ -68,7 +68,12 @@ generateSuccessPage res req model =
   in
     handleFiles `andThen` (\url -> writeNode (view url) res)
 
-insertUserIntoDatabase : Request -> Model -> Task a String
+
+userAlreadyExists user database =
+  Database.find user database
+    |> Task.map (not << List.isEmpty)
+
+insertUserIntoDatabase : Request -> Model -> Task String String
 insertUserIntoDatabase req model =
   let
     name =
@@ -78,11 +83,21 @@ insertUserIntoDatabase req model =
     email =
       getFormField "email" req.form
         |> Maybe.withDefault "anon"
+
+    user =
+      { name = name
+      , email = email
+      }
   in
-    Database.insert [{ name = name, email = email }] model.database
+    userAlreadyExists user model.database
+      |> (flip Task.andThen) (\doesUserExist ->
+        if doesUserExist then
+          Task.fail "User already exists!"
+        else
+          Database.insert [user] model.database)
 
 
-generateSignupPage : Response -> Request -> Model -> Task x ()
+generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
   let
     name : String
@@ -93,4 +108,5 @@ generateSignupPage res req model =
     insertUserIntoDatabase req model
       |> (flip Task.andThen) (\_ -> randomUrl False model.baseUrl)
       |> Task.map (successfulSignupView name)
+      |> (flip Task.onError) (\_ -> Task.succeed failedSignupView)
       |> (flip Task.andThen) (\node -> writeNode node res)

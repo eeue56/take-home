@@ -29,6 +29,13 @@ createClientFromConfigFile =
 {-| Insert documents into the client database
 
 -}
-insert : List a -> Client -> Task b String
+insert : List a -> Client -> Task String String
 insert =
     Native.Database.Nedb.insert
+
+{-|
+    Takes a record with given fields and attempts to search for them
+-}
+find : c -> Client -> Task String d
+find =
+    Native.Database.Nedb.find

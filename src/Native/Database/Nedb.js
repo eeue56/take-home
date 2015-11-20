@@ -49,11 +49,26 @@ var databaseApi = function(Database) {
         };
     };
 
+    var find = function(toArray, toList, Task) {
+        return function(queryRecord, client){
+            return Task.asyncFunction(function(callback){
+                client.find(queryRecord, function(err, docs){
+                    if (err){
+                        return callback(Task.fail("Failed to find any matches"));
+                    }
+
+                    return callback(Task.succeed(toList(docs)));
+                });
+            })
+        };
+    };
+
     return {
         loadConfig, loadConfig,
         createClient: createClient,
         createClientFromConfigFile: createClientFromConfigFile,
-        insert: insert
+        insert: insert,
+        find: find
     }
 };
 
@@ -81,7 +96,8 @@ var make = function make(localRuntime) {
         loadConfig: nedbApi.loadConfig(jsObjectToElmDict, Task),
         createClient: nedbApi.createClient(),
         createClientFromConfigFile: nedbApi.createClientFromConfigFile(),
-        insert: F2(nedbApi.insert(List.toArray, Task))
+        insert: F2(nedbApi.insert(List.toArray, Task)),
+        find: F2(nedbApi.find(List.toArray, List.fromArray, Task))
     };
 };
 

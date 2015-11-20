@@ -47,8 +47,14 @@ var setForm = function setForm(multiparty, fs, Task) {
                     vals.push(files[name][0]);
                 });
 
+                var fieldVals = {};
+
+                Object.keys(fields).forEach(function(name, i){
+                    fieldVals[name] = fields[name][0];
+                });
+
                 request.form = {
-                    fields: fields,
+                    fields: fieldVals,
                     files: vals,
                     ctor: "Form"
                 };
@@ -130,7 +136,8 @@ var getQueryField = function(Just, Nothing) {
 
 var getFormField = function(Just, Nothing) {
     return function(fieldName, form) {
-        return getQueryField(Just, Nothing)(fieldName, form.fields);
+        var filed = getQueryField(Just, Nothing)(fieldName, form.fields);
+        return filed;
     };
 };
 

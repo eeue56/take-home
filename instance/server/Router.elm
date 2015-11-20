@@ -71,7 +71,11 @@ routeIncoming (req, res) model =
           model =>
             (setForm req
               |> (flip andThen) (\req -> generateSignupPage res req model)
-              |> Task.map Run
+              |> Task.toMaybe
+              |> Task.map (\maybeGenerated ->
+                case maybeGenerated of
+                  Just _ -> Run ()
+                  Nothing -> Noop)
               |> Effects.task)
 
         _ ->

@@ -6,3 +6,4 @@ main.js
 instance/**/*.js
 run_with_credentials.sh
 file
+users.db

@@ -67,6 +67,10 @@ signUpForTakeHomeView =
         , submitView
         ]
 
+failedSignupView : Html
+failedSignupView =
+    text "You've already signed up!"
+
 successfulSignupView : String -> String -> Html
 successfulSignupView name uniqueUrl =
     div
