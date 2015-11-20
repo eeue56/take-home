@@ -13,6 +13,7 @@ import Http.Server.StartApp exposing (App, start)
 
 import Database.Nedb as Database
 
+import Config exposing (loadConfig)
 import Env
 
 import Signal exposing (dropRepeats, Mailbox, mailbox)
@@ -28,27 +29,32 @@ import Model exposing (..)
 (?) : Maybe a -> a -> a
 (?) mx x = Maybe.withDefault x mx
 
+myConfig =
+  loadConfig "./config/config.json"
+
 model =
   { key = ""
   , secret = ""
   , bucket = ""
   , baseUrl = ""
-  , database = Database.createClientFromConfigFile "./db_config.json"
+  , database = Database.createClientFromConfigFile myConfig.databaseConfig
   }
+
+
 
 
 envToModel env =
   { key =
-      Dict.get "S3_AUTH" env ? ""
+      Dict.get myConfig.accessKey env ? ""
 
   , secret =
-      Dict.get "S3_SECRET" env ? ""
+      Dict.get myConfig.secret env ? ""
 
   , bucket =
-      Dict.get "S3_BUCKET" env ? ""
+      Dict.get myConfig.bucket env ? ""
 
   , baseUrl =
-      Dict.get "BASE_URL" env ? ""
+      Dict.get myConfig.baseUrl env ? ""
 
   , database =
       model.database
@@ -94,7 +100,7 @@ port serve : Task x Server
 port serve =
     createServer'
       server.address
-      8080
+      myConfig.myPort
       "Listening on 8080"
 
 port reply : Signal (Task Effects.Never ())

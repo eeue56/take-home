@@ -1,0 +1,8 @@
+{
+    "myPort" : 8080,
+    "databaseConfig" : "./config/db_config.json",
+    "accessKey" : "S3_AUTH",
+    "secret" : "S3_SECRET",
+    "bucket" : "S3_BUCKET",
+    "baseUrl" : "BASE_URL"
+}
