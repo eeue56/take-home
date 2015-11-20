@@ -40,7 +40,7 @@ type StartAppAction
   = Init Model
   | Update Action
 
-handleError : Response -> Task a () -> Task a ()
+handleError : Response -> Task a () -> Task b ()
 handleError res errTask =
   errTask
     |> (flip Task.onError) (\_ -> writeNode genericErrorView res)
@@ -49,7 +49,7 @@ handleError res errTask =
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
   let
-    actuallyHandleError : Task a () -> Task a ()
+    actuallyHandleError : Task a () -> Task b ()
     actuallyHandleError =
       handleError res
   in
@@ -83,6 +83,7 @@ routeIncoming (req, res) model =
             model =>
               (setForm req
                 |> (flip andThen) (\req -> generateSignupPage res req model)
+                |> actuallyHandleError
                 |> Task.map Run
                 |> Effects.task)
 

@@ -70,9 +70,9 @@ signUpForTakeHomeView =
         , submitView
         ]
 
-failedSignupView : Html
-failedSignupView =
-    text "You've already signed up!"
+failedSignupView : String -> Html
+failedSignupView url =
+    text ("You've already signed up!" ++ url)
 
 successfulSignupView : String -> String -> Html
 successfulSignupView name uniqueUrl =

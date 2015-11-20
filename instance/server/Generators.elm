@@ -20,6 +20,7 @@ import Database.Nedb as Database
 
 import Client.App exposing (successView, successfulSignupView, failedSignupView)
 import Model exposing (Connection, Model)
+import User
 
 import Debug
 import Maybe
@@ -68,45 +69,51 @@ generateSuccessPage res req model =
   in
     handleFiles `andThen` (\url -> writeNode (view url) res)
 
-
-userAlreadyExists user database =
-  Database.find user database
-    |> Task.map (not << List.isEmpty)
-
-insertUserIntoDatabase : Request -> Model -> Task String String
-insertUserIntoDatabase req model =
+insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe b) (String, String)
+insertUserIntoDatabase name email url database =
   let
-    name =
-      getFormField "name" req.form
-        |> Maybe.withDefault "anon"
-
-    email =
-      getFormField "email" req.form
-        |> Maybe.withDefault "anon"
-
     user =
       { name = name
       , email = email
       }
+
+    handleInsertErrors : List a -> Task (Maybe a) (String, String)
+    handleInsertErrors userList =
+      case userList of
+        [] ->
+          let
+            userWithUrl =
+              { name = name
+              , email = email
+              , uniqueUrl = url }
+          in
+            User.insertIntoDatabase userWithUrl database
+              |> (flip Task.onError) (\_ -> Task.fail Nothing)
+              |> Task.map (\id -> (url, id))
+        x::_ ->
+          Task.fail (Just x)
   in
-    userAlreadyExists user model.database
-      |> (flip Task.andThen) (\doesUserExist ->
-        if doesUserExist then
-          Task.fail "User already exists!"
-        else
-          Database.insert [user] model.database)
+    User.getUser user database
+      |> (flip Task.onError) (\_ -> Task.fail Nothing)
+      |> (flip Task.andThen) handleInsertErrors
 
 
-generateSignupPage : Response -> Request -> Model -> Task a ()
+generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
   let
-    name : String
     name =
       getFormField "name" req.form
         |> Maybe.withDefault "anon"
+    email =
+      getFormField "email" req.form
+        |> Maybe.withDefault "anon"
   in
-    insertUserIntoDatabase req model
-      |> (flip Task.andThen) (\_ -> randomUrl False model.baseUrl)
-      |> Task.map (successfulSignupView name)
-      |> (flip Task.onError) (\_ -> Task.succeed failedSignupView)
+    randomUrl False model.baseUrl
+      |> (flip Task.andThen) (\url -> insertUserIntoDatabase name email url model.database)
+      |> Task.map (\(url, _) -> successfulSignupView name url)
+      |> (flip Task.onError) (\maybeUser ->
+        case maybeUser of
+          Just user -> Task.succeed (failedSignupView user.uniqueUrl)
+          Nothing -> Task.fail "no such user"
+        )
       |> (flip Task.andThen) (\node -> writeNode node res)

@@ -36,6 +36,6 @@ insert =
 {-|
     Takes a record with given fields and attempts to search for them
 -}
-find : c -> Client -> Task String d
+find : c -> Client -> Task String (List d)
 find =
     Native.Database.Nedb.find
