@@ -12,6 +12,8 @@ type alias Config = { }
 type Client =
     Client
 
+type alias Operation a b =
+    a -> Client -> Task String b
 
 {-| Create a client using the given record as an options object
 -}
@@ -29,13 +31,13 @@ createClientFromConfigFile =
 {-| Insert documents into the client database
 
 -}
-insert : List a -> Client -> Task String String
+insert : Operation a b
 insert =
     Native.Database.Nedb.insert
 
 {-|
     Takes a record with given fields and attempts to search for them
 -}
-find : c -> Client -> Task String (List d)
+find : Operation a (List b)
 find =
     Native.Database.Nedb.find

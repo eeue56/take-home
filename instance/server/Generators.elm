@@ -97,7 +97,7 @@ insertUserIntoDatabase name email url database =
         x::_ ->
           Task.fail (Just x)
   in
-    User.getUser user database
+    User.getUsers user database
       |> onError (\_ -> Task.fail Nothing)
       |> andThen handleInsertErrors
 
