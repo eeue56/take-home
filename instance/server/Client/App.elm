@@ -1,5 +1,7 @@
 module Client.App where
 
+import Shared.User exposing (User)
+
 import Html exposing (form, label, input, text, div, a, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
 import Json.Encode as Encode
@@ -70,23 +72,24 @@ signUpForTakeHomeView =
         , submitView
         ]
 
-failedSignupView : String -> Html
-failedSignupView url =
+
+alreadySignupView : User -> Html
+alreadySignupView user =
     div
         []
         [ text "You've already signed up!"
         , a
-            [ href url ]
-            [ text url ]
+            [ href user.uniqueUrl ]
+            [ text user.uniqueUrl ]
         ]
 
-successfulSignupView : String -> String -> Html
-successfulSignupView name uniqueUrl =
+successfulSignupView : User -> Html
+successfulSignupView user =
     div
         []
         [ a
-            [ href uniqueUrl ]
-            [ text ("You have successfully signed up," ++ name ) ]
+            [ href user.uniqueUrl ]
+            [ text ("You have successfully signed up," ++ user.name ) ]
         ]
 
 

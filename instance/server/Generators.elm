@@ -18,9 +18,10 @@ import Http.Server exposing (randomUrl)
 import Knox
 import Database.Nedb as Database
 
-import Client.App exposing (successView, successfulSignupView, failedSignupView)
+import Client.App exposing (successView, successfulSignupView, alreadySignupView)
 import Model exposing (Connection, Model)
 import User
+import Shared.User exposing (User)
 
 import Debug
 import Maybe
@@ -73,7 +74,7 @@ generateSuccessPage res req model =
     handleFiles
       |> andThen (\url -> writeNode (view url) res)
 
-insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe b) String
+insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe User) String
 insertUserIntoDatabase name email url database =
   let
     user =
@@ -112,15 +113,18 @@ generateSignupPage res req model =
       getFormField "email" req.form
         |> Maybe.withDefault "anon"
 
+    user =
+      { name = name, email = email }
+
     getUrl =
       randomUrl False model.baseUrl
   in
     getUrl
       |> andThen (\url -> insertUserIntoDatabase name email url model.database)
-      |> Task.map (\url -> successfulSignupView name url)
+      |> Task.map (\url -> successfulSignupView { name = name, email = email, uniqueUrl = url } )
       |> onError (\maybeUser ->
         case maybeUser of
-          Just user -> Task.succeed (failedSignupView user.uniqueUrl)
+          Just user -> Task.succeed (alreadySignupView user)
           Nothing -> Task.fail "no such user"
         )
       |> andThen (\node -> writeNode node res)
