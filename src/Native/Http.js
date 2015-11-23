@@ -19,7 +19,7 @@ var make_compile_dir = function(fs, dir){
     }
 };
 
-var setBody = function getBody(request, encoding) {
+var setBody = function setBody(request, encoding) {
     if (typeof encoding === "undefined" || encoding === null){
         encoding = "utf8";
     }
