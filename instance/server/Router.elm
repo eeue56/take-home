@@ -25,6 +25,7 @@ import Maybe
 import Result exposing (Result)
 import Effects exposing (Effects)
 import Dict
+import Regex
 
 import Env
 import Converters
@@ -40,12 +41,15 @@ type StartAppAction
   = Init Model
   | Update Action
 
+{-| when we don't want to 500, write an error view
+-}
 handleError : Response -> Task a () -> Task b ()
 handleError res errTask =
   errTask
     |> (flip Task.onError) (\_ -> writeNode genericErrorView res)
 
-
+{-| route each request/response pair and write a response
+-}
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
   let
@@ -63,11 +67,35 @@ routeIncoming (req, res) model =
                 |> Task.map Run
                 |> Effects.task)
           url ->
-            model =>
-              (writeFile url res
-                |> actuallyHandleError
-                |> Task.map Run
-                |> Effects.task)
+            case parseQuery url of
+              Err _ ->
+                model =>
+                  (writeFile url res
+                    |> actuallyHandleError
+                    |> Task.map Run
+                    |> Effects.task)
+              Ok bag ->
+                case getQueryField "/token" bag of
+                  Nothing ->
+                    let
+                      _ = Debug.log "erm" bag
+                    in
+                      model =>
+                        (writeHtml ("<h1>failed to find anything</h1>" ++ url) res
+                          |> Task.map Run
+                          |> Effects.task)
+
+                  Just token ->
+                    let
+                      _ =
+                        Debug.log "hello" token
+
+
+                    in
+                      model =>
+                        (writeHtml token res
+                          |> Task.map Run
+                          |> Effects.task)
 
       POST ->
         case req.url of
@@ -107,5 +135,17 @@ update action model =
     Run _ -> (model, Effects.none)
     Noop -> (model, Effects.none)
 
+uniqueUrl : String -> Maybe String
+uniqueUrl url =
+  let
+    uniqueRegex =
+      Regex.regex "?token=(.+)(&.)"
+  in
+    case Regex.find (Regex.AtMost 1) uniqueRegex url of
+      [] -> Nothing
+      uniqueMatch::_ ->
+        case uniqueMatch.submatches of
+          uniqueString::_::[] -> uniqueString
+          _ -> Nothing
 
 (=>) = (,)

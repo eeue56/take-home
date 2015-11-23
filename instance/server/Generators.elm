@@ -13,7 +13,7 @@ import Http.Request exposing (emptyReq
   )
 
 import Http.Response exposing (Response)
-import Http.Server exposing (randomUrl)
+import Http.Server
 
 import Knox
 import Database.Nedb as Database
@@ -22,6 +22,7 @@ import Client.App exposing (successView, successfulSignupView, alreadySignupView
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
+import Utils exposing (randomUrl)
 
 import Debug
 import Maybe
@@ -117,7 +118,7 @@ generateSignupPage res req model =
       { name = name, email = email }
 
     getUrl =
-      randomUrl False model.baseUrl
+      randomUrl False (model.baseUrl ++ "?token=")
   in
     getUrl
       |> andThen (\url -> insertUserIntoDatabase name email url model.database)

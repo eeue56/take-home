@@ -15,3 +15,12 @@ type alias Model =
 
 type alias Connection =
   (Request, Response)
+
+type alias SiteConfig =
+  { myPort: Int
+  , databaseConfig: String
+  , accessKey: String
+  , secret: String
+  , bucket: String
+  , baseUrl: String
+  }

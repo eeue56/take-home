@@ -29,6 +29,7 @@ import Model exposing (..)
 (?) : Maybe a -> a -> a
 (?) mx x = Maybe.withDefault x mx
 
+myConfig : SiteConfig
 myConfig =
   loadConfig "./config/config.json"
 
