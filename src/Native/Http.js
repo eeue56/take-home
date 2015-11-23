@@ -96,13 +96,13 @@ var listen = function listen(Task) {
     };
 };
 
-var on = function on(Signal) {
+var on = function on(Signal, Tuple0, Tuple2) {
     return function (eventName, x) {
         return x.on(eventName, function (request, response) {
             if (typeof(request) == 'undefined') {
                 return Signal.input(eventName, Tuple0);
             }
-            return Signal.input(eventName, Tuple(request, response));
+            return Signal.input(eventName, Tuple2(request, response));
         });
     };
 };
@@ -152,15 +152,6 @@ var getFormFiles = function(toList) {
     };
 };
 
-var randomUrl = function(uuid){
-    return function(isTimeBased, base){
-        if (isTimeBased){
-            return base + "/" + uuid.v1();
-        }
-        return base + "/" + uuid.v4();
-    };
-};
-
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Http = localRuntime.Native.Http || {};
@@ -196,7 +187,7 @@ var make = function make(localRuntime) {
     return {
         'createServer': createServer(fs, http, multiparty, Tuple2, Task),
         'listen': F3(listen(Task)),
-        'on': F2(on(Signal, Tuple0)),
+        'on': F2(on(Signal, Tuple0, Tuple2)),
         'parseQuery': parseQuery(Result.Ok, Result.Err, querystring),
         'getQueryField': F2(getQueryField(Just, Nothing)),
         'getFormField': F2(getFormField(Just, Nothing)),
