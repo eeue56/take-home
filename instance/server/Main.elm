@@ -9,7 +9,7 @@ import Http.Response.Write exposing
 
 import Http.Request exposing (emptyReq)
 import Http.Response exposing (emptyRes)
-import Http.Server.StartApp exposing (App, start)
+import StartApp exposing (App, start)
 
 import Database.Nedb as Database
 
