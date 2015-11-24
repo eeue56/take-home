@@ -15,7 +15,8 @@ import Http.Request exposing (emptyReq
 import Http.Response exposing (Response)
 
 import Model exposing (Connection, Model)
-import Client.App exposing (index, signUpForTakeHomeView, genericErrorView)
+import Client.App exposing (index, genericErrorView)
+import Client.Signup.Views exposing (signUpForTakeHomeView)
 import Generators exposing (generateSuccessPage, generateSignupPage)
 
 import Task exposing (..)

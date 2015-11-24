@@ -18,7 +18,9 @@ import Http.Server
 import Knox
 import Database.Nedb as Database
 
-import Client.App exposing (successView, successfulSignupView, alreadySignupView)
+import Client.App exposing (successView)
+import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
+
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
@@ -78,7 +80,7 @@ generateSuccessPage res req model =
 insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe User) String
 insertUserIntoDatabase name email url database =
   let
-    user =
+    userForSearching =
       { name = name
       , email = email
       }
@@ -99,7 +101,7 @@ insertUserIntoDatabase name email url database =
         x::_ ->
           Task.fail (Just x)
   in
-    User.getUsers user database
+    User.getUsers userForSearching database
       |> onError (\_ -> Task.fail Nothing)
       |> andThen handleInsertErrors
 
