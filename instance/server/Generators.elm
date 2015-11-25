@@ -18,7 +18,7 @@ import Http.Server
 import Knox
 import Database.Nedb as Database
 
-import Client.App exposing (successView)
+import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 
 import Model exposing (Connection, Model)
@@ -77,34 +77,6 @@ generateSuccessPage res req model =
     handleFiles
       |> andThen (\url -> writeNode (view url) res)
 
-insertUserIntoDatabase : String -> String -> String -> Database.Client -> Task (Maybe User) String
-insertUserIntoDatabase name email url database =
-  let
-    userForSearching =
-      { name = name
-      , email = email
-      }
-
-    handleInsertErrors : List a -> Task (Maybe a) String
-    handleInsertErrors userList =
-      case userList of
-        [] ->
-          let
-            userWithUrl =
-              { name = name
-              , email = email
-              , uniqueUrl = url }
-          in
-            User.insertIntoDatabase userWithUrl database
-              |> onError (\_ -> Task.fail Nothing)
-              |> Task.map (\_ -> url)
-        x::_ ->
-          Task.fail (Just x)
-  in
-    User.getUsers userForSearching database
-      |> onError (\_ -> Task.fail Nothing)
-      |> andThen handleInsertErrors
-
 
 generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
@@ -116,18 +88,34 @@ generateSignupPage res req model =
       getFormField "email" req.form
         |> Maybe.withDefault "anon"
 
-    user =
+    searchUser =
       { name = name, email = email }
 
     getUrl =
       randomUrl False (model.baseUrl ++ "?token=")
+
+    tryInserting url =
+      let
+        userWithUrl =
+          { name = name, email = email, uniqueUrl = url }
+      in
+        User.insertIntoDatabase userWithUrl model.database
+          |> andThen (\_ -> Task.succeed (successfulSignupView userWithUrl))
+
   in
-    getUrl
-      |> andThen (\url -> insertUserIntoDatabase name email url model.database)
-      |> Task.map (\url -> successfulSignupView { name = name, email = email, uniqueUrl = url } )
-      |> onError (\maybeUser ->
-        case maybeUser of
-          Just user -> Task.succeed (alreadySignupView user)
-          Nothing -> Task.fail "no such user"
+    User.getUsers { name = name, email = email } model.database
+      |> andThen (\userList ->
+        case userList of
+            [] ->
+                getUrl
+                  |> andThen tryInserting
+                  |> Task.mapError (\_ -> "no such user")
+
+
+            existingUser :: [] ->
+              Task.succeed (alreadySignupView existingUser)
+
+            _ ->
+              Task.fail "multiple users found with that name and email address"
         )
       |> andThen (\node -> writeNode node res)

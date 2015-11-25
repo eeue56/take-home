@@ -14,7 +14,7 @@ signUpForTakeHomeView =
         , enctype "multipart/form-data"
         ]
         [ emailField
-        , passwordField
+        , nameField
         , submitField
         ]
 

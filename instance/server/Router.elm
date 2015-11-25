@@ -78,25 +78,16 @@ routeIncoming (req, res) model =
               Ok bag ->
                 case getQueryField "/token" bag of
                   Nothing ->
-                    let
-                      _ = Debug.log "erm" bag
-                    in
-                      model =>
-                        (writeHtml ("<h1>failed to find anything</h1>" ++ url) res
-                          |> Task.map Run
-                          |> Effects.task)
+                    model =>
+                      (writeHtml ("<h1>failed to find anything</h1>" ++ url) res
+                        |> Task.map Run
+                        |> Effects.task)
 
                   Just token ->
-                    let
-                      _ =
-                        Debug.log "hello" token
-
-
-                    in
-                      model =>
-                        (writeHtml token res
-                          |> Task.map Run
-                          |> Effects.task)
+                    model =>
+                      (writeHtml token res
+                        |> Task.map Run
+                        |> Effects.task)
 
       POST ->
         case req.url of
