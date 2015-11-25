@@ -6,8 +6,8 @@ var configApi = function() {
     };
 
     return {
-        loadConfig, loadConfig
-    }
+        loadConfig: loadConfig
+    };
 }();
 
 var make = function make(localRuntime) {

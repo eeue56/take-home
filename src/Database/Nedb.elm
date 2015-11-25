@@ -1,14 +1,28 @@
-module Database.Nedb where
+module Database.Nedb
+    ( Config, Client(..)
+    , Operation
+    , createClient, createClientFromConfigFile
+    , insert, find
+    )
+    where
+{-| Wrappers around Nedb for Node
 
+@docs Config, Client, Operation
+
+@docs createClient, createClientFromConfigFile
+
+@docs insert
+
+@docs find
+-}
 import Task exposing (Task)
 
 import Native.Database.Nedb
 
--- sadly, since nebd's options are all optional,
--- we just have to provide an empty record as a base
--- for createClient to take
+{-| empty config -}
 type alias Config = { }
 
+{-| standard client -}
 type Client =
     Client
 

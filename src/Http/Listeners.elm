@@ -6,7 +6,7 @@ module Http.Listeners (on) where
 
 import Native.Http
 
-{-| Wrapper for creating even listeners
+{-| Wrapper for creating event listeners
 -}
 on : String -> target -> Signal input
 on = Native.Http.on
