@@ -1,6 +1,7 @@
 {
     "myPort" : 8080,
     "databaseConfig" : "./config/db_config.json",
+    "testConfig" : "./config/tests_config.json",
     "accessKey" : "S3_AUTH",
     "secret" : "S3_SECRET",
     "bucket" : "S3_BUCKET",

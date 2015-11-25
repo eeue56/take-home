@@ -100,7 +100,7 @@ port serve =
     createServer'
       server.address
       myConfig.myPort
-      "Listening on 8080"
+      ("Listening on " ++ (toString myConfig.myPort))
 
 port reply : Signal (Task Effects.Never ())
 port reply =

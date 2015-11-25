@@ -1,0 +1,10 @@
+{
+    "backend" : {
+        "item" : "some_file.zip",
+        "testType" : "file"
+    },
+    "frontend" : {
+        "item" : "http://github.com",
+        "testType" : "link"
+    }
+}
