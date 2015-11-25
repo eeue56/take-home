@@ -111,7 +111,6 @@ generateSignupPage res req model =
                   |> andThen tryInserting
                   |> Task.mapError (\_ -> "no such user")
 
-
             existingUser :: [] ->
               Task.succeed (alreadySignupView existingUser)
 

@@ -49,14 +49,18 @@ handleError res errTask =
   errTask
     |> (flip Task.onError) (\_ -> writeNode genericErrorView res)
 
+runRoute task =
+  task
+    |> Task.map Run
+    |> Effects.task
+
 {-| route each request/response pair and write a response
 -}
 routeIncoming : Connection -> Model -> (Model, Effects Action)
 routeIncoming (req, res) model =
   let
-    actuallyHandleError : Task a () -> Task b ()
-    actuallyHandleError =
-      handleError res
+    runRouteWithErrorHandler =
+      (handleError res) >> runRoute
   in
     case req.method of
       GET ->
@@ -64,30 +68,24 @@ routeIncoming (req, res) model =
           "/" ->
             model =>
               (writeNode signUpForTakeHomeView res
-                |> actuallyHandleError
-                |> Task.map Run
-                |> Effects.task)
+                |> runRouteWithErrorHandler)
           url ->
             case parseQuery url of
               Err _ ->
                 model =>
                   (writeFile url res
-                    |> actuallyHandleError
-                    |> Task.map Run
-                    |> Effects.task)
+                    |> runRouteWithErrorHandler)
               Ok bag ->
                 case getQueryField "/token" bag of
                   Nothing ->
                     model =>
                       (writeHtml ("<h1>failed to find anything</h1>" ++ url) res
-                        |> Task.map Run
-                        |> Effects.task)
+                        |> runRoute)
 
                   Just token ->
                     model =>
                       (writeHtml token res
-                        |> Task.map Run
-                        |> Effects.task)
+                        |> runRoute)
 
       POST ->
         case req.url of
@@ -95,18 +93,13 @@ routeIncoming (req, res) model =
             model =>
               (setForm req
                 |> (flip andThen) (\req -> generateSuccessPage res req model)
-                |> actuallyHandleError
-                |> Task.map Run
-                |> Effects.task)
+                |> runRouteWithErrorHandler)
 
           "/signup" ->
             model =>
               (setForm req
                 |> (flip andThen) (\req -> generateSignupPage res req model)
-                |> actuallyHandleError
-                |> Task.map Run
-                |> Effects.task)
-
+                |> runRouteWithErrorHandler)
           _ ->
             model => Effects.none
 
@@ -116,8 +109,7 @@ routeIncoming (req, res) model =
       _ ->
         model =>
           (writeJson (Json.string "unknown method!") res
-            |> Task.map Run
-            |> Effects.task)
+            |> runRoute)
 
 
 update : Action -> Model -> (Model, Effects Action)
