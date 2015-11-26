@@ -40,3 +40,9 @@ alreadyExists user database =
 insertIntoDatabase : Database.Operation User String
 insertIntoDatabase user client =
     Database.insert [user] client
+
+{-| Update a user
+-}
+updateUser : Database.UpdateOperation a User
+updateUser oldUser newUser database =
+    Database.update oldUser newUser database

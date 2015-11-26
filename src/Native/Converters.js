@@ -14,6 +14,12 @@ var jsObjectToElmDict = function(toList, Tuple2, Dict){
     };
 };
 
+var deserialize = function(){
+    return function(a){
+        return a;
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Converters = localRuntime.Native.Converters || {};
@@ -28,7 +34,8 @@ var make = function make(localRuntime) {
     var Dict = Elm.Dict.make(localRuntime);
 
     return {
-        jsObjectToElmDict: jsObjectToElmDict(List.fromArray, Tuple2, Dict)
+        jsObjectToElmDict: jsObjectToElmDict(List.fromArray, Tuple2, Dict),
+        deserialize: deserialize()
     };
 };
 

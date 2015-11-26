@@ -1,7 +1,8 @@
 module Shared.User where
 
-import Json.Decode exposing (Decoder, succeed, (:=), string, maybe)
+import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
+import Converters exposing (deserialize)
 
 (|:) = Json.Decode.Extra.apply
 
@@ -15,6 +16,11 @@ type alias User =
     , submissionLocation : Maybe String
     }
 
+decodeMaybe : Decoder (Maybe String)
+decodeMaybe =
+    customDecoder value (\val -> Ok (deserialize val))
+
+
 decoder : Decoder User
 decoder =
     succeed User
@@ -22,6 +28,6 @@ decoder =
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := string)
-        |: ("startTime" := maybe string)
-        |: ("endTime" := maybe string)
-        |: ("submissionLocation" := maybe string)
+        |: ("startTime" := decodeMaybe)
+        |: ("endTime" := decodeMaybe)
+        |: ("submissionLocation" := decodeMaybe)

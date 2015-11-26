@@ -53,6 +53,7 @@ var databaseApi = function(Database) {
         return function(queryRecord, client){
             return Task.asyncFunction(function(callback){
                 client.find(queryRecord, function(err, docs){
+                    console.log("docs", docs);
                     if (err){
                         return callback(Task.fail("Failed to find any matches"));
                     }
@@ -63,13 +64,33 @@ var databaseApi = function(Database) {
         };
     };
 
+    var update = function(Task) {
+        return function(queryRecord, replacement, client){
+            console.log("query", queryRecord);
+            console.log("replacement", replacement);
+            return Task.asyncFunction(function(callback){
+                client.update(queryRecord, replacement, function(err, docs){
+                    console.log("err", err);
+                    console.log("docs", docs);
+                    if (err){
+                        return callback(Task.fail("Failed to find any matches"));
+                    }
+
+                    return callback(Task.succeed([]));
+                });
+            })
+        };
+    };
+
     return {
         loadConfig, loadConfig,
         createClient: createClient,
         createClientFromConfigFile: createClientFromConfigFile,
         insert: insert,
-        find: find
-    }
+        find: find,
+        update: update,
+        actualLog: console.log
+    };
 };
 
 var nedbApi = function() {
@@ -97,7 +118,9 @@ var make = function make(localRuntime) {
         createClient: nedbApi.createClient(),
         createClientFromConfigFile: nedbApi.createClientFromConfigFile(),
         insert: F2(nedbApi.insert(List.toArray, Task)),
-        find: F2(nedbApi.find(List.toArray, List.fromArray, Task))
+        find: F2(nedbApi.find(List.toArray, List.fromArray, Task)),
+        update: F3(nedbApi.update(Task)),
+        actualLog: nedbApi.actualLog
     };
 };
 

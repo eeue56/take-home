@@ -1,8 +1,9 @@
 module Database.Nedb
     ( Config, Client(..)
-    , Operation
+    , Operation, UpdateOperation
     , createClient, createClientFromConfigFile
-    , insert, find
+    , insert, find, update
+    , actualLog
     )
     where
 {-| Wrappers around Nedb for Node
@@ -28,6 +29,9 @@ type Client =
 
 type alias Operation a b =
     a -> Client -> Task String b
+
+type alias UpdateOperation a b =
+    a -> b -> Client -> Task String ()
 
 {-| Create a client using the given record as an options object
 -}
@@ -55,3 +59,11 @@ insert =
 find : Operation a (List b)
 find =
     Native.Database.Nedb.find
+
+update : UpdateOperation a b
+update =
+    Native.Database.Nedb.update
+
+actualLog : a -> a
+actualLog =
+    Native.Database.Nedb.actualLog

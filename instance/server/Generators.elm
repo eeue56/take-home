@@ -157,11 +157,14 @@ generateWelcomePage token res model =
                 [] ->
                     writeRedirect "/" res
                 existingUser :: [] ->
-                    case testEntryByName existingUser.role model.testConfig of
-                        [] ->
-                            Task.fail "No matching roles!"
-                        testEntry :: _ ->
-                            writeNode (beforeTestWelcome existingUser testEntry) res
+                    let
+                        _ = Debug.log "exist" existingUser |> Database.actualLog
+                    in
+                        case testEntryByName existingUser.role model.testConfig of
+                            [] ->
+                                Task.fail "No matching roles!"
+                            testEntry :: _ ->
+                                writeNode (beforeTestWelcome existingUser testEntry) res
                 _ ->
                     Debug.crash "This should be impossible!"
             )
@@ -173,10 +176,9 @@ generateTestPage res req model =
             getFormField "token" req.form
                 |> Maybe.withDefault ""
 
-        _  =
+        startTime  =
             Moment.getCurrent ()
-                |> Moment.toRecord
-                |> Debug.log "startTime"
+                |> Moment.format
     in
         User.getUsers { token = token } model.database
             |> andThen (\userList ->
@@ -188,7 +190,11 @@ generateTestPage res req model =
                             [] ->
                                 Task.fail "No matching roles!"
                             testEntry :: _ ->
-                                writeNode (viewTakeHome testEntry) res
+                                User.updateUser
+                                    { token = token }
+                                    { existingUser | startTime = Just startTime }
+                                    model.database
+                                        |> andThen (\_ -> writeNode (viewTakeHome testEntry) res)
                     _ ->
                         Debug.crash "This should be impossible"
                 )
