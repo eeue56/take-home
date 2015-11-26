@@ -14,15 +14,23 @@ var MomentApi = function(){
         };
     };
 
-    var dateDiff =  function(){
-        return function(first, second){
-            return first - second;
+    var toRecord = function(){
+        return function(moment) {
+            return moment.toObject();
+        };
+    };
+
+    var fromRecord = function(Moment) {
+        return function(moment){
+            return Moment(moment);
         };
     };
 
     return {
         getCurrent: getCurrent,
-        format: format
+        format: format,
+        toRecord: toRecord,
+        fromRecord: fromRecord
     };
 
 }();
@@ -41,7 +49,9 @@ var make = function make(localRuntime) {
     return {
         'getCurrent': MomentApi.getCurrent(moment),
         'formatString': F2(MomentApi.format()),
-        'format': MomentApi.format()
+        'format': MomentApi.format(),
+        'toRecord': MomentApi.toRecord(),
+        'fromRecord': MomentApi.fromRecord(moment)
     };
 };
 

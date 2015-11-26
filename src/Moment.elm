@@ -1,9 +1,22 @@
-module Moment (getCurrent, format, formatString) where
+module Moment (getCurrent,
+    Moment(..), MomentRecord,
+    format, formatString,
+    toRecord, fromRecord) where
 
 import Native.Moment
 
 type Moment =
     Moment
+
+type alias MomentRecord =
+    { years : Int
+    , months : Int
+    , date : Int
+    , hours : Int
+    , minutes : Int
+    , seconds : Int
+    , milliseconds : Int
+}
 
 getCurrent : () -> Moment
 getCurrent =
@@ -16,3 +29,11 @@ format =
 formatString : Moment -> String -> String
 formatString =
     Native.Moment.formatString
+
+toRecord : Moment -> MomentRecord
+toRecord =
+    Native.Moment.toRecord
+
+fromRecord : MomentRecord -> Moment
+fromRecord =
+    Native.Moment.fromRecord

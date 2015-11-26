@@ -174,7 +174,9 @@ generateTestPage res req model =
                 |> Maybe.withDefault ""
 
         _  =
-            Debug.log "startTime" <| Moment.format <| Moment.getCurrent ()
+            Moment.getCurrent ()
+                |> Moment.toRecord
+                |> Debug.log "startTime"
     in
         User.getUsers { token = token } model.database
             |> andThen (\userList ->
