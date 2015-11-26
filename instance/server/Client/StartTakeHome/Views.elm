@@ -70,8 +70,16 @@ viewUploadSolution user =
 
 viewTakeHome : User -> TestEntry -> Html
 viewTakeHome user test =
-    case test.itemType of
-        TestLink ->
-            viewTestLink test
-        TestFile ->
-            viewTestFile test
+    let
+        testView =
+            case test.itemType of
+                TestLink ->
+                    viewTestLink test
+                TestFile ->
+                    viewTestFile test
+    in
+        div
+            []
+            [ testView
+            , viewUploadSolution user
+            ]

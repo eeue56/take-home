@@ -12,7 +12,6 @@ var knoxApi = function(){
 
     var createClient = function() {
         return function(config) {
-            console.log(knox);
             return knox.createClient(config);
         };
     };

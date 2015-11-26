@@ -92,7 +92,7 @@ updateWrapper startAppAction maybeModel =
     _ ->
       (maybeModel, Effects.none)
 
-app : App (Maybe Model)
+app : App (Maybe Model) StartAppAction
 app =
   start
     { init = (Nothing, Effects.task init)
