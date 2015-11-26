@@ -12,7 +12,7 @@ import Shared.Routes exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
 
-import Moment exposing (emptyMoment)
+import Moment exposing (emptyMoment, Moment)
 
 
 startTestButton : Html
@@ -72,8 +72,8 @@ viewUploadSolution user =
         , submitField
         ]
 
-viewTimeStarted : User -> Html
-viewTimeStarted user =
+viewTimeStarted : Moment -> User -> Html
+viewTimeStarted currentTime user =
     case user.startTime of
         Nothing ->
             div [] [ text "Not started yet!" ]
@@ -87,14 +87,15 @@ viewTimeStarted user =
                         |> Moment.add withTwoHours
 
                 timeLeft =
-                    Moment.fromRecord time
-                        |> Moment.subtract (Moment.toRecord endTime)
+                    currentTime
+                        |> Moment.toRecord
+                        |> (flip Moment.subtract) (Moment.fromRecord time)
             in
                 div
                     []
-                    [ text <| "Started at " ++ (Moment.format <| Moment.fromRecord time)
-                    , text <| "End time" ++ (Moment.format <| endTime)
-                    , text <| "Time left" ++ (Moment.format <| timeLeft)
+                    [ text <| "Started at " ++ (Moment.formatString "h:mm:ss a" <| Moment.fromRecord time)
+                    , text <| "End time" ++ (Moment.formatString "h:mm:ss a" <| endTime)
+                    , text <| "Time left" ++ (Moment.formatString "h:mm:ss a" <| timeLeft)
                     ]
 
 
@@ -114,5 +115,5 @@ viewTakeHome address model =
             []
             [ testView
             , viewUploadSolution model.user
-            , viewTimeStarted model.user
+            , viewTimeStarted model.currentTime model.user
             ]

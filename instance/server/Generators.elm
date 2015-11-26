@@ -195,7 +195,6 @@ generateTestPage res req model =
                                 case existingUser.startTime of
                                     Nothing ->
                                         let
-
                                             updatedUser =
                                                 { existingUser
                                                 | startTime = Just startTime }

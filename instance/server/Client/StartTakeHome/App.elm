@@ -13,8 +13,10 @@ import Client.StartTakeHome.Update exposing (update, Action(..))
 import Client.StartTakeHome.Views exposing (..)
 import Effects
 
+import Time exposing (..)
 
 import Telate exposing (loadObject)
+import Moment
 import StartApp exposing (App, start)
 
 config =
@@ -31,8 +33,12 @@ app =
     start
         { init = (model, Effects.none)
         , update = update
-        , inputs = []
+        , inputs = [ eachSecond ]
         }
+
+eachSecond =
+    every second
+        |> Signal.map (\_ -> UpdateTime (Moment.getCurrent ()))
 
 main =
     Signal.map (viewTakeHome app.address) app.model

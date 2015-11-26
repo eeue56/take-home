@@ -6,9 +6,9 @@ import Html.Attributes exposing (for, id, type', name, action, method, enctype, 
 import Shared.User exposing (User)
 import Client.Components exposing (..)
 
-genericErrorView : Html
-genericErrorView =
-    text "Something went wrong!"
+genericErrorView : a -> Html
+genericErrorView err =
+    text (toString err)
 
 successView : String -> String -> Html
 successView name url =

@@ -6,7 +6,13 @@ var MomentApi = function(){
     };
 
     var format = function(){
-        return function(moment, formatString) {
+        return function(moment) {
+            return moment.format();
+        };
+    };
+
+    var formatString = function(){
+        return function(formatString, moment) {
             if (typeof formatString === "undefined" || formatString === null){
                 return moment.format();
             }
@@ -47,6 +53,7 @@ var MomentApi = function(){
     return {
         getCurrent: getCurrent,
         format: format,
+        formatString: formatString,
         add: add,
         subtract: subtract,
         toRecord: toRecord,
@@ -68,7 +75,7 @@ var make = function make(localRuntime) {
 
     return {
         'getCurrent': MomentApi.getCurrent(Moment),
-        'formatString': F2(MomentApi.format()),
+        'formatString': F2(MomentApi.formatString()),
         'format': MomentApi.format(),
         'add': F2(MomentApi.add(Moment)),
         'subtract': F2(MomentApi.subtract(Moment)),

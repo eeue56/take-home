@@ -39,7 +39,7 @@ format : Moment -> String
 format =
     Native.Moment.format
 
-formatString : Moment -> String -> String
+formatString : String -> Moment -> String
 formatString =
     Native.Moment.formatString
 

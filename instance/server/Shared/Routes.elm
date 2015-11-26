@@ -5,6 +5,7 @@ type alias Routes =
     , index : String
     , signup : String
     , startTest : String
+    , login : String
     }
 
 routes =
@@ -12,4 +13,5 @@ routes =
     , index = "/"
     , signup = "/signup"
     , startTest = "/start-test"
+    , login = "/login"
     }

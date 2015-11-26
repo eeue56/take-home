@@ -22,6 +22,8 @@ import Generators exposing (generateSuccessPage
   , generateTestPage
   )
 
+import Client.Admin.Views exposing (loginView)
+
 import Shared.Routes exposing (routes)
 
 import Task exposing (..)
@@ -53,7 +55,7 @@ type StartAppAction
 handleError : Response -> Task a () -> Task b ()
 handleError res errTask =
   errTask
-    |> (flip Task.onError) (\_ -> writeNode genericErrorView res)
+    |> (flip Task.onError) (\err -> writeNode (genericErrorView err) res)
 
 runRoute task =
   task
@@ -87,15 +89,10 @@ routeIncoming (req, res) model =
           model =>
             (writeNode (signUpForTakeHomeView model.testConfig) res
               |> runRouteWithErrorHandler)
-        else if url == "/test" then
+        else if url == routes.login then
           model =>
-            let
-              obj =
-                { name = "Dino"
-                , val = {dino = "hello"}}
-              in
-                (writeElm "/Client/StartTakeHome/App" (Just obj) res
-                  |> runRouteWithErrorHandler)
+            (writeNode loginView res
+              |> runRouteWithErrorHandler)
         else
           case hasQuery url of
             False ->
@@ -112,8 +109,8 @@ routeIncoming (req, res) model =
                   case getQueryField "token" bag of
                     Nothing ->
                       model =>
-                        (writeFile ("<h1>failed to find anything</h1>" ++ url) res
-                          |> runRoute)
+                        (Task.fail ("Failed to find anything " ++ url)
+                          |> runRouteWithErrorHandler)
 
                     Just token ->
                       model =>
@@ -137,7 +134,9 @@ routeIncoming (req, res) model =
               |> (flip andThen) (\req -> generateTestPage res req model)
               |> runRouteWithErrorHandler)
         else
-          model => Effects.none
+          model =>
+            (handleError res (Task.fail "Route not found")
+              |> runRouteWithErrorHandler)
 
       NOOP ->
         model => Effects.none
