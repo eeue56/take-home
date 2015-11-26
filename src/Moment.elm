@@ -1,6 +1,8 @@
 module Moment (getCurrent,
     Moment(..), MomentRecord,
+    emptyMoment,
     format, formatString,
+    add, subtract,
     toRecord, fromRecord) where
 
 import Native.Moment
@@ -17,7 +19,17 @@ type alias MomentRecord =
     , minutes : Int
     , seconds : Int
     , milliseconds : Int
-}
+    }
+
+emptyMoment =
+    { years = 0
+    , months = 0
+    , date = 0
+    , hours = 0
+    , minutes = 0
+    , seconds = 0
+    , milliseconds = 0
+    }
 
 getCurrent : () -> Moment
 getCurrent =
@@ -30,6 +42,14 @@ format =
 formatString : Moment -> String -> String
 formatString =
     Native.Moment.formatString
+
+add : MomentRecord -> Moment -> Moment
+add =
+    Native.Moment.add
+
+subtract : MomentRecord -> Moment -> Moment
+subtract =
+    Native.Moment.subtract
 
 toRecord : Moment -> MomentRecord
 toRecord =

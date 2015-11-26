@@ -192,23 +192,35 @@ generateTestPage res req model =
                             [] ->
                                 Task.fail "No matching roles!"
                             testEntry :: _ ->
-                                let
+                                case existingUser.startTime of
+                                    Nothing ->
+                                        let
 
-                                    updatedUser =
-                                        { existingUser
-                                        | startTime = Just startTime }
+                                            updatedUser =
+                                                { existingUser
+                                                | startTime = Just startTime }
 
-                                    obj =
-                                        { name = "TelateProps"
-                                        , val = { user = updatedUser
-                                                , test = testEntry}
-                                        }
-                                in
-                                    User.updateUser { token = token } updatedUser model.database
-                                            |> andThen
-                                                (\_ ->
-                                                    writeElm "/Client/StartTakeHome/App" (Just obj) res
-                                                )
+                                            obj =
+                                                { name = "TelateProps"
+                                                , val = { user = updatedUser
+                                                        , test = testEntry}
+                                                }
+                                        in
+                                            User.updateUser { token = token } updatedUser model.database
+                                                    |> andThen
+                                                        (\_ ->
+                                                            writeElm "/Client/StartTakeHome/App" (Just obj) res
+                                                        )
+                                    Just time ->
+                                        let
+                                            obj =
+                                                { name = "TelateProps"
+                                                , val = { user = existingUser
+                                                        , test = testEntry}
+                                                }
+                                        in
+                                            writeElm "/Client/StartTakeHome/App" (Just obj) res
+
                     _ ->
                         Debug.crash "This should be impossible"
                 )

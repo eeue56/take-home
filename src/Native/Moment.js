@@ -14,6 +14,24 @@ var MomentApi = function(){
         };
     };
 
+    var add = function(Moment) {
+        return function(first, second){
+            var m = Moment(second);
+            m.add(first);
+
+            return m;
+        };
+    };
+
+    var subtract = function(Moment) {
+        return function(first, second){
+            var m = Moment(second);
+            m.subtract(first);
+
+            return m;
+        };
+    };
+
     var toRecord = function(){
         return function(moment) {
             return moment.toObject();
@@ -29,6 +47,8 @@ var MomentApi = function(){
     return {
         getCurrent: getCurrent,
         format: format,
+        add: add,
+        subtract: subtract,
         toRecord: toRecord,
         fromRecord: fromRecord
     };
@@ -43,15 +63,17 @@ var make = function make(localRuntime) {
         return localRuntime.Native.Moment.values;
     }
 
-    var moment = require('moment');
+    var Moment = require('moment');
 
 
     return {
-        'getCurrent': MomentApi.getCurrent(moment),
+        'getCurrent': MomentApi.getCurrent(Moment),
         'formatString': F2(MomentApi.format()),
         'format': MomentApi.format(),
+        'add': F2(MomentApi.add(Moment)),
+        'subtract': F2(MomentApi.subtract(Moment)),
         'toRecord': MomentApi.toRecord(),
-        'fromRecord': MomentApi.fromRecord(moment)
+        'fromRecord': MomentApi.fromRecord(Moment)
     };
 };
 

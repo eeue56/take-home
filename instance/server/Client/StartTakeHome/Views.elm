@@ -12,7 +12,7 @@ import Shared.Routes exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
 
-import Moment
+import Moment exposing (emptyMoment)
 
 
 startTestButton : Html
@@ -78,9 +78,24 @@ viewTimeStarted user =
         Nothing ->
             div [] [ text "Not started yet!" ]
         Just time ->
-            div
-                []
-                [ text <| "Started at " ++ (Moment.format <| Moment.fromRecord time)]
+            let
+                withTwoHours =
+                    { emptyMoment | hours = 2 }
+
+                endTime =
+                    Moment.fromRecord time
+                        |> Moment.add withTwoHours
+
+                timeLeft =
+                    Moment.fromRecord time
+                        |> Moment.subtract (Moment.toRecord endTime)
+            in
+                div
+                    []
+                    [ text <| "Started at " ++ (Moment.format <| Moment.fromRecord time)
+                    , text <| "End time" ++ (Moment.format <| endTime)
+                    , text <| "Time left" ++ (Moment.format <| timeLeft)
+                    ]
 
 
 viewTakeHome : Signal.Address Action -> Model -> Html
