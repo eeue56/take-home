@@ -96,7 +96,7 @@ generateSignupPage res req model =
       { name = name, email = email }
 
     getUrl =
-      randomUrl False (model.baseUrl ++ "?token=")
+      randomUrl False (model.baseUrl ++ "token=")
 
     tryInserting url =
       let
