@@ -62,10 +62,10 @@ writeFile file res =
     `andThen` end
 
 {-| write elm! -}
-writeElm : String -> Response -> Task a ()
-writeElm file res =
+writeElm : String -> Maybe b -> Response -> Task a ()
+writeElm file appendable res =
   writeHead 200 textHtml res
-    `andThen` Native.Http.Response.Write.writeElm file
+    `andThen` Native.Http.Response.Write.writeElm file appendable
     `andThen` end
 
 writeNode : Node -> Response -> Task a ()

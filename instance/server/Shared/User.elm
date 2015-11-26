@@ -16,6 +16,15 @@ type alias User =
     , submissionLocation : Maybe String
     }
 
+emptyUser =
+    { token = ""
+    , name = ""
+    , email = ""
+    , role = ""
+    , startTime = Nothing
+    , endTime = Nothing
+    , submissionLocation = Nothing}
+
 decodeMaybe : Decoder (Maybe String)
 decodeMaybe =
     customDecoder value (\val -> Ok (deserialize val))

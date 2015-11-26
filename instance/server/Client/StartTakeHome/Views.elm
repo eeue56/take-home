@@ -9,6 +9,9 @@ import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
 
+import Client.StartTakeHome.Update exposing (Action)
+import Client.StartTakeHome.Model exposing (Model)
+
 
 startTestButton : Html
 startTestButton =
@@ -68,18 +71,20 @@ viewUploadSolution user =
         ]
 
 
-viewTakeHome : User -> TestEntry -> Html
-viewTakeHome user test =
+viewTakeHome : Signal.Address Action -> Model -> Html
+viewTakeHome address model =
     let
         testView =
-            case test.itemType of
+            case model.test.itemType of
                 TestLink ->
-                    viewTestLink test
+                    viewTestLink model.test
                 TestFile ->
-                    viewTestFile test
+                    viewTestFile model.test
+                NoTest ->
+                    text "failed to find your test"
     in
         div
             []
             [ testView
-            , viewUploadSolution user
+            , viewUploadSolution model.user
             ]

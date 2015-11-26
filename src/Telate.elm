@@ -2,7 +2,6 @@ module Telate (loadObject) where
 
 import Native.Telate
 
-
-loadObject : String -> a
+loadObject : String -> Maybe a
 loadObject =
-    Native.Telate
+    Native.Telate.loadObject

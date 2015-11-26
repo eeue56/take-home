@@ -21,7 +21,7 @@ var write = function write(Task) {
 };
 
 var writeFile = function writeFile(fs, mime, Task){
-    return function (fileName, res) {
+    return function (fileName, res, appendage) {
         return Task.asyncFunction(function (callback) {
             var file = __dirname + fileName;
             var type = mime.lookup(file);
@@ -29,7 +29,19 @@ var writeFile = function writeFile(fs, mime, Task){
             res.writeHead('Content-Type', type);
 
             fs.readFile(file, function (e, data) {
-                res.end(data);
+                if (e.code == 'ENOENT'){
+                    res.writeHead(404);
+                    return callback(Task.fail("404"));
+                }
+                console.log("data", data);
+                console.log("e", e);
+                console.log("file", file);
+                res.write(data);
+
+                if (!(typeof appendage === "undefined" || appendage === null)){
+                    res.write("<script>" + appendage + "</script>");
+                }
+
                 return callback(Task.succeed(res));
             });
 
@@ -42,22 +54,33 @@ var writeElm = function writeElm(fs, mime, crypto, compiler, Task){
     var compile = function(file, outFile, onClose){
         // switch to the directory that the elm-app is served out of
 
-        var dirIndex = file.lastIndexOf('/');
-        var dir = file.substr(0, dirIndex);
-        process.chdir(dir);
+        //var dirIndex = file.lastIndexOf('/');
+        //var dir = file.substr(0, dirIndex);
+        //process.chdir(dir);
 
         compiler.compile([file + '.elm'], {
             output: outFile,
             yes: true
         }).on('close', onClose);
-    }
+    };
 
-    return function (fileName, res) {
+    return function (fileName, appendable, res) {
         var compiledFile = COMPILED_DIR + fileName + '.html';
+
+        if (typeof appendable !== "undefined"){
+            if (appendable.ctor === "Nothing"){
+                appendable = null;
+            } else {
+                var name = appendable._0.name;
+                var val = appendable._0.val;
+                appendable = "var " + name + " = " + JSON.stringify(val);
+            }
+        }
 
         // if the file is already compiled, just send it out
         if (fs.existsSync(compiledFile)) {
-            return writeFile(fs, mime, Task)("/" + compiledFile, res);
+            console.log("already compiled");
+            return writeFile(fs, mime, Task)("/" + compiledFile, res, appendable);
         }
 
         return Task.asyncFunction(function (callback) {
@@ -70,7 +93,21 @@ var writeElm = function writeElm(fs, mime, crypto, compiler, Task){
                 res.writeHead('Content-Type', type);
 
                 fs.readFile(outFile, function (e, data) {
-                    res.end(data);
+                    var headClose = data.indexOf("</head>");
+                    var outData = data;
+                    if (!(typeof appendable === "undefined" || appendable === null)){
+                        var extra = new Buffer("<script>" + appendable + "</script>");
+                        outData = new Buffer(extra.length + data.length);
+
+                        //outData = Buffer.concat(data.slice(0, headClose), extra, data.slice(headClose, ))
+                        outData.write(data.slice(0, headClose).toString());
+                        outData.write(extra.toString(), headClose);
+                        outData.write(data.slice(headClose).toString(), headClose + extra.length);
+                    }
+
+                    res.write(outData);
+
+
                     return callback(Task.succeed(res));
                 });
             };
@@ -122,7 +159,7 @@ var make = function make(localRuntime) {
     return {
         'writeHead': F3(writeHead(Task)),
         'writeFile': F2(writeFile(fs, mime, Task)),
-        'writeElm': F2(writeElm(fs, mime, crypto, compiler, Task)),
+        'writeElm': F3(writeElm(fs, mime, crypto, compiler, Task)),
         'writeNode': F2(writeNode(toHtml, Task)),
         'write': F2(write(Task)),
         'toHtml': toHtml,

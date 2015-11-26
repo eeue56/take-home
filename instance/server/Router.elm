@@ -87,6 +87,15 @@ routeIncoming (req, res) model =
           model =>
             (writeNode (signUpForTakeHomeView model.testConfig) res
               |> runRouteWithErrorHandler)
+        else if url == "/test" then
+          model =>
+            let
+              obj =
+                { name = "Dino"
+                , val = {dino = "hello"}}
+              in
+                (writeElm "/Client/StartTakeHome/App" (Just obj) res
+                  |> runRouteWithErrorHandler)
         else
           case hasQuery url of
             False ->

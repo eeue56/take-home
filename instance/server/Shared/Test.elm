@@ -9,11 +9,18 @@ import String
 type TestType
     = TestFile
     | TestLink
+    | NoTest
 
 type alias TestEntry =
     { name : String
     , item : String
     , itemType : TestType
+    }
+
+emptyTestEntry =
+    { name = ""
+    , item = ""
+    , itemType = NoTest
     }
 
 type alias TestConfig =

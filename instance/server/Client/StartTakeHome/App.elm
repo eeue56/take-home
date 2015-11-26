@@ -9,28 +9,27 @@ import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
 import Client.StartTakeHome.Model exposing (Model)
+import Client.StartTakeHome.Update exposing (update, Action(..))
+import Client.StartTakeHome.Views exposing (..)
+import Effects
 
 
 import Telate exposing (loadObject)
 import StartApp exposing (App, start)
 
-user =
-    loadObject "user"
-
-test =
-    loadObject "test"
+config = loadObject "TelateProps"
+    |> Maybe.withDefault
+        { user = emptyUser
+        , test = emptyTestEntry}
 
 model =
-    { user = user
-    , test = test
-    }
+    config
 
-
-app : App (Model ())
+app : App Model Action
 app =
     start
         { init = (model, Effects.none)
-        , update = (\x -> (x, Effects.none))
+        , update = update
         , inputs = []
         }
 

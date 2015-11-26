@@ -197,11 +197,17 @@ generateTestPage res req model =
                                     updatedUser =
                                         { existingUser
                                         | startTime = Just startTime }
+
+                                    obj =
+                                        { name = "TelateProps"
+                                        , val = { user = updatedUser
+                                                , test = testEntry}
+                                        }
                                 in
                                     User.updateUser { token = token } updatedUser model.database
                                             |> andThen
                                                 (\_ ->
-                                                    writeNode (viewTakeHome updatedUser testEntry) res
+                                                    writeElm "/Client/StartTakeHome/App" (Just obj) res
                                                 )
                     _ ->
                         Debug.crash "This should be impossible"
