@@ -180,7 +180,7 @@ generateTestPage res req model =
 
         startTime  =
             Moment.getCurrent ()
-                |> Moment.format
+                |> Moment.toRecord
     in
         User.getUsers { token = token } model.database
             |> andThen (\userList ->

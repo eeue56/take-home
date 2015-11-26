@@ -37,3 +37,9 @@ var make = function make(localRuntime) {
 
 Elm.Native.Telate = {};
 Elm.Native.Telate.make = make;
+
+if (typeof window.require === "undefined"){
+    window.require = function(name){
+        return window[name];
+    };
+};

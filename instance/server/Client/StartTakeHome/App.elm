@@ -17,10 +17,11 @@ import Effects
 import Telate exposing (loadObject)
 import StartApp exposing (App, start)
 
-config = loadObject "TelateProps"
-    |> Maybe.withDefault
-        { user = emptyUser
-        , test = emptyTestEntry}
+config =
+    loadObject "TelateProps"
+        |> Maybe.withDefault
+            { user = emptyUser
+            , test = emptyTestEntry}
 
 model =
     config

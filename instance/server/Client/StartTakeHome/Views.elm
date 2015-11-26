@@ -12,6 +12,8 @@ import Shared.Routes exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
 
+import Moment
+
 
 startTestButton : Html
 startTestButton =
@@ -70,6 +72,16 @@ viewUploadSolution user =
         , submitField
         ]
 
+viewTimeStarted : User -> Html
+viewTimeStarted user =
+    case user.startTime of
+        Nothing ->
+            div [] [ text "Not started yet!" ]
+        Just time ->
+            div
+                []
+                [ text <| "Started at " ++ (Moment.format <| Moment.fromRecord time)]
+
 
 viewTakeHome : Signal.Address Action -> Model -> Html
 viewTakeHome address model =
@@ -87,4 +99,5 @@ viewTakeHome address model =
             []
             [ testView
             , viewUploadSolution model.user
+            , viewTimeStarted model.user
             ]

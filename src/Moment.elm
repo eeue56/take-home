@@ -4,6 +4,7 @@ module Moment (getCurrent,
     toRecord, fromRecord) where
 
 import Native.Moment
+import Native.MomentJS
 
 type Moment =
     Moment
