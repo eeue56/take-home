@@ -43,6 +43,7 @@ model =
   , baseUrl = ""
   , database = Database.createClientFromConfigFile myConfig.databaseConfig
   , testConfig = testConfig
+  , authSecret = ""
   }
 
 
@@ -58,6 +59,9 @@ envToModel env =
 
   , baseUrl =
       Dict.get myConfig.baseUrl env ? ""
+
+  , authSecret =
+      Dict.get myConfig.authSecret env ? ""
 
   , database =
       model.database

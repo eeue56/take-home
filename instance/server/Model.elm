@@ -14,6 +14,7 @@ type alias Model =
   , baseUrl : String
   , database : Client
   , testConfig : TestConfig
+  , authSecret : String
   }
 
 type alias Connection =
@@ -27,4 +28,5 @@ type alias SiteConfig =
   , secret: String
   , bucket: String
   , baseUrl: String
+  , authSecret: String
   }

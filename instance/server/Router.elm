@@ -19,7 +19,7 @@ import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
 import Generators exposing (generateSuccessPage
   , generateSignupPage, generateWelcomePage
-  , generateTestPage
+  , generateTestPage, generateAdminPage
   )
 
 import Client.Admin.Views exposing (loginView)
@@ -133,6 +133,12 @@ routeIncoming (req, res) model =
             (setForm req
               |> (flip andThen) (\req -> generateTestPage res req model)
               |> runRouteWithErrorHandler)
+        else if url == routes.login then
+          model =>
+            (setForm req
+              |> (flip andThen) (\req -> generateAdminPage res req model)
+              |> runRouteWithErrorHandler
+            )
         else
           model =>
             (handleError res (Task.fail "Route not found")

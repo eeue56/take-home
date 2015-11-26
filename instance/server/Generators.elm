@@ -22,6 +22,7 @@ import Moment
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
+import Client.Admin.Views exposing (allUsersView)
 
 import Model exposing (Connection, Model)
 import User
@@ -223,3 +224,23 @@ generateTestPage res req model =
                     _ ->
                         Debug.crash "This should be impossible"
                 )
+
+generateAdminPage : Response -> Request -> Model -> Task String ()
+generateAdminPage res req model =
+    let
+        password =
+            getFormField "password" req.form
+                |> Maybe.withDefault ""
+
+        _ =
+            Debug.log "password" password
+
+        attemptLogin =
+            if password == model.authSecret then
+                Task.succeed ()
+            else
+                Task.fail "Invalid password"
+    in
+        attemptLogin
+            |> andThen (\_ -> User.getUsers {} model.database)
+            |> andThen (\users -> writeNode (allUsersView users) res)
