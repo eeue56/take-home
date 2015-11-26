@@ -5,13 +5,14 @@ import Html.Attributes exposing (for, id, type', name, action, method, enctype, 
 
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
+import Shared.Routes exposing (routes)
 
 import Client.Components exposing (..)
 
 signUpForTakeHomeView : TestConfig -> Html
 signUpForTakeHomeView testConfig =
     form
-        [ action "/signup"
+        [ action routes.signup
         , method "POST"
         , enctype "multipart/form-data"
         ]

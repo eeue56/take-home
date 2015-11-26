@@ -1,7 +1,7 @@
 module Client.Components where
 
 import Html exposing (form, label, input, text, div, a, Html)
-import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
+import Html.Attributes exposing (..)
 
 
 emailField : Html
@@ -66,3 +66,13 @@ fileField =
         , id "file"
         ]
         [ ]
+
+hiddenTokenField : String -> Html
+hiddenTokenField token =
+    input
+        [ type' "hidden"
+        , id "token"
+        , name "token"
+        , attribute "value" token
+        ]
+        []

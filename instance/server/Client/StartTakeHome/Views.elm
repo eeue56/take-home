@@ -7,6 +7,7 @@ import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
+import Shared.Routes exposing (..)
 
 
 startTestButton : Html
@@ -18,19 +19,13 @@ startTestButton =
 beforeTestWelcome : User -> TestEntry -> Html
 beforeTestWelcome user test =
     form
-        [ action "/start-test"
+        [ action routes.startTest
         , method "POST"
         , enctype "multipart/form-data"
         ]
         [ text <| "Welcome " ++ user.name ++ " "
         , text <| "You signed up to take the " ++ test.name ++ " take home!"
-        , input
-            [ type' "hidden"
-            , id "token"
-            , name "token"
-            , attribute "value" user.token
-            ]
-            []
+        , hiddenTokenField user.token
         , startTestButton
         ]
 
@@ -60,9 +55,21 @@ viewTestFile test =
             [ text "Click here to download the test content!" ]
         ]
 
+viewUploadSolution : User -> Html
+viewUploadSolution user =
+    form
+        [ action routes.apply
+        , method "POST"
+        , enctype "multipart/form-data"
+        ]
+        [ fileField
+        , hiddenTokenField user.token
+        , submitField
+        ]
 
-viewTakeHome : TestEntry -> Html
-viewTakeHome test =
+
+viewTakeHome : User -> TestEntry -> Html
+viewTakeHome user test =
     case test.itemType of
         TestLink ->
             viewTestLink test

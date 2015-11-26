@@ -28,6 +28,8 @@ import User
 import Shared.User exposing (User)
 import Shared.Test exposing (testEntryByName)
 
+import Shared.Routes exposing (routes)
+
 import Utils exposing (randomUrl)
 
 import Debug
@@ -155,7 +157,7 @@ generateWelcomePage token res model =
         |> andThen (\userList ->
             case userList of
                 [] ->
-                    writeRedirect "/" res
+                    writeRedirect routes.index res
                 existingUser :: [] ->
                     let
                         _ = Debug.log "exist" existingUser |> Database.actualLog
@@ -184,17 +186,23 @@ generateTestPage res req model =
             |> andThen (\userList ->
                 case userList of
                     [] ->
-                        writeRedirect "/" res
+                        writeRedirect routes.index res
                     existingUser :: [] ->
                         case testEntryByName existingUser.role model.testConfig of
                             [] ->
                                 Task.fail "No matching roles!"
                             testEntry :: _ ->
-                                User.updateUser
-                                    { token = token }
-                                    { existingUser | startTime = Just startTime }
-                                    model.database
-                                        |> andThen (\_ -> writeNode (viewTakeHome testEntry) res)
+                                let
+
+                                    updatedUser =
+                                        { existingUser
+                                        | startTime = Just startTime }
+                                in
+                                    User.updateUser { token = token } updatedUser model.database
+                                            |> andThen
+                                                (\_ ->
+                                                    writeNode (viewTakeHome updatedUser testEntry) res
+                                                )
                     _ ->
                         Debug.crash "This should be impossible"
                 )

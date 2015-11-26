@@ -22,6 +22,8 @@ import Generators exposing (generateSuccessPage
   , generateTestPage
   )
 
+import Shared.Routes exposing (routes)
+
 import Task exposing (..)
 import Signal exposing (..)
 import Json.Encode as Json
@@ -76,58 +78,57 @@ routeIncoming (req, res) model =
   let
     runRouteWithErrorHandler =
       (handleError res) >> runRoute
+    url =
+      req.url
   in
     case req.method of
       GET ->
-        case req.url of
-          "/" ->
-            model =>
-              (writeNode (signUpForTakeHomeView model.testConfig) res
-                |> runRouteWithErrorHandler)
-          url ->
-            case hasQuery url of
-              False ->
-                model =>
-                  (writeFile url res
+        if url == routes.index then
+          model =>
+            (writeNode (signUpForTakeHomeView model.testConfig) res
+              |> runRouteWithErrorHandler)
+        else
+          case hasQuery url of
+            False ->
+              model =>
+                (writeFile url res
+                    |> runRouteWithErrorHandler)
+            True ->
+              case parseQuery <| queryPart url of
+                Err _ ->
+                  model =>
+                    (Task.fail "failed to parse"
                       |> runRouteWithErrorHandler)
-              True ->
-                case parseQuery <| queryPart url of
-                  Err _ ->
-                    model =>
-                      (Task.fail "failed to parse"
-                        |> runRouteWithErrorHandler)
-                  Ok bag ->
-                    case getQueryField "token" bag of
-                      Nothing ->
-                        model =>
-                          (writeFile ("<h1>failed to find anything</h1>" ++ url) res
-                            |> runRoute)
+                Ok bag ->
+                  case getQueryField "token" bag of
+                    Nothing ->
+                      model =>
+                        (writeFile ("<h1>failed to find anything</h1>" ++ url) res
+                          |> runRoute)
 
-                      Just token ->
-                        model =>
-                          (generateWelcomePage token res model
-                            |> runRouteWithErrorHandler)
+                    Just token ->
+                      model =>
+                        (generateWelcomePage token res model
+                          |> runRouteWithErrorHandler)
 
       POST ->
-        case req.url of
-          "/apply" ->
-            model =>
-              (setForm req
-                |> (flip andThen) (\req -> generateSuccessPage res req model)
-                |> runRouteWithErrorHandler)
-
-          "/signup" ->
-            model =>
-              (setForm req
-                |> (flip andThen) (\req -> generateSignupPage res req model)
-                |> runRouteWithErrorHandler)
-          "/start-test" ->
-            model =>
-              (setForm req
-                |> (flip andThen) (\req -> generateTestPage res req model)
-                |> runRouteWithErrorHandler)
-          _ ->
-            model => Effects.none
+        if url == routes.apply then
+          model =>
+            (setForm req
+              |> (flip andThen) (\req -> generateSuccessPage res req model)
+              |> runRouteWithErrorHandler)
+        else if url == routes.signup then
+          model =>
+            (setForm req
+              |> (flip andThen) (\req -> generateSignupPage res req model)
+              |> runRouteWithErrorHandler)
+        else if url == routes.startTest then
+          model =>
+            (setForm req
+              |> (flip andThen) (\req -> generateTestPage res req model)
+              |> runRouteWithErrorHandler)
+        else
+          model => Effects.none
 
       NOOP ->
         model => Effects.none
