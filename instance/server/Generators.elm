@@ -88,6 +88,10 @@ generateSignupPage res req model =
       getFormField "email" req.form
         |> Maybe.withDefault "anon"
 
+    role =
+      getFormField "role" req.form
+        |> Maybe.withDefault "none"
+
     searchUser =
       { name = name, email = email }
 
@@ -97,7 +101,10 @@ generateSignupPage res req model =
     tryInserting url =
       let
         userWithUrl =
-          { name = name, email = email, uniqueUrl = url }
+          { name = name
+          , email = email
+          , uniqueUrl = url
+          , role = role }
       in
         User.insertIntoDatabase userWithUrl model.database
           |> andThen (\_ -> Task.succeed (successfulSignupView userWithUrl))

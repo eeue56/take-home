@@ -12,7 +12,6 @@ import Http.Response exposing (emptyRes)
 import StartApp exposing (App, start)
 
 import Database.Nedb as Database
-
 import Config exposing (loadConfig)
 import Env
 
@@ -21,8 +20,12 @@ import Dict
 import Task exposing (..)
 import Effects exposing (Effects)
 
+import Shared.Test exposing (TestConfig)
+
 import Router exposing (..)
 import Model exposing (..)
+import Test
+
 
 
 -- TODO use Maybe.Extra for this
@@ -33,12 +36,18 @@ myConfig : SiteConfig
 myConfig =
   loadConfig "./config/config.json"
 
+testConfig : TestConfig
+testConfig =
+  Test.loadConfig myConfig.testConfig
+
+model : Model
 model =
   { key = ""
   , secret = ""
   , bucket = ""
   , baseUrl = ""
   , database = Database.createClientFromConfigFile myConfig.databaseConfig
+  , testConfig = testConfig
   }
 
 
@@ -57,6 +66,9 @@ envToModel env =
 
   , database =
       model.database
+
+  , testConfig =
+      model.testConfig
   }
 
 server : Mailbox Connection

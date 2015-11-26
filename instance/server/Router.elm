@@ -67,7 +67,7 @@ routeIncoming (req, res) model =
         case req.url of
           "/" ->
             model =>
-              (writeNode signUpForTakeHomeView res
+              (writeNode (signUpForTakeHomeView model.testConfig) res
                 |> runRouteWithErrorHandler)
           url ->
             case parseQuery url of

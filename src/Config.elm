@@ -1,9 +1,9 @@
-module Config (loadConfig, unsureLoadConfig) where
+module Config (loadConfig, loadConfigIntoValue) where
 {-| Load JSON as a config
 Only works on node - `require` is both builtin and blocking on node
 meaning no need for Tasks
 
-@docs loadConfig, unsureLoadConfig
+@docs loadConfig, loadConfigIntoValue
 -}
 import Json.Decode as Json
 import Native.Config
@@ -16,6 +16,6 @@ loadConfig =
 
 {-| Load a given filename into a Json value
 -}
-unsureLoadConfig : String -> Json.Value
-unsureLoadConfig =
+loadConfigIntoValue : String -> Json.Value
+loadConfigIntoValue =
     Native.Config.loadConfig

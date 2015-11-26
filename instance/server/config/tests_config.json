@@ -1,10 +1,14 @@
 {
-    "backend" : {
-        "item" : "some_file.zip",
-        "testType" : "file"
-    },
-    "frontend" : {
-        "item" : "http://github.com",
-        "testType" : "link"
-    }
+    "tests":[
+        {
+            "name" : "Frontend developer",
+            "item" : "some_file.zip",
+            "itemType" : "file"
+        },
+        {
+            "name" : "Backend developer",
+            "item" : "http://github.com",
+            "itemType" : "link"
+        }
+    ]
 }

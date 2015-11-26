@@ -1,5 +1,7 @@
 module Model where
 
+import Shared.Test exposing (TestConfig)
+
 import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 
@@ -11,6 +13,7 @@ type alias Model =
   , bucket : String
   , baseUrl : String
   , database : Client
+  , testConfig : TestConfig
   }
 
 type alias Connection =
@@ -19,6 +22,7 @@ type alias Connection =
 type alias SiteConfig =
   { myPort: Int
   , databaseConfig: String
+  , testConfig : String
   , accessKey: String
   , secret: String
   , bucket: String

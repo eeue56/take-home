@@ -8,7 +8,8 @@ import Json.Decode.Extra exposing (apply)
 type alias User =
     { uniqueUrl : String
     , name : String
-    , email : String }
+    , email : String
+    , role : String }
 
 decoder : Decoder User
 decoder =
@@ -16,3 +17,4 @@ decoder =
         |: ("uniqueUrl" := string)
         |: ("name" := string)
         |: ("email" := string)
+        |: ("role" := string)
