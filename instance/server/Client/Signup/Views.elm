@@ -21,22 +21,22 @@ signUpForTakeHomeView testConfig =
         , submitField
         ]
 
-alreadySignupView : User -> Html
-alreadySignupView user =
+alreadySignupView : String -> User -> Html
+alreadySignupView url user =
     div
         []
         [ text "You've already signed up!"
         , a
-            [ href user.uniqueUrl ]
-            [ text user.uniqueUrl ]
+            [ href url ]
+            [ text url ]
         ]
 
-successfulSignupView : User -> Html
-successfulSignupView user =
+successfulSignupView : String -> User -> Html
+successfulSignupView url user =
     div
         []
         [ a
-            [ href user.uniqueUrl ]
+            [ href url ]
             [ text ("You have successfully signed up," ++ user.name ) ]
         ]
 

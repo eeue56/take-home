@@ -17,7 +17,7 @@ import Http.Response exposing (Response)
 import Model exposing (Connection, Model)
 import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
-import Generators exposing (generateSuccessPage, generateSignupPage)
+import Generators exposing (generateSuccessPage, generateSignupPage, generateWelcomePage)
 
 import Task exposing (..)
 import Signal exposing (..)
@@ -84,8 +84,8 @@ routeIncoming (req, res) model =
 
                   Just token ->
                     model =>
-                      (writeHtml token res
-                        |> runRoute)
+                      (generateWelcomePage token res model
+                        |> runRouteWithErrorHandler)
 
       POST ->
         case req.url of

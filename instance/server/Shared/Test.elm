@@ -20,6 +20,10 @@ type alias TestConfig =
     { tests : List TestEntry
     }
 
+testEntryByName : String -> TestConfig -> List TestEntry
+testEntryByName name config =
+    List.filter (\test -> test.name == name) config.tests
+
 testTypeDecoder : Decoder TestType
 testTypeDecoder =
     customDecoder

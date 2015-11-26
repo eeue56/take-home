@@ -6,7 +6,7 @@ import Json.Decode.Extra exposing (apply)
 (|:) = Json.Decode.Extra.apply
 
 type alias User =
-    { uniqueUrl : String
+    { token : String
     , name : String
     , email : String
     , role : String }
@@ -14,7 +14,7 @@ type alias User =
 decoder : Decoder User
 decoder =
     succeed User
-        |: ("uniqueUrl" := string)
+        |: ("token" := string)
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := string)
