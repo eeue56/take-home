@@ -17,6 +17,7 @@ import Http.Server
 
 import Knox
 import Database.Nedb as Database
+import Moment
 
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
@@ -117,6 +118,9 @@ generateSignupPage res req model =
                     , email = email
                     , token = token
                     , role = role
+                    , startTime = Nothing
+                    , endTime = Nothing
+                    , submissionLocation = Nothing
                     }
 
                 url =
@@ -168,6 +172,9 @@ generateTestPage res req model =
         token =
             getFormField "token" req.form
                 |> Maybe.withDefault ""
+
+        _  =
+            Debug.log "startTime" <| Moment.format <| Moment.getCurrent ()
     in
         User.getUsers { token = token } model.database
             |> andThen (\userList ->
