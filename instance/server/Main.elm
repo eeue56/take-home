@@ -2,11 +2,6 @@ module Main where
 
 import Http.Server exposing (..)
 
-import Http.Response.Write exposing
-  ( writeHtml, writeJson
-  , writeElm, writeFile
-  , writeNode, writeRedirect)
-
 import Http.Request exposing (emptyReq)
 import Http.Response exposing (emptyRes)
 import StartApp exposing (App, start)
@@ -73,7 +68,6 @@ envToModel env =
 
 server : Mailbox Connection
 server = mailbox (emptyReq, emptyRes)
-
 
 init : Task Effects.Never StartAppAction
 init =
