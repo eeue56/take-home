@@ -2,6 +2,7 @@ module Client.StartTakeHome.Views where
 
 import Html exposing (a, div, form, label, input, text, button, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
+import String
 
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
@@ -44,10 +45,18 @@ viewTestLink test =
 
 viewTestFile : TestEntry -> Html
 viewTestFile test =
+    let
+        justFileName =
+            case List.reverse (String.indexes "/" test.item) of
+                [] -> test.item
+                x::_ -> String.dropLeft (x + 1) test.item
+
+    in
     div
         [ ]
         [ a
-            [ href test.item ]
+            [ href test.item
+            , attribute "download" justFileName ]
             [ text "Click here to download the test content!" ]
         ]
 
