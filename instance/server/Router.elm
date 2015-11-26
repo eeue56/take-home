@@ -17,7 +17,10 @@ import Http.Response exposing (Response)
 import Model exposing (Connection, Model)
 import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
-import Generators exposing (generateSuccessPage, generateSignupPage, generateWelcomePage)
+import Generators exposing (generateSuccessPage
+  , generateSignupPage, generateWelcomePage
+  , generateTestPage
+  )
 
 import Task exposing (..)
 import Signal exposing (..)
@@ -27,6 +30,7 @@ import Result exposing (Result)
 import Effects exposing (Effects)
 import Dict
 import Regex
+import String
 
 import Env
 import Converters
@@ -54,6 +58,17 @@ runRoute task =
     |> Task.map Run
     |> Effects.task
 
+hasQuery url =
+  String.contains "?" url
+
+queryPart url =
+  String.indexes "?" url
+    |> (\xs ->
+      case xs of
+        [] -> ""
+        x::_ -> String.dropLeft (x + 1) url
+      )
+
 {-| route each request/response pair and write a response
 -}
 routeIncoming : Connection -> Model -> (Model, Effects Action)
@@ -70,22 +85,28 @@ routeIncoming (req, res) model =
               (writeNode (signUpForTakeHomeView model.testConfig) res
                 |> runRouteWithErrorHandler)
           url ->
-            case parseQuery url of
-              Err _ ->
+            case hasQuery url of
+              False ->
                 model =>
                   (writeFile url res
-                    |> runRouteWithErrorHandler)
-              Ok bag ->
-                case getQueryField "/token" bag of
-                  Nothing ->
+                      |> runRouteWithErrorHandler)
+              True ->
+                case parseQuery <| queryPart url of
+                  Err _ ->
                     model =>
-                      (writeHtml ("<h1>failed to find anything</h1>" ++ url) res
-                        |> runRoute)
-
-                  Just token ->
-                    model =>
-                      (generateWelcomePage token res model
+                      (Task.fail "failed to parse"
                         |> runRouteWithErrorHandler)
+                  Ok bag ->
+                    case getQueryField "token" bag of
+                      Nothing ->
+                        model =>
+                          (writeFile ("<h1>failed to find anything</h1>" ++ url) res
+                            |> runRoute)
+
+                      Just token ->
+                        model =>
+                          (generateWelcomePage token res model
+                            |> runRouteWithErrorHandler)
 
       POST ->
         case req.url of
@@ -99,6 +120,11 @@ routeIncoming (req, res) model =
             model =>
               (setForm req
                 |> (flip andThen) (\req -> generateSignupPage res req model)
+                |> runRouteWithErrorHandler)
+          "/start-test" ->
+            model =>
+              (setForm req
+                |> (flip andThen) (\req -> generateTestPage res req model)
                 |> runRouteWithErrorHandler)
           _ ->
             model => Effects.none

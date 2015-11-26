@@ -20,7 +20,7 @@ import Database.Nedb as Database
 
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
-import Client.StartTakeHome.Views exposing (beforeTestWelcome)
+import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 
 import Model exposing (Connection, Model)
 import User
@@ -108,7 +108,7 @@ generateSignupPage res req model =
             randomUrl False ""
 
         tokenAsUrl token =
-            model.baseUrl ++ "/token=" ++ token
+            model.baseUrl ++ "?token=" ++ token
 
         tryInserting token =
             let
@@ -161,3 +161,25 @@ generateWelcomePage token res model =
                 _ ->
                     Debug.crash "This should be impossible!"
             )
+
+generateTestPage : Response -> Request -> Model -> Task String ()
+generateTestPage res req model =
+    let
+        token =
+            getFormField "token" req.form
+                |> Maybe.withDefault ""
+    in
+        User.getUsers { token = token } model.database
+            |> andThen (\userList ->
+                case userList of
+                    [] ->
+                        writeRedirect "/" res
+                    existingUser :: [] ->
+                        case testEntryByName existingUser.role model.testConfig of
+                            [] ->
+                                Task.fail "No matching roles!"
+                            testEntry :: _ ->
+                                writeNode (viewTakeHome testEntry) res
+                    _ ->
+                        Debug.crash "This should be impossible"
+                )

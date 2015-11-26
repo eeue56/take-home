@@ -2,7 +2,7 @@
     "tests":[
         {
             "name" : "Frontend developer",
-            "item" : "some_file.zip",
+            "item" : "tests/README.md",
             "itemType" : "file"
         },
         {
