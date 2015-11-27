@@ -4,6 +4,9 @@ module Client.Admin.Views where
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import String
+import Dict
+
+import Record
 
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
@@ -21,7 +24,17 @@ loginView =
         , submitField
         ]
 
+userView : User -> Html
+userView user =
+    Record.asDict user
+        |> Dict.toList
+        |> List.map
+            (\(field, value) ->
+                li [] [ text ((field) ++ " : " ++ (toString value)) ]
+            )
+        |> ul []
+
 allUsersView : List User -> Html
 allUsersView users =
-    List.map (\user -> li [] [ text user.name ]) users
+    List.map (\user -> li [] [ userView user ]) users
         |> ul []
