@@ -181,7 +181,6 @@ generateTestPage res req model =
 
         startTime  =
             Moment.getCurrent ()
-                |> Moment.toRecord
 
         app obj =
             writeElm "/Client/StartTakeHome/App" (Just obj) res

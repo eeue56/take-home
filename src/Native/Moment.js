@@ -1,52 +1,61 @@
-var MomentApi = function(){
-    var getCurrent = function(Moment){
+var MomentApi = function(Moment){
+    var getCurrent = function(){
         return function(){
-            return Moment();
+            return Moment().toObject();
         };
     };
 
     var format = function(){
         return function(moment) {
-            return moment.format();
+            return Moment(moment).format().toObject();
         };
     };
 
     var formatString = function(){
         return function(formatString, moment) {
             if (typeof formatString === "undefined" || formatString === null){
-                return moment.format();
+                return Moment(moment).format();
             }
-            return moment.format(formatString);
+            return Moment(moment).format(formatString);
         };
     };
 
-    var add = function(Moment) {
+    var add = function() {
         return function(first, second){
-            var m = Moment(second);
-            m.add(first);
+            var m = Moment(first);
+            m.add(second);
 
-            return m;
+            return m.toObject();
         };
     };
 
-    var subtract = function(Moment) {
+    var subtract = function() {
         return function(first, second){
-            var m = Moment(second);
-            m.subtract(first);
+            var m = Moment(first);
+            m.subtract(second);
 
-            return m;
+            return m.toObject();
         };
     };
 
-    var toRecord = function(){
-        return function(moment) {
-            return moment.toObject();
+    var from = function() {
+        return function(first, second){
+            var m = Moment(first);
+            return m.from(Moment(second));
         };
     };
 
-    var fromRecord = function(Moment) {
-        return function(moment){
-            return Moment(moment);
+    var isBefore = function() {
+        return function(first, second){
+            var m = Moment(first);
+            return m.isBefore(Moment(second));
+        };
+    };
+
+    var isAfter = function() {
+        return function(first, second){
+            var m = Moment(first);
+            return m.isAfter(Moment(second));
         };
     };
 
@@ -56,11 +65,12 @@ var MomentApi = function(){
         formatString: formatString,
         add: add,
         subtract: subtract,
-        toRecord: toRecord,
-        fromRecord: fromRecord
+        from: from,
+        isBefore: isBefore,
+        isAfter: isAfter
     };
 
-}();
+};
 
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
@@ -71,16 +81,18 @@ var make = function make(localRuntime) {
     }
 
     var Moment = require('moment');
+    var API = MomentApi(Moment);
 
 
     return {
-        'getCurrent': MomentApi.getCurrent(Moment),
-        'formatString': F2(MomentApi.formatString()),
-        'format': MomentApi.format(),
-        'add': F2(MomentApi.add(Moment)),
-        'subtract': F2(MomentApi.subtract(Moment)),
-        'toRecord': MomentApi.toRecord(),
-        'fromRecord': MomentApi.fromRecord(Moment)
+        'getCurrent': API.getCurrent(),
+        'formatString': F2(API.formatString()),
+        'format': API.format(),
+        'add': F2(API.add()),
+        'subtract': F2(API.subtract()),
+        'from': F2(API.from()),
+        'isBefore': F2(API.isBefore()),
+        'isAfter': F2(API.isAfter())
     };
 };
 

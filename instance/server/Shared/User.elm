@@ -3,7 +3,7 @@ module Shared.User where
 import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
 import Converters exposing (deserialize)
-import Moment exposing (MomentRecord)
+import Moment exposing (Moment)
 
 (|:) = Json.Decode.Extra.apply
 
@@ -12,9 +12,9 @@ type alias User =
     , name : String
     , email : String
     , role : String
-    , startTime : Maybe MomentRecord
-    , endTime : Maybe MomentRecord
-    , submissionLocation : Maybe MomentRecord
+    , startTime : Maybe Moment
+    , endTime : Maybe Moment
+    , submissionLocation : Maybe Moment
     }
 
 emptyUser =
@@ -27,7 +27,7 @@ emptyUser =
     , submissionLocation = Nothing
     }
 
-decodeMaybe : Decoder (Maybe MomentRecord)
+decodeMaybe : Decoder (Maybe Moment)
 decodeMaybe =
     customDecoder value (\val -> Ok (deserialize val))
 

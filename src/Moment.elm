@@ -1,17 +1,15 @@
 module Moment (getCurrent,
-    Moment(..), MomentRecord,
+    Moment,
     emptyMoment,
     format, formatString,
     add, subtract,
-    toRecord, fromRecord) where
+    from,
+    isBefore, isAfter) where
 
 import Native.Moment
 import Native.MomentJS
 
-type Moment =
-    Moment
-
-type alias MomentRecord =
+type alias Moment =
     { years : Int
     , months : Int
     , date : Int
@@ -43,18 +41,22 @@ formatString : String -> Moment -> String
 formatString =
     Native.Moment.formatString
 
-add : MomentRecord -> Moment -> Moment
+add : Moment -> Moment -> Moment
 add =
     Native.Moment.add
 
-subtract : MomentRecord -> Moment -> Moment
+subtract : Moment -> Moment -> Moment
 subtract =
     Native.Moment.subtract
 
-toRecord : Moment -> MomentRecord
-toRecord =
-    Native.Moment.toRecord
+from : Moment -> Moment -> String
+from =
+    Native.Moment.from
 
-fromRecord : MomentRecord -> Moment
-fromRecord =
-    Native.Moment.fromRecord
+isBefore : Moment -> Moment -> Bool
+isBefore =
+    Native.Moment.isBefore
+
+isAfter : Moment -> Moment -> Bool
+isAfter =
+    Native.Moment.isAfter

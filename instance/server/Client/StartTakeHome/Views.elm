@@ -50,15 +50,14 @@ viewTestFile test =
             case List.reverse (String.indexes "/" test.item) of
                 [] -> test.item
                 x::_ -> String.dropLeft (x + 1) test.item
-
     in
-    div
-        [ ]
-        [ a
-            [ href test.item
-            , attribute "download" justFileName ]
-            [ text "Click here to download the test content!" ]
-        ]
+        div
+            [ ]
+            [ a
+                [ href test.item
+                , attribute "download" justFileName ]
+                [ text "Click here to download the test content!" ]
+            ]
 
 viewUploadSolution : User -> Html
 viewUploadSolution user =
@@ -83,19 +82,18 @@ viewTimeStarted currentTime user =
                     { emptyMoment | hours = 2 }
 
                 endTime =
-                    Moment.fromRecord time
-                        |> Moment.add withTwoHours
+                    Moment.add time withTwoHours
 
                 timeLeft =
-                    currentTime
-                        |> Moment.toRecord
-                        |> (flip Moment.subtract) (Moment.fromRecord time)
+                    Moment.from endTime currentTime
+                _ =
+                    Debug.log "timeleft" timeLeft
             in
                 div
                     []
-                    [ text <| "Started at " ++ (Moment.formatString "h:mm:ss a" <| Moment.fromRecord time)
-                    , text <| "End time" ++ (Moment.formatString "h:mm:ss a" <| endTime)
-                    , text <| "Time left" ++ (Moment.formatString "h:mm:ss a" <| timeLeft)
+                    [ text <| "Started at " ++ (Moment.formatString "h:mm:ss a" time)
+                    , text <| "End time" ++ (Moment.formatString "h:mm:ss a" endTime)
+                    , text <| "Time left" ++ (toString timeLeft)
                     ]
 
 

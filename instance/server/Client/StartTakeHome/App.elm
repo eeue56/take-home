@@ -23,7 +23,9 @@ config =
     loadObject "TelateProps"
         |> Maybe.withDefault
             { user = emptyUser
-            , test = emptyTestEntry}
+            , test = emptyTestEntry
+            , currentTime = Moment.getCurrent ()
+            }
 
 model =
     config
