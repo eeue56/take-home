@@ -182,6 +182,9 @@ generateTestPage res req model =
         startTime  =
             Moment.getCurrent ()
                 |> Moment.toRecord
+
+        app obj =
+            writeElm "/Client/StartTakeHome/App" (Just obj) res
     in
         User.getUsers { token = token } model.database
             |> andThen (\userList ->
@@ -202,24 +205,20 @@ generateTestPage res req model =
 
                                             obj =
                                                 { name = "TelateProps"
-                                                , val = { user = updatedUser
-                                                        , test = testEntry}
+                                                , val =
+                                                    { user = updatedUser
+                                                    , test = testEntry
+                                                    }
                                                 }
                                         in
                                             User.updateUser { token = token } updatedUser model.database
-                                                    |> andThen
-                                                        (\_ ->
-                                                            writeElm "/Client/StartTakeHome/App" (Just obj) res
-                                                        )
+                                                |> andThen (\_ -> app obj)
                                     Just time ->
-                                        let
-                                            obj =
-                                                { name = "TelateProps"
-                                                , val = { user = existingUser
-                                                        , test = testEntry}
-                                                }
-                                        in
-                                            writeElm "/Client/StartTakeHome/App" (Just obj) res
+                                        app
+                                            { name = "TelateProps"
+                                            , val = { user = existingUser
+                                                    , test = testEntry}
+                                            }
 
                     _ ->
                         Debug.crash "This should be impossible"
