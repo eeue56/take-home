@@ -82,6 +82,11 @@ routeIncoming (req, res) model =
       (handleError res) >> runRoute
     url =
       req.url
+
+    generatePOST generator =
+      (setForm req
+        |> (flip andThen) (\req -> generator res req model)
+        |> runRouteWithErrorHandler)
   in
     case req.method of
       GET ->
@@ -120,25 +125,16 @@ routeIncoming (req, res) model =
       POST ->
         if url == routes.apply then
           model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateSuccessPage res req model)
-              |> runRouteWithErrorHandler)
+            generatePOST generateSuccessPage
         else if url == routes.signup then
           model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateSignupPage res req model)
-              |> runRouteWithErrorHandler)
+            generatePOST generateSignupPage
         else if url == routes.startTest then
           model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateTestPage res req model)
-              |> runRouteWithErrorHandler)
+            generatePOST generateTestPage
         else if url == routes.login then
           model =>
-            (setForm req
-              |> (flip andThen) (\req -> generateAdminPage res req model)
-              |> runRouteWithErrorHandler
-            )
+            generatePOST generateAdminPage
         else
           model =>
             (handleError res (Task.fail "Route not found")
