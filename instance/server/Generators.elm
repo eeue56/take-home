@@ -165,7 +165,7 @@ generateWelcomePage token res model =
                     in
                         case testEntryByName existingUser.role model.testConfig of
                             [] ->
-                                Task.fail "No matching roles!"
+                                Task.fail ("No matching roles! Please message " ++ model.contact)
                             testEntry :: _ ->
                                 writeNode (beforeTestWelcome existingUser testEntry) res
                 _ ->

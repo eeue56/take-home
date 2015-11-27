@@ -6,5 +6,6 @@
     "secret" : "S3_SECRET",
     "bucket" : "S3_BUCKET",
     "authSecret" : "AUTH_SECRET",
-    "baseUrl" : "BASE_URL"
+    "baseUrl" : "BASE_URL",
+    "contact" : "JOBS_CONTACT"
 }

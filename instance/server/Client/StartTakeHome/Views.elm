@@ -109,7 +109,7 @@ viewTakeHome address model =
                 TestFile ->
                     viewTestFile model.test
                 NoTest ->
-                    text "failed to find your test"
+                    text "Failed to find your test"
     in
         div
             []
