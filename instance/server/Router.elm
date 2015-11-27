@@ -65,6 +65,7 @@ runRoute task =
 hasQuery url =
   String.contains "?" url
 
+queryPart : String -> String
 queryPart url =
   String.indexes "?" url
     |> (\xs ->
@@ -73,80 +74,95 @@ queryPart url =
         x::_ -> String.dropLeft (x + 1) url
       )
 
-{-| route each request/response pair and write a response
--}
-routeIncoming : Connection -> Model -> (Model, Effects Action)
-routeIncoming (req, res) model =
+
+routePost : Connection -> Model -> (Model, Effects Action)
+routePost (req, res) model =
   let
     runRouteWithErrorHandler =
       (handleError res) >> runRoute
     url =
       req.url
 
-    generatePOST generator =
+    generate generator =
       (setForm req
         |> (flip andThen) (\req -> generator res req model)
         |> runRouteWithErrorHandler)
   in
-    case req.method of
-      GET ->
-        if url == routes.index then
+    if url == routes.apply then
+      model =>
+        generate generateSuccessPage
+    else if url == routes.signup then
+      model =>
+        generate generateSignupPage
+    else if url == routes.startTest then
+      model =>
+        generate generateTestPage
+    else if url == routes.login then
+      model =>
+        generate generateAdminPage
+    else
+      model =>
+        (handleError res (Task.fail "Route not found")
+          |> runRouteWithErrorHandler)
+
+routeGet : Connection -> Model -> (Model, Effects Action)
+routeGet (req, res) model =
+  let
+    runRouteWithErrorHandler =
+      (handleError res) >> runRoute
+    url =
+      req.url
+  in
+    if url == routes.index then
+      model =>
+        (writeNode (signUpForTakeHomeView model.testConfig) res
+          |> runRouteWithErrorHandler)
+    else if url == routes.login then
+      model =>
+        (writeNode loginView res
+          |> runRouteWithErrorHandler)
+    else
+      case queryPart url of
+        "" ->
           model =>
-            (writeNode (signUpForTakeHomeView model.testConfig) res
-              |> runRouteWithErrorHandler)
-        else if url == routes.login then
-          model =>
-            (writeNode loginView res
-              |> runRouteWithErrorHandler)
-        else
-          case hasQuery url of
-            False ->
+            (writeFile url res
+                |> runRouteWithErrorHandler)
+        query ->
+          case parseQuery <| query of
+            Err _ ->
               model =>
-                (writeFile url res
-                    |> runRouteWithErrorHandler)
-            True ->
-              case parseQuery <| queryPart url of
-                Err _ ->
+                (Task.fail "failed to parse"
+                  |> runRouteWithErrorHandler)
+            Ok bag ->
+              case getQueryField "token" bag of
+                Nothing ->
                   model =>
-                    (Task.fail "failed to parse"
+                    (Task.fail ("Failed to find anything " ++ url)
                       |> runRouteWithErrorHandler)
-                Ok bag ->
-                  case getQueryField "token" bag of
-                    Nothing ->
-                      model =>
-                        (Task.fail ("Failed to find anything " ++ url)
-                          |> runRouteWithErrorHandler)
 
-                    Just token ->
-                      model =>
-                        (generateWelcomePage token res model
-                          |> runRouteWithErrorHandler)
+                Just token ->
+                  model =>
+                    (generateWelcomePage token res model
+                      |> runRouteWithErrorHandler)
 
-      POST ->
-        if url == routes.apply then
-          model =>
-            generatePOST generateSuccessPage
-        else if url == routes.signup then
-          model =>
-            generatePOST generateSignupPage
-        else if url == routes.startTest then
-          model =>
-            generatePOST generateTestPage
-        else if url == routes.login then
-          model =>
-            generatePOST generateAdminPage
-        else
-          model =>
-            (handleError res (Task.fail "Route not found")
-              |> runRouteWithErrorHandler)
+{-| route each request/response pair and write a response
+-}
+routeIncoming : Connection -> Model -> (Model, Effects Action)
+routeIncoming (req, res) model =
+  case req.method of
+    GET ->
+      routeGet (req, res) model
 
-      NOOP ->
-        model => Effects.none
+    POST ->
+      routePost (req, res) model
 
-      _ ->
-        model =>
-          (writeJson (Json.string "unknown method!") res
-            |> runRoute)
+    NOOP ->
+      model => Effects.none
+
+    _ ->
+      model =>
+        (writeJson (Json.string "unknown method!") res
+          |> runRoute)
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -155,18 +171,5 @@ update action model =
     Incoming connection -> routeIncoming connection model
     Run _ -> (model, Effects.none)
     Noop -> (model, Effects.none)
-
-uniqueUrl : String -> Maybe String
-uniqueUrl url =
-  let
-    uniqueRegex =
-      Regex.regex "?token=(.+)(&.)"
-  in
-    case Regex.find (Regex.AtMost 1) uniqueRegex url of
-      [] -> Nothing
-      uniqueMatch::_ ->
-        case uniqueMatch.submatches of
-          uniqueString::_::[] -> uniqueString
-          _ -> Nothing
 
 (=>) = (,)
