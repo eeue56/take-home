@@ -21,7 +21,7 @@ var write = function write(Task) {
 };
 
 var writeFile = function writeFile(fs, mime, Task){
-    return function (fileName, res, appendage) {
+    return function (fileName, res) {
         return Task.asyncFunction(function (callback) {
             var file = __dirname + fileName;
             var type = mime.lookup(file);
@@ -29,18 +29,11 @@ var writeFile = function writeFile(fs, mime, Task){
             res.writeHead('Content-Type', type);
 
             fs.readFile(file, function (e, data) {
-                if (e.code == 'ENOENT'){
+                if (e !== null && e.code == 'ENOENT'){
                     res.writeHead(404);
                     return callback(Task.fail("404"));
                 }
-                console.log("data", data);
-                console.log("e", e);
-                console.log("file", file);
                 res.write(data);
-
-                if (!(typeof appendage === "undefined" || appendage === null)){
-                    res.write("<script>" + appendage + "</script>");
-                }
 
                 return callback(Task.succeed(res));
             });

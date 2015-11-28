@@ -2,6 +2,8 @@ module Client.StartTakeHome.Views where
 
 import Html exposing (a, div, form, label, input, text, button, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
+import Html.Tags exposing (style, stylesheetLink)
+
 import String
 
 import Client.Components exposing (..)
@@ -93,7 +95,7 @@ viewTimeStarted currentTime user =
                     []
                     [ text <| "Started at " ++ (Moment.formatString "h:mm:ss a" time)
                     , text <| "End time" ++ (Moment.formatString "h:mm:ss a" endTime)
-                    , text <| "Time left" ++ (toString timeLeft)
+                    , text <| "You should submit your solution " ++ timeLeft
                     ]
 
 
@@ -111,7 +113,8 @@ viewTakeHome address model =
     in
         div
             []
-            [ testView
+            [ stylesheetLink "/styles.css"
+            , testView
             , viewUploadSolution model.user
             , viewTimeStarted model.currentTime model.user
             ]

@@ -53,7 +53,6 @@ var databaseApi = function(Database) {
         return function(queryRecord, client){
             return Task.asyncFunction(function(callback){
                 client.find(queryRecord, function(err, docs){
-                    console.log("docs", docs);
                     if (err){
                         return callback(Task.fail("Failed to find any matches"));
                     }
@@ -66,13 +65,11 @@ var databaseApi = function(Database) {
 
     var update = function(Task) {
         return function(queryRecord, replacement, client){
-            console.log("query", queryRecord);
-            console.log("replacement", replacement);
+
             return Task.asyncFunction(function(callback){
                 client.update(queryRecord, replacement, function(err, docs){
-                    console.log("err", err);
-                    console.log("docs", docs);
                     if (err){
+                        console.log("err", err);
                         return callback(Task.fail("Failed to find any matches"));
                     }
 

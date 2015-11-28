@@ -81,7 +81,7 @@ generateSuccessPage res req model =
         handleFiles =
             case getFormFiles req.form of
                 [] ->
-                    Debug.log "no files" <| Task.succeed "failed"
+                    Debug.log "no files" <| Task.fail "failed"
                 x::_ ->
                   uploadFile x.path (newPath x.originalFilename) client
 
@@ -112,7 +112,7 @@ generateSignupPage res req model =
             randomUrl False ""
 
         tokenAsUrl token =
-            model.baseUrl ++ "?token=" ++ token
+            "http://" ++ model.baseUrl ++ "?token=" ++ token
 
         tryInserting token =
             let

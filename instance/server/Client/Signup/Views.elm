@@ -2,6 +2,7 @@ module Client.Signup.Views where
 
 import Html exposing (form, label, input, text, div, a, select, option, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
+import Html.Tags exposing (style)
 
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
@@ -16,7 +17,8 @@ signUpForTakeHomeView testConfig =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ emailField
+        [ style "body { background-color : 'red'; }"
+        , emailField
         , nameField
         , chooseRole (List.map (\test -> test.name) testConfig.tests)
         , submitField
