@@ -15,10 +15,7 @@ loadConfig filename =
         |> (\value ->
             case value of
                 Err err ->
-                    let
-                        _ = Debug.log "oops" err
-                    in
-                        { tests = [] }
+                    { tests = [] }
                 Ok v ->
                     v
             )

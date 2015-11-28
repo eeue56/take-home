@@ -88,8 +88,7 @@ viewTimeStarted currentTime user =
 
                 timeLeft =
                     Moment.from endTime currentTime
-                _ =
-                    Debug.log "timeleft" timeLeft
+
             in
                 div
                     []

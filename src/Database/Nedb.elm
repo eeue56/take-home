@@ -60,10 +60,14 @@ find : Operation a (List b)
 find =
     Native.Database.Nedb.find
 
+{-| Update any matching records with the given record
+-}
 update : UpdateOperation a b
 update =
     Native.Database.Nedb.update
 
+{-| Use for low-level debugging to see how data is stored
+-}
 actualLog : a -> a
 actualLog =
     Native.Database.Nedb.actualLog

@@ -45,11 +45,6 @@ andThen = (flip Task.andThen)
 onError = (flip Task.onError)
 
 
---uploadFile : String -> String -> Knox.Client -> Task (Result String String) String
-uploadFile fileName fileNameOnServer client =
-    Knox.putFile fileName fileNameOnServer client
-
-
 --generateSuccessPage : Response -> Request -> Model -> Task b ()
 generateSuccessPage res req model =
     let
@@ -75,19 +70,16 @@ generateSuccessPage res req model =
             getFormField "email" req.form
                 |> Maybe.withDefault "anon"
 
-        view =
-            successView name
-
         handleFiles =
             case getFormFiles req.form of
                 [] ->
                     Debug.log "no files" <| Task.fail "failed"
                 x::_ ->
-                  uploadFile x.path (newPath x.originalFilename) client
+                  Knox.putFile x.path (newPath x.originalFilename) client
 
     in
         handleFiles
-            |> andThen (\url -> writeNode (view url) res)
+            |> andThen (\url -> writeNode (successView name url) res)
 
 
 generateSignupPage : Response -> Request -> Model -> Task String ()
@@ -160,14 +152,11 @@ generateWelcomePage token res model =
                 [] ->
                     writeRedirect routes.index res
                 existingUser :: [] ->
-                    let
-                        _ = Debug.log "exist" existingUser |> Database.actualLog
-                    in
-                        case testEntryByName existingUser.role model.testConfig of
-                            [] ->
-                                Task.fail ("No matching roles! Please message " ++ model.contact)
-                            testEntry :: _ ->
-                                writeNode (beforeTestWelcome existingUser testEntry) res
+                    case testEntryByName existingUser.role model.testConfig of
+                        [] ->
+                            Task.fail ("No matching roles! Please message " ++ model.contact)
+                        testEntry :: _ ->
+                            writeNode (beforeTestWelcome existingUser testEntry) res
                 _ ->
                     Debug.crash "This should be impossible!"
             )
@@ -229,9 +218,6 @@ generateAdminPage res req model =
         password =
             getFormField "password" req.form
                 |> Maybe.withDefault ""
-
-        _ =
-            Debug.log "password" password
 
         attemptLogin =
             if password == model.authSecret then
