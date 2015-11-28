@@ -3,6 +3,7 @@ module Http.Response
   , emptyRes
   , okCode, redirectCode
   , textHtml, applicationJson
+  , textCss
   , redirectHeader
   , onCloseRes, onFinishRes
   ) where
@@ -31,6 +32,11 @@ emptyRes =
 textHtml : Header
 textHtml =
     ("Content-Type", "text/html")
+
+{-| Html Header {"Content-Type":"text/css"}-}
+textCss : Header
+textCss =
+    ("Content-Type", "text/css")
 
 {-| Json Header {"Content-Type":"application/json"}-}
 applicationJson : Header

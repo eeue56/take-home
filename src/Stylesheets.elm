@@ -82,6 +82,8 @@ h3 = Tag "h3"
 h4 = Tag "h4"
 p = Tag "p"
 ol = Tag "ol"
+ul = Tag "ul"
+li = Tag "li"
 input = Tag "input"
 
 tagToString (Tag str) = str

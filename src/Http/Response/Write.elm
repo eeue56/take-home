@@ -1,6 +1,7 @@
 module Http.Response.Write
   ( write, writeHead
   , writeHtml, writeJson
+  , writeCss
   , writeFile, writeElm
   , writeNode, writeRedirect
   , end) where
@@ -8,6 +9,7 @@ module Http.Response.Write
 
 import Http.Response exposing (
   textHtml, applicationJson,
+  textCss,
   okCode, redirectCode,
   redirectHeader,
   Header, Response, StatusCode)
@@ -44,6 +46,14 @@ writeAs code header html res =
  -}
 writeHtml : String -> Response -> Task x ()
 writeHtml = writeAs okCode textHtml
+
+{-| Write out HTML to a Response. For example
+
+    res `writeCss` "h1 { color : red; }"
+
+ -}
+writeCss : String -> Response -> Task x ()
+writeCss = writeAs okCode textCss
 
 {-| Write out JSON to a Response. For example
     res `writeJson` Json.object

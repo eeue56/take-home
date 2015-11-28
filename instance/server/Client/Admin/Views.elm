@@ -1,8 +1,9 @@
 module Client.Admin.Views where
 
-
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
+import Html.Tags exposing (style, stylesheetLink)
+
 import String
 import Dict
 
@@ -36,5 +37,10 @@ userView user =
 
 allUsersView : List User -> Html
 allUsersView users =
-    List.map (\user -> li [] [ userView user ]) users
-        |> ul []
+    div
+        []
+        [ stylesheetLink assets.admin.route
+        , List.map (\user -> li [] [ userView user ]) users
+            |> ul []
+        ]
+

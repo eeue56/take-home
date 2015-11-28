@@ -1,7 +1,7 @@
 module Router where
 
 import Http.Response.Write exposing (writeHtml
-  , writeJson
+  , writeJson, writeCss
   , writeElm, writeFile
   , writeNode, writeRedirect)
 
@@ -24,7 +24,7 @@ import Generators exposing (generateSuccessPage
 
 import Client.Admin.Views exposing (loginView)
 
-import Shared.Routes exposing (routes)
+import Shared.Routes exposing (routes, assets)
 
 import Task exposing (..)
 import Signal exposing (..)
@@ -121,6 +121,10 @@ routeGet (req, res) model =
       model =>
         (writeNode loginView res
           |> runRouteWithErrorHandler)
+    else if url == assets.admin.route then
+      model =>
+        (writeCss assets.admin.css res
+          |> runRouteWithErrorHandler)
     else
       case queryPart url of
         "" ->
@@ -128,7 +132,7 @@ routeGet (req, res) model =
             (writeFile url res
                 |> runRouteWithErrorHandler)
         query ->
-          case parseQuery <| query of
+          case parseQuery query of
             Err _ ->
               model =>
                 (Task.fail "failed to parse"
