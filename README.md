@@ -28,6 +28,9 @@ In a brief summary, this program has support for the following in Elm
 - Nedb server side
 - StartApp on the server
 
+## Framework
+
+While this project provides a good start place for anyone wishing to use full-stack Elm, it does not provide a "do everything" framework like Rails or Django just yet. There is work to make it more like a framework with scripting, but at this time it's not there yet.
 
 # How does it work?
 
