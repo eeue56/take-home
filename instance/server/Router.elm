@@ -57,14 +57,16 @@ handleError res errTask =
   errTask
     |> (flip Task.onError) (\err -> writeNode (genericErrorView err) res)
 
+{-| Actually queue the response up
+-}
 runRoute task =
   task
     |> Task.map Run
     |> Effects.task
 
-hasQuery url =
-  String.contains "?" url
-
+{-| Get any part of a string past `?`.
+Useful for getting a query string out of a url
+-}
 queryPart : String -> String
 queryPart url =
   String.indexes "?" url
@@ -74,7 +76,8 @@ queryPart url =
         x::_ -> String.dropLeft (x + 1) url
       )
 
-
+{-| Route any `POST` requests
+-}
 routePost : Connection -> Model -> (Model, Effects Action)
 routePost (req, res) model =
   let
@@ -105,6 +108,8 @@ routePost (req, res) model =
         (handleError res (Task.fail "Route not found")
           |> runRouteWithErrorHandler)
 
+{-| Route any `GET` requests
+-}
 routeGet : Connection -> Model -> (Model, Effects Action)
 routeGet (req, res) model =
   let

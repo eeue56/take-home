@@ -27,8 +27,10 @@ emptyUser =
     , submissionLocation = Nothing
     }
 
-decodeMaybe : Decoder (Maybe Moment)
-decodeMaybe =
+{-| Decode a Maybe Moment
+-}
+decodeMaybeMoment : Decoder (Maybe Moment)
+decodeMaybeMoment =
     customDecoder value (\val -> Ok (deserialize val))
 
 
@@ -39,6 +41,6 @@ decoder =
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := string)
-        |: ("startTime" := decodeMaybe)
-        |: ("endTime" := decodeMaybe)
-        |: ("submissionLocation" := decodeMaybe)
+        |: ("startTime" := decodeMaybeMoment)
+        |: ("endTime" := decodeMaybeMoment)
+        |: ("submissionLocation" := decodeMaybeMoment)

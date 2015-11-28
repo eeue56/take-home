@@ -27,14 +27,22 @@ import Test
 (?) : Maybe a -> a -> a
 (?) mx x = Maybe.withDefault x mx
 
+{-| Load a config from a json file
+This will die at compile time if the file is missing
+-}
 myConfig : SiteConfig
 myConfig =
   loadConfig "./config/config.json"
 
+{-| load up our test configs based on where our main
+config tells us where it's kept
+-}
 testConfig : TestConfig
 testConfig =
   Test.loadConfig myConfig.testConfig
 
+{-| Our server model
+-}
 model : Model
 model =
   { key = ""
@@ -47,7 +55,8 @@ model =
   , authSecret = ""
   }
 
-
+{-| Grab properties from ENV for use in our model
+-}
 envToModel env =
   { key =
       Dict.get myConfig.accessKey env ? ""
@@ -74,14 +83,20 @@ envToModel env =
       model.testConfig
   }
 
+{-| Our actual server is just a mailbox
+-}
 server : Mailbox Connection
 server = mailbox (emptyReq, emptyRes)
 
+{-| Load the current Env on startup and populate the model
+-}
 init : Task Effects.Never StartAppAction
 init =
   Env.getCurrent
     |> Task.map (\env -> Init (envToModel env))
 
+{-| Wrap the model
+-}
 translateModel : (Model, Effects.Effects Action) -> (Maybe Model, Effects.Effects StartAppAction)
 translateModel (model, action) =
   (Just model, Effects.map Update action)
@@ -100,6 +115,9 @@ updateWrapper startAppAction maybeModel =
     _ ->
       (maybeModel, Effects.none)
 
+{-| This uses a slightly modified start-app with anything binding it to
+HTML removed, and the address exposed
+-}
 app : App (Maybe Model) StartAppAction
 app =
   start
@@ -108,7 +126,8 @@ app =
     , inputs = [Signal.map (Update << Incoming) <| dropRepeats server.signal]
     }
 
-
+{-| Create the server through using the ports hack
+-}
 port serve : Task x Server
 port serve =
     createServer'
@@ -116,6 +135,8 @@ port serve =
       myConfig.myPort
       ("Listening on " ++ (toString myConfig.myPort))
 
+{-| Standard port for running tasks with StartApp
+-}
 port reply : Signal (Task Effects.Never ())
 port reply =
     app.tasks
