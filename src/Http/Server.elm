@@ -1,5 +1,5 @@
 module Http.Server
-  ( createServer, createServer', listen
+  ( createServer, createServerAndListen, listen
   , Port, Server
   , onRequest, onClose
   ) where
@@ -63,11 +63,11 @@ createServer = Native.Http.createServer
 
 {-| Create a Http Server and listen in one command! For example
     port serve : Task x Server
-    port serve = createServer' server.address 8080 "Alive on 8080!"
+    port serve = createServerAndListen server.address 8080 "Alive on 8080!"
 -}
 
-createServer' : Address (Request, Response) -> Port -> String -> Task x Server
-createServer' address port' text  =
+createServerAndListen : Address (Request, Response) -> Port -> String -> Task x Server
+createServerAndListen address port' text  =
   createServer address `andThen` listen port' text
 
 {-| Command Server to listen on a specific port,

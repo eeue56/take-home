@@ -130,7 +130,7 @@ app =
 -}
 port serve : Task x Server
 port serve =
-    createServer'
+    createServerAndListen
       server.address
       myConfig.myPort
       ("Listening on " ++ (toString myConfig.myPort))
