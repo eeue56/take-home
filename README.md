@@ -50,6 +50,7 @@ Yes! We're going to use in production.
 
 Fresheyeball provided the [PoC](https://github.com/Fresheyeball/elm-http-server) HTTP server implementation that we rewrote parts of [here](https://github.com/eeue56/servelm) and then applied to production!
 
+rtfeldman provided CSS support through [elm-stylesheets](https://github.com/rtfeldman/elm-stylesheets)
 
 # Awesome!
 
