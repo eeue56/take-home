@@ -2,6 +2,8 @@
 
 take-home is the world's first open-source project written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm.
 
+## Support summary
+
 In a brief summary, this program has support for the following in Elm
 
 - Server-side programs
@@ -14,7 +16,7 @@ In a brief summary, this program has support for the following in Elm
 - [Shared models between client and server side code](https://github.com/NoRedInk/take-home/tree/master/instance/server/Shared)
 - [Server-side templating for data injection](https://github.com/NoRedInk/take-home/blob/master/instance/server/Client/StartTakeHome/App.elm#L22)
 
-Some extras
+### Some extras
 
 - Moment.js wrapper both client and server side
 - Knox server side
