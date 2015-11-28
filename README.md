@@ -1,6 +1,6 @@
 # take-home
 
-take-home is the world's first open-source project written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm.
+take-home is the world's first open-source project with all parts of the stack written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm.
 
 # Interesting parts
 
@@ -25,7 +25,19 @@ In a brief summary, this program has support for the following in Elm
 - Knox server side
 - Uuid server side
 - Nedb server side
+- StartApp on the server
 
+
+# How does it work?
+
+The server itself follows the Elm architecture. It uses a [modified startapp](https://github.com/NoRedInk/start-app) implementation. This means you have the following core functions
+
+```elm
+update : Action -> Model -> (Model, Effects Action)
+routeIncoming : Connection -> Model -> (Model, Effects Action)
+```
+
+Notice how there's no longer a view. The update function is responsible for updating the model, while the router is responsible for writing replies to the client.
 
 # FAQ
 
@@ -34,6 +46,9 @@ In a brief summary, this program has support for the following in Elm
 Yes! We're going to use in production.
 
 
+# Credit
+
+Fresheyeball provided the [PoC](https://github.com/Fresheyeball/elm-http-server) HTTP server implementation that we rewrote parts of [here](https://github.com/eeue56/servelm) and then applied to production!
 
 
 # Awesome!
