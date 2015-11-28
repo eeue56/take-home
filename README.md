@@ -2,6 +2,9 @@
 
 take-home is the world's first open-source project written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm.
 
+# Interesting parts
+
+
 ## Support summary
 
 In a brief summary, this program has support for the following in Elm
@@ -23,12 +26,12 @@ In a brief summary, this program has support for the following in Elm
 - Uuid server side
 - Nedb server side
 
+
+# FAQ
+
 ## Will this be used in production?
 
 Yes! We're going to use in production.
-
-
-# Interesting parts
 
 
 
