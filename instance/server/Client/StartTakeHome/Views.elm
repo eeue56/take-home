@@ -1,27 +1,24 @@
-module Client.StartTakeHome.Views where
+module Client.StartTakeHome.Views (..) where
 
 import Html exposing (a, div, form, label, input, text, button, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
-
 import String
-
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
-
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
-
 import Moment exposing (emptyMoment, Moment)
 
 
 startTestButton : Html
 startTestButton =
     button
-        [ ]
+        []
         [ text "Start test" ]
+
 
 beforeTestWelcome : User -> TestEntry -> Html
 beforeTestWelcome user test =
@@ -36,30 +33,37 @@ beforeTestWelcome user test =
         , startTestButton
         ]
 
+
 viewTestLink : TestEntry -> Html
 viewTestLink test =
     div
-        [ ]
+        []
         [ a
             [ href test.item ]
             [ text "Click here to read the test contents!" ]
         ]
+
 
 viewTestFile : TestEntry -> Html
 viewTestFile test =
     let
         justFileName =
             case List.reverse (String.indexes "/" test.item) of
-                [] -> test.item
-                x::_ -> String.dropLeft (x + 1) test.item
+                [] ->
+                    test.item
+
+                x :: _ ->
+                    String.dropLeft (x + 1) test.item
     in
         div
-            [ ]
+            []
             [ a
                 [ href test.item
-                , attribute "download" justFileName ]
+                , attribute "download" justFileName
+                ]
                 [ text "Click here to download the test content!" ]
             ]
+
 
 viewUploadSolution : User -> Html
 viewUploadSolution user =
@@ -73,11 +77,13 @@ viewUploadSolution user =
         , submitField
         ]
 
+
 viewTimeStarted : Moment -> User -> Html
 viewTimeStarted currentTime user =
     case user.startTime of
         Nothing ->
             div [] [ text "Not started yet!" ]
+
         Just time ->
             let
                 withTwoHours =
@@ -88,7 +94,6 @@ viewTimeStarted currentTime user =
 
                 timeLeft =
                     Moment.from endTime currentTime
-
             in
                 div
                     []
@@ -105,8 +110,10 @@ viewTakeHome address model =
             case model.test.itemType of
                 TestLink ->
                     viewTestLink model.test
+
                 TestFile ->
                     viewTestFile model.test
+
                 NoTest ->
                     text "Failed to find your test"
     in

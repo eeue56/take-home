@@ -1,11 +1,14 @@
-module Shared.User where
+module Shared.User (..) where
 
 import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
 import Converters exposing (deserialize)
 import Moment exposing (Moment)
 
-(|:) = Json.Decode.Extra.apply
+
+(|:) =
+    Json.Decode.Extra.apply
+
 
 type alias User =
     { token : String
@@ -17,6 +20,7 @@ type alias User =
     , submissionLocation : Maybe Moment
     }
 
+
 emptyUser =
     { token = ""
     , name = ""
@@ -26,6 +30,7 @@ emptyUser =
     , endTime = Nothing
     , submissionLocation = Nothing
     }
+
 
 {-| Decode a Maybe Moment
 -}

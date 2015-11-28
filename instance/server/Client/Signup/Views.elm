@@ -1,14 +1,13 @@
-module Client.Signup.Views where
+module Client.Signup.Views (..) where
 
 import Html exposing (form, label, input, text, div, a, select, option, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
 import Html.Tags exposing (style)
-
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
 import Shared.Routes exposing (routes)
-
 import Client.Components exposing (..)
+
 
 signUpForTakeHomeView : TestConfig -> Html
 signUpForTakeHomeView testConfig =
@@ -24,6 +23,7 @@ signUpForTakeHomeView testConfig =
         , submitField
         ]
 
+
 alreadySignupView : String -> User -> Html
 alreadySignupView url user =
     div
@@ -34,14 +34,16 @@ alreadySignupView url user =
             [ text url ]
         ]
 
+
 successfulSignupView : String -> User -> Html
 successfulSignupView url user =
     div
         []
         [ a
             [ href url ]
-            [ text ("You have successfully signed up," ++ user.name ) ]
+            [ text ("You have successfully signed up," ++ user.name) ]
         ]
+
 
 chooseRole : List String -> Html
 chooseRole choices =
@@ -49,7 +51,7 @@ chooseRole choices =
         roles =
             List.map
                 (\role -> option [] [ text role ])
-            choices
+                choices
     in
         select
             [ id "role"

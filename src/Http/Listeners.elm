@@ -1,4 +1,5 @@
 module Http.Listeners (on) where
+
 {-| Module for event listener helpers
 
 @docs on
@@ -6,7 +7,9 @@ module Http.Listeners (on) where
 
 import Native.Http
 
+
 {-| Wrapper for creating event listeners
 -}
 on : String -> target -> Signal input
-on = Native.Http.on
+on =
+    Native.Http.on

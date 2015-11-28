@@ -1,4 +1,4 @@
-module Client.Components where
+module Client.Components (..) where
 
 import Html exposing (form, label, input, text, div, a, Html)
 import Html.Attributes exposing (..)
@@ -16,8 +16,9 @@ emailField =
             , name "email"
             , id "email"
             ]
-            [ ]
+            []
         ]
+
 
 nameField : Html
 nameField =
@@ -31,8 +32,9 @@ nameField =
             , name "name"
             , id "name"
             ]
-            [ ]
+            []
         ]
+
 
 passwordField : Html
 passwordField =
@@ -46,8 +48,9 @@ passwordField =
             , name "password"
             , id "password"
             ]
-            [ ]
+            []
         ]
+
 
 submitField : Html
 submitField =
@@ -56,7 +59,8 @@ submitField =
         , name "submit"
         , id "submit"
         ]
-        [ ]
+        []
+
 
 fileField : Html
 fileField =
@@ -65,7 +69,8 @@ fileField =
         , name "file"
         , id "file"
         ]
-        [ ]
+        []
+
 
 hiddenTokenField : String -> Html
 hiddenTokenField token =

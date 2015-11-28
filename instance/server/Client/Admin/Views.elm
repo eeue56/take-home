@@ -1,14 +1,11 @@
-module Client.Admin.Views where
+module Client.Admin.Views (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
-
 import String
 import Dict
-
 import Record
-
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
@@ -25,15 +22,17 @@ loginView =
         , submitField
         ]
 
+
 userView : User -> Html
 userView user =
     Record.asDict user
         |> Dict.toList
         |> List.map
-            (\(field, value) ->
+            (\( field, value ) ->
                 li [] [ text ((field) ++ " : " ++ (toString value)) ]
             )
         |> ul []
+
 
 allUsersView : List User -> Html
 allUsersView users =
@@ -43,4 +42,3 @@ allUsersView users =
         , List.map (\user -> li [] [ userView user ]) users
             |> ul []
         ]
-
