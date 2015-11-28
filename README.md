@@ -5,15 +5,14 @@ take-home is the world's first open-source project written in only Elm. The serv
 In a brief summary, this program has support for the following in Elm
 
 - Server-side programs
-- A web server
-- Database support in Elm
-- Build tools
+- [A web server](https://github.com/NoRedInk/take-home/blob/master/instance/server/Main.elm)
+- [Database support in Elm](https://github.com/NoRedInk/take-home/blob/master/instance/server/User.elm)
+- [Build tools](https://github.com/NoRedInk/take-home/pull/2)
 - Env/JSON config support
-- Filesystem support
-- Type-safe CSS
-- Server-side rendered client-side HTML
-- Shared models between client and server side code
-- Server-side templating for data injection
+- [Type-safe CSS](https://github.com/NoRedInk/take-home/blob/master/instance/server/Client/Admin/Styles.elm)
+- [Server-side rendered client-side HTML](https://github.com/NoRedInk/take-home/blob/master/instance/server/Router.elm#L118)
+- [Shared models between client and server side code](https://github.com/NoRedInk/take-home/tree/master/instance/server/Shared)
+- [Server-side templating for data injection](https://github.com/NoRedInk/take-home/blob/master/instance/server/Client/StartTakeHome/App.elm#L22)
 
 Some extras
 
