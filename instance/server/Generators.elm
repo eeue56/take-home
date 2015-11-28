@@ -1,38 +1,22 @@
-module Generators where
+module Generators (..) where
 
-import Http.Response.Write exposing (writeHtml
-    , writeJson
-    , writeElm, writeFile
-    , writeNode, writeRedirect)
-
-import Http.Request exposing (emptyReq
-    , Request, Method(..)
-    , parseQuery, getQueryField
-    , getFormField, getFormFiles
-    , setForm
-    )
-
+import Http.Response.Write exposing (writeHtml, writeJson, writeElm, writeFile, writeNode, writeRedirect)
+import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
 import Http.Response exposing (Response)
 import Http.Server
-
 import Knox
 import Database.Nedb as Database
 import Moment
-
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 import Client.Admin.Views exposing (allUsersView)
-
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
 import Shared.Test exposing (testEntryByName)
-
 import Shared.Routes exposing (routes)
-
 import Utils exposing (randomUrl)
-
 import Debug
 import Maybe
 import Result exposing (Result)
@@ -41,11 +25,19 @@ import Dict
 import Task exposing (Task)
 import String
 
-andThen = (flip Task.andThen)
-onError = (flip Task.onError)
+
+andThen =
+    (flip Task.andThen)
+
+
+onError =
+    (flip Task.onError)
+
 
 
 --generateSuccessPage : Response -> Request -> Model -> Task b ()
+
+
 generateSuccessPage res req model =
     let
         client =
@@ -56,7 +48,8 @@ generateSuccessPage res req model =
                 }
 
         newPath originalFilename =
-            String.join "/"
+            String.join
+                "/"
                 [ name
                 , email
                 , originalFilename
@@ -74,9 +67,9 @@ generateSuccessPage res req model =
             case getFormFiles req.form of
                 [] ->
                     Debug.log "no files" <| Task.fail "failed"
-                x::_ ->
-                  Knox.putFile x.path (newPath x.originalFilename) client
 
+                x :: _ ->
+                    Knox.putFile x.path (newPath x.originalFilename) client
     in
         handleFiles
             |> andThen (\url -> writeNode (successView name url) res)
@@ -88,9 +81,11 @@ generateSignupPage res req model =
         name =
             getFormField "name" req.form
                 |> Maybe.withDefault "anon"
+
         email =
             getFormField "email" req.form
                 |> Maybe.withDefault "anon"
+
         role =
             getFormField "role" req.form
                 |> Maybe.withDefault "none"
@@ -122,24 +117,25 @@ generateSignupPage res req model =
                     tokenAsUrl token
             in
                 User.insertIntoDatabase userWithToken model.database
-                    |> andThen (\_ ->
-                        Task.succeed (successfulSignupView url userWithToken)
+                    |> andThen
+                        (\_ ->
+                            Task.succeed (successfulSignupView url userWithToken)
                         )
-
     in
         User.getUsers { name = name, email = email } model.database
-            |> andThen (\userList ->
-                case userList of
-                    [] ->
-                        getToken
-                            |> andThen tryInserting
-                            |> Task.mapError (\_ -> "no such user")
+            |> andThen
+                (\userList ->
+                    case userList of
+                        [] ->
+                            getToken
+                                |> andThen tryInserting
+                                |> Task.mapError (\_ -> "no such user")
 
-                    existingUser :: [] ->
-                        Task.succeed (alreadySignupView (tokenAsUrl existingUser.token) existingUser)
+                        existingUser :: [] ->
+                            Task.succeed (alreadySignupView (tokenAsUrl existingUser.token) existingUser)
 
-                    _ ->
-                        Task.fail "multiple users found with that name and email address"
+                        _ ->
+                            Task.fail "multiple users found with that name and email address"
                 )
             |> andThen (\node -> writeNode node res)
 
@@ -147,19 +143,24 @@ generateSignupPage res req model =
 generateWelcomePage : String -> Response -> Model -> Task String ()
 generateWelcomePage token res model =
     User.getUsers { token = token } model.database
-        |> andThen (\userList ->
-            case userList of
-                [] ->
-                    writeRedirect routes.index res
-                existingUser :: [] ->
-                    case testEntryByName existingUser.role model.testConfig of
-                        [] ->
-                            Task.fail ("No matching roles! Please message " ++ model.contact)
-                        testEntry :: _ ->
-                            writeNode (beforeTestWelcome existingUser testEntry) res
-                _ ->
-                    Debug.crash "This should be impossible!"
+        |> andThen
+            (\userList ->
+                case userList of
+                    [] ->
+                        writeRedirect routes.index res
+
+                    existingUser :: [] ->
+                        case testEntryByName existingUser.role model.testConfig of
+                            [] ->
+                                Task.fail ("No matching roles! Please message " ++ model.contact)
+
+                            testEntry :: _ ->
+                                writeNode (beforeTestWelcome existingUser testEntry) res
+
+                    _ ->
+                        Debug.crash "This should be impossible!"
             )
+
 
 generateTestPage : Response -> Request -> Model -> Task String ()
 generateTestPage res req model =
@@ -168,49 +169,57 @@ generateTestPage res req model =
             getFormField "token" req.form
                 |> Maybe.withDefault ""
 
-        startTime  =
+        startTime =
             Moment.getCurrent ()
 
         app obj =
             writeElm "/Client/StartTakeHome/App" (Just obj) res
     in
         User.getUsers { token = token } model.database
-            |> andThen (\userList ->
-                case userList of
-                    [] ->
-                        writeRedirect routes.index res
-                    existingUser :: [] ->
-                        case testEntryByName existingUser.role model.testConfig of
-                            [] ->
-                                Task.fail "No matching roles!"
-                            testEntry :: _ ->
-                                case existingUser.startTime of
-                                    Nothing ->
-                                        let
-                                            updatedUser =
-                                                { existingUser
-                                                | startTime = Just startTime }
+            |> andThen
+                (\userList ->
+                    case userList of
+                        [] ->
+                            writeRedirect routes.index res
 
-                                            obj =
+                        existingUser :: [] ->
+                            case testEntryByName existingUser.role model.testConfig of
+                                [] ->
+                                    Task.fail "No matching roles!"
+
+                                testEntry :: _ ->
+                                    case existingUser.startTime of
+                                        Nothing ->
+                                            let
+                                                updatedUser =
+                                                    { existingUser
+                                                        | startTime = Just startTime
+                                                    }
+
+                                                obj =
+                                                    { name = "TelateProps"
+                                                    , val =
+                                                        { user = updatedUser
+                                                        , test = testEntry
+                                                        }
+                                                    }
+                                            in
+                                                User.updateUser { token = token } updatedUser model.database
+                                                    |> andThen (\_ -> app obj)
+
+                                        Just time ->
+                                            app
                                                 { name = "TelateProps"
                                                 , val =
-                                                    { user = updatedUser
+                                                    { user = existingUser
                                                     , test = testEntry
                                                     }
                                                 }
-                                        in
-                                            User.updateUser { token = token } updatedUser model.database
-                                                |> andThen (\_ -> app obj)
-                                    Just time ->
-                                        app
-                                            { name = "TelateProps"
-                                            , val = { user = existingUser
-                                                    , test = testEntry}
-                                            }
 
-                    _ ->
-                        Debug.crash "This should be impossible"
+                        _ ->
+                            Debug.crash "This should be impossible"
                 )
+
 
 generateAdminPage : Response -> Request -> Model -> Task String ()
 generateAdminPage res req model =
