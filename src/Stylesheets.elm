@@ -1,18 +1,7 @@
-module Stylesheets where
-
-{-
-    Implementation notes:
-
-    - strip out []()""'' - so:
-    - toString ["html", "body"] -> "[\"html\",\"body\"]" -> "html,body"
-
-    How would you write this?
-
-    html, body, .foo, .bar
-        width: 100%
--}
+module Stylesheets (..) where
 
 import String
+
 
 prettyPrint : Int -> Style class id -> String
 prettyPrint =
@@ -54,7 +43,9 @@ prettyPrintHelp indentLevel indentSpaces (Style selector attributes children) =
                         |> String.join subIndentStr
                         |> (++) subIndentStr
         in
-            indentStr ++ selector ++ " {\n"
+            indentStr
+                ++ selector
+                ++ " {\n"
                 ++ attrsStr
                 ++ childrenStr
                 ++ "}"
@@ -65,39 +56,109 @@ attributeToString (Attribute str) =
     str ++ ";\n"
 
 
+
 {- Tags -}
 
-html = Tag "html"
-body = Tag "body"
-header = Tag "header"
-nav = Tag "nav"
-div = Tag "div"
-span = Tag "span"
-img = Tag "img"
-nowrap = Tag "nowrap"
-button = Tag "button"
-h1 = Tag "h1"
-h2 = Tag "h2"
-h3 = Tag "h3"
-h4 = Tag "h4"
-p = Tag "p"
-ol = Tag "ol"
-ul = Tag "ul"
-li = Tag "li"
-input = Tag "input"
 
-tagToString (Tag str) = str
+html =
+    Tag "html"
+
+
+body =
+    Tag "body"
+
+
+header =
+    Tag "header"
+
+
+nav =
+    Tag "nav"
+
+
+div =
+    Tag "div"
+
+
+span =
+    Tag "span"
+
+
+img =
+    Tag "img"
+
+
+nowrap =
+    Tag "nowrap"
+
+
+button =
+    Tag "button"
+
+
+h1 =
+    Tag "h1"
+
+
+h2 =
+    Tag "h2"
+
+
+h3 =
+    Tag "h3"
+
+
+h4 =
+    Tag "h4"
+
+
+p =
+    Tag "p"
+
+
+ol =
+    Tag "ol"
+
+
+ul =
+    Tag "ul"
+
+
+li =
+    Tag "li"
+
+
+input =
+    Tag "input"
+
+
+tagToString (Tag str) =
+    str
+
 
 
 -- TODO these are just for @media - maybe improve type guarantees?
-screen = "screen"
-print = "print"
+
+
+screen =
+    "screen"
+
+
+print =
+    "print"
+
+
 
 -- TODO this is just for ::selection - maybe improve type guarantees?
-selection = "selection"
+
+
+selection =
+    "selection"
+
 
 
 {- Units -}
+
 
 inheritToString : (a -> String) -> InheritOr a -> String
 inheritToString translate value =
@@ -117,6 +178,7 @@ autoToString translate value =
 
         NotAuto notAuto ->
             translate notAuto
+
 
 noneToString : (a -> String) -> NoneOr a -> String
 noneToString translate value =
@@ -166,6 +228,7 @@ whiteSpaceToString =
         |> autoToString
         |> inheritToString
 
+
 colorToString : Color -> String
 colorToString =
     (\(ExplicitColor str) -> str)
@@ -191,128 +254,224 @@ explicitTextShadowToString value =
         NoTextShadow ->
             "TODO"
 
+
 outlineStyleToString : OutlineStyle -> String
-outlineStyleToString (OutlineStyle str) = str
+outlineStyleToString (OutlineStyle str) =
+    str
 
 
 opacityStyleToString : OpacityStyle -> String
-opacityStyleToString (OpacityStyle str) = str
+opacityStyleToString (OpacityStyle str) =
+    str
 
 
 type Tag
     = Tag String
 
+
 type InheritOr a
     = Inherit
     | NotInherit a
+
 
 type AutoOr a
     = Auto
     | NotAuto a
 
+
 type NoneOr a
     = None
     | NotNone a
 
-type alias BoxSizing = InheritOr ExplicitBoxSizing
-type alias Overflow = InheritOr (AutoOr ExplicitOverflow)
-type alias Display = InheritOr (NoneOr ExplicitDisplay)
-type alias WhiteSpace = InheritOr (AutoOr ExplicitWhiteSpace)
-type alias Color = InheritOr (AutoOr ExplicitColor)
-type alias TextShadow = InheritOr (NoneOr ExplicitTextShadow)
-type alias Outline = InheritOr ExplicitOutline
-type alias Units = InheritOr ExplicitUnits
-type alias VerticalAlign = InheritOr ExplicitVerticalAlign
 
-type ExplicitUnits = ExplicitUnits String
-type ExplicitBoxSizing = ExplicitBoxSizing String
-type ExplicitOverflow = ExplicitOverflow String
-type ExplicitDisplay = ExplicitDisplay String
-type ExplicitWhiteSpace = ExplicitWhiteSpace String
-type ExplicitColor = ExplicitColor String
-type ExplicitVerticalAlign = ExplicitVerticalAlign String
+type alias BoxSizing =
+    InheritOr ExplicitBoxSizing
+
+
+type alias Overflow =
+    InheritOr (AutoOr ExplicitOverflow)
+
+
+type alias Display =
+    InheritOr (NoneOr ExplicitDisplay)
+
+
+type alias WhiteSpace =
+    InheritOr (AutoOr ExplicitWhiteSpace)
+
+
+type alias Color =
+    InheritOr (AutoOr ExplicitColor)
+
+
+type alias TextShadow =
+    InheritOr (NoneOr ExplicitTextShadow)
+
+
+type alias Outline =
+    InheritOr ExplicitOutline
+
+
+type alias Units =
+    InheritOr ExplicitUnits
+
+
+type alias VerticalAlign =
+    InheritOr ExplicitVerticalAlign
+
+
+type ExplicitUnits
+    = ExplicitUnits String
+
+
+type ExplicitBoxSizing
+    = ExplicitBoxSizing String
+
+
+type ExplicitOverflow
+    = ExplicitOverflow String
+
+
+type ExplicitDisplay
+    = ExplicitDisplay String
+
+
+type ExplicitWhiteSpace
+    = ExplicitWhiteSpace String
+
+
+type ExplicitColor
+    = ExplicitColor String
+
+
+type ExplicitVerticalAlign
+    = ExplicitVerticalAlign String
+
 
 type ExplicitOutline
     = ExplicitOutline Float ExplicitUnits OutlineStyle OpacityStyle
 
+
 type OutlineStyle
     = OutlineStyle String
+
 
 type OpacityStyle
     = OpacityStyle String
 
+
 type ExplicitTextShadow
     = NoTextShadow
 
+
 solid : OutlineStyle
-solid = OutlineStyle "solid"
+solid =
+    OutlineStyle "solid"
+
 
 transparent : OpacityStyle
-transparent = OpacityStyle "transparent"
+transparent =
+    OpacityStyle "transparent"
+
 
 rgb : number -> number -> number -> Color
 rgb r g b =
     ExplicitColor ("rgb(" ++ (numberToString r) ++ ", " ++ (numberToString g) ++ ", " ++ (numberToString b) ++ ")")
-        |> NotAuto |> NotInherit
+        |> NotAuto
+        |> NotInherit
 
 
 rgba : number -> number -> number -> number -> Color
 rgba r g b a =
     ExplicitColor ("rgba(" ++ (numberToString r) ++ ", " ++ (numberToString g) ++ ", " ++ (numberToString b) ++ ", " ++ (numberToString a) ++ ")")
-        |> NotAuto |> NotInherit
+        |> NotAuto
+        |> NotInherit
 
 
 hex : String -> Color
 hex str =
     ExplicitColor ("#" ++ str)
-        |> NotAuto |> NotInherit
+        |> NotAuto
+        |> NotInherit
+
 
 pct : Units
-pct = "%" |> ExplicitUnits |> NotInherit
+pct =
+    "%" |> ExplicitUnits |> NotInherit
+
 
 em : Units
-em = "em" |> ExplicitUnits |> NotInherit
+em =
+    "em" |> ExplicitUnits |> NotInherit
+
 
 px : Units
-px = "px" |> ExplicitUnits |> NotInherit
+px =
+    "px" |> ExplicitUnits |> NotInherit
 
-borderBox = "border-box" |> ExplicitBoxSizing |> NotInherit
+
+borderBox =
+    "border-box" |> ExplicitBoxSizing |> NotInherit
+
 
 visible : Display
-visible = "visible" |> ExplicitDisplay |> NotNone |> NotInherit
+visible =
+    "visible" |> ExplicitDisplay |> NotNone |> NotInherit
+
 
 block : Display
-block = "block" |> ExplicitDisplay |> NotNone |> NotInherit
+block =
+    "block" |> ExplicitDisplay |> NotNone |> NotInherit
+
 
 inlineBlock : Display
-inlineBlock = "inline-block" |> ExplicitDisplay |> NotNone |> NotInherit
+inlineBlock =
+    "inline-block" |> ExplicitDisplay |> NotNone |> NotInherit
+
 
 inline : Display
-inline = "inline" |> ExplicitDisplay |> NotNone |> NotInherit
+inline =
+    "inline" |> ExplicitDisplay |> NotNone |> NotInherit
+
 
 none : InheritOr (NoneOr a)
-none = None |> NotInherit
+none =
+    None |> NotInherit
+
 
 auto : InheritOr (AutoOr a)
-auto = Auto |> NotInherit
+auto =
+    Auto |> NotInherit
+
 
 inherit : InheritOr a
-inherit = Inherit
+inherit =
+    Inherit
+
 
 noWrap : WhiteSpace
-noWrap = "no-wrap" |> ExplicitWhiteSpace |> NotAuto |> NotInherit
+noWrap =
+    "no-wrap" |> ExplicitWhiteSpace |> NotAuto |> NotInherit
+
 
 top : VerticalAlign
-top = "top" |> ExplicitVerticalAlign |> NotInherit
+top =
+    "top" |> ExplicitVerticalAlign |> NotInherit
+
 
 middle : VerticalAlign
-middle = "middle" |> ExplicitVerticalAlign |> NotInherit
+middle =
+    "middle" |> ExplicitVerticalAlign |> NotInherit
+
 
 bottom : VerticalAlign
-bottom = "bottom" |> ExplicitVerticalAlign |> NotInherit
+bottom =
+    "bottom" |> ExplicitVerticalAlign |> NotInherit
+
 
 
 {- Attributes -}
+
 
 attr1 name translate value =
     Attribute (name ++ ": " ++ (translate value))
@@ -373,41 +532,51 @@ padding : number -> Units -> Attribute
 padding =
     attr2 "padding" numberToString unitsToString
 
+
 paddingTop : number -> Units -> Attribute
 paddingTop =
     attr2 "padding-top" numberToString unitsToString
+
 
 paddingBottom : number -> Units -> Attribute
 paddingBottom =
     attr2 "padding-bottom" numberToString unitsToString
 
+
 paddingRight : number -> Units -> Attribute
 paddingRight =
     attr2 "padding-right" numberToString unitsToString
+
 
 paddingLeft : number -> Units -> Attribute
 paddingLeft =
     attr2 "padding-left" numberToString unitsToString
 
+
 margin : number -> Units -> Attribute
 margin =
     attr2 "margin" numberToString unitsToString
+
 
 marginTop : number -> Units -> Attribute
 marginTop =
     attr2 "margin-top" numberToString unitsToString
 
+
 marginBottom : number -> Units -> Attribute
 marginBottom =
     attr2 "margin-bottom" numberToString unitsToString
+
 
 marginRight : number -> Units -> Attribute
 marginRight =
     attr2 "margin-right" numberToString unitsToString
 
+
 marginLeft : number -> Units -> Attribute
 marginLeft =
     attr2 "margin-left" numberToString unitsToString
+
 
 boxSizing : BoxSizing -> Attribute
 boxSizing =
@@ -429,9 +598,6 @@ whiteSpace =
     attr1 "white-space" whiteSpaceToString
 
 
-
-
-
 backgroundColor : Color -> Attribute
 backgroundColor =
     attr1 "background-color" colorToString
@@ -445,7 +611,11 @@ color =
 media : a -> String
 media value =
     "media " ++ (toString value)
-    -- TODO
+
+
+
+-- TODO
+
 
 textShadow : TextShadow -> Attribute
 textShadow =
@@ -456,12 +626,15 @@ outline : Float -> Units -> OutlineStyle -> OpacityStyle -> Attribute
 outline =
     attr4
         "outline"
-            toString unitsToString
-            (\str -> " " ++ outlineStyleToString str ++ " ")
-            opacityStyleToString
+        toString
+        unitsToString
+        (\str -> " " ++ outlineStyleToString str ++ " ")
+        opacityStyleToString
+
 
 
 {- Types -}
+
 
 type Style class id
     = Style String (List Attribute) (List (Style class id))
@@ -478,13 +651,15 @@ stylesheet =
 
 styleWithPrefix : String -> Style class id -> a -> Style class id
 styleWithPrefix prefix (Style selector attrs children) childSelector =
-    children ++ [ Style (prefix ++ (toString childSelector)) [] [] ]
+    children
+        ++ [ Style (prefix ++ (toString childSelector)) [] [] ]
         |> Style selector attrs
 
 
 (|%|) : Style class id -> Tag -> Style class id
 (|%|) (Style selector attrs children) tag =
-    children ++ [ Style (tagToString tag) [] [] ]
+    children
+        ++ [ Style (tagToString tag) [] [] ]
         |> Style selector attrs
 
 
@@ -496,27 +671,32 @@ styleWithPrefix prefix (Style selector attrs children) childSelector =
                 |> List.map tagToString
                 |> String.join ", "
     in
-        children ++ [ Style childSelector [] [] ]
+        children
+            ++ [ Style childSelector [] [] ]
             |> Style selector attrs
 
 
 (|@|) : Style class id -> a -> Style class id
-(|@|) = styleWithPrefix "@"
+(|@|) =
+    styleWithPrefix "@"
 
 
 (|::|) : Style class id -> a -> Style class id
-(|::|) = styleWithPrefix "::"
+(|::|) =
+    styleWithPrefix "::"
 
 
 (|>%|) : Style class id -> Tag -> Style class id
 (|>%|) (Style selector attrs children) tag =
     case splitStartLast children of
         ( _, Nothing ) ->
-            children ++ [ Style (selector ++ " > " ++ tagToString tag) [] [] ]
+            children
+                ++ [ Style (selector ++ " > " ++ tagToString tag) [] [] ]
                 |> Style selector attrs
 
         ( start, Just (Style activeSelector _ _) ) ->
-            children ++ [ Style (activeSelector ++ " > " ++ tagToString tag) [] [] ]
+            children
+                ++ [ Style (activeSelector ++ " > " ++ tagToString tag) [] [] ]
                 |> Style selector attrs
 
 
@@ -536,20 +716,24 @@ styleWithPrefix prefix (Style selector attrs children) childSelector =
                 |> List.map selectorFromTag
                 |> String.join ", "
     in
-        children ++ [ Style childSelector [] [] ]
+        children
+            ++ [ Style childSelector [] [] ]
             |> Style selector attrs
 
 
 (|.|) : Style class id -> class -> Style class id
-(|.|) = styleWithPrefix "."
+(|.|) =
+    styleWithPrefix "."
 
 
 (|#|) : Style class id -> id -> Style class id
-(|#|) = styleWithPrefix "#"
+(|#|) =
+    styleWithPrefix "#"
 
 
 (|>.|) : Style class id -> a -> Style class id
-(|>.|) = styleWithPrefix ">."
+(|>.|) =
+    styleWithPrefix ">."
 
 
 (|!|) : Style class id -> Attribute -> Style class id
@@ -568,7 +752,7 @@ addAttr attr (Style selector attrs children) =
 
 
 transformActiveChild : (Style a b -> Style a b) -> Style a b -> Style a b
-transformActiveChild transform (( Style selector attrs children ) as style) =
+transformActiveChild transform ((Style selector attrs children) as style) =
     case splitStartLast children of
         ( _, Nothing ) ->
             transform style
@@ -580,7 +764,7 @@ transformActiveChild transform (( Style selector attrs children ) as style) =
                 (inactiveChildren ++ [ transform activeChild ])
 
 
-splitStartLast : List a -> (List a, Maybe a)
+splitStartLast : List a -> ( List a, Maybe a )
 splitStartLast list =
     case list of
         [] ->
