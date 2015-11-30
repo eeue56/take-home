@@ -25,12 +25,14 @@ emptyMoment =
     , milliseconds = 0
     }
 
-
+{-| Get the current the moment
+-}
 getCurrent : () -> Moment
 getCurrent =
     Native.Moment.getCurrent
 
-
+{-| Call the default `Moment.js` format method
+-}
 format : Moment -> String
 format =
     Native.Moment.format
@@ -55,12 +57,14 @@ from : Moment -> Moment -> String
 from =
     Native.Moment.from
 
-
+{-| Returns `True` if the first `Moment` is before the second
+-}
 isBefore : Moment -> Moment -> Bool
 isBefore =
     Native.Moment.isBefore
 
-
+{-| Returns `True` if the first `Moment` is after the second
+-}
 isAfter : Moment -> Moment -> Bool
 isAfter =
     Native.Moment.isAfter

@@ -3,7 +3,7 @@ module Shared.User (..) where
 import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
 import Converters exposing (deserialize)
-import Moment exposing (Moment)
+import Moment exposing (Moment, emptyMoment)
 
 
 (|:) =
@@ -65,3 +65,15 @@ hasFinishedTest user =
 hasTestInProgress : User -> Bool
 hasTestInProgress user =
     hasStartedTest user && not (hasFinishedTest user)
+
+hasFinishedTestInTime : User -> Bool
+hasFinishedTestInTime user =
+    case (user.startTime, user.endTime) of
+        (Just endTime, Just startTime) ->
+            let
+                withTwoHours =
+                    Moment.add startTime { emptyMoment | hours = 2 }
+            in
+                Moment.isBefore endTime (withTwoHours)
+        _ ->
+            False

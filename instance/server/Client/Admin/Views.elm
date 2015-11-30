@@ -51,8 +51,8 @@ userView user =
         |> ul
             [ typedClassList
                 [ ( TestInProgress, hasTestInProgress user )
-                , ( TestFinishedLate, hasFinishedTest user)
-                , ( TestFinishedInTime, hasFinishedTest user)
+                , ( TestFinishedLate, (hasFinishedTest user && not (hasFinishedTestInTime user)))
+                , ( TestFinishedInTime, hasFinishedTestInTime user)
                 , ( TestNotTaken, not (hasStartedTest user) )]
             ]
 
