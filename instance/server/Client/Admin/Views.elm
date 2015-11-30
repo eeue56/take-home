@@ -3,14 +3,13 @@ module Client.Admin.Views (..) where
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
-import Html.Helpers exposing (typedClassList)
 
 import String
 import Dict
 import Record
 
 import Client.Components exposing (..)
-import Client.Styles exposing(..)
+import Client.Styles exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
@@ -46,15 +45,10 @@ userView user =
         |> Dict.toList
         |> List.map
             (\( field, value ) ->
-                li [] [ text ((field) ++ " : " ++ (toString value)) ]
+                li [] [ text (field ++ " : " ++ (toString value)) ]
             )
         |> ul
-            [ typedClassList
-                [ ( TestInProgress, hasTestInProgress user )
-                , ( TestFinishedLate, (hasFinishedTest user && not (hasFinishedTestInTime user)))
-                , ( TestFinishedInTime, hasFinishedTestInTime user)
-                , ( TestNotTaken, not (hasStartedTest user) )]
-            ]
+            [ userClassesBasedOnTime user ]
 
 
 allUsersView : List User -> Html

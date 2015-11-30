@@ -77,3 +77,10 @@ hasFinishedTestInTime user =
                 Moment.isBefore endTime (withTwoHours)
         _ ->
             False
+
+hasFinishedTestLate : User -> Bool
+hasFinishedTestLate user =
+    if hasFinishedTest user then
+        not (hasFinishedTestInTime user)
+    else
+        False
