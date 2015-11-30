@@ -7,6 +7,11 @@ class str =
     Attr.class (toString str)
 
 
+typedClassList xs =
+    List.map (\(x,y) -> (toString x, y)) xs
+        |> Attr.classList
+
+
 id str =
     Attr.id (toString str)
 
