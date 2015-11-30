@@ -3,12 +3,14 @@
         {
             "name" : "Frontend developer",
             "item" : "tests/README.md",
-            "itemType" : "file"
+            "itemType" : "file",
+            "allowedTime" : "2h"
         },
         {
             "name" : "Backend developer",
             "item" : "http://github.com",
-            "itemType" : "link"
+            "itemType" : "link",
+            "allowedTime" : "2h"
         }
     ]
 }

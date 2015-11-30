@@ -19,6 +19,7 @@ type alias TestEntry =
     { name : String
     , item : String
     , itemType : TestType
+    , allowedTime : String
     }
 
 
@@ -62,6 +63,7 @@ testEntryDecoder =
         |: ("name" := string)
         |: ("item" := string)
         |: ("itemType" := testTypeDecoder)
+        |: ("allowedTime" := string)
 
 
 testConfigDecoder : Decoder TestConfig
