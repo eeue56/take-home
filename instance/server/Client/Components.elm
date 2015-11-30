@@ -3,6 +3,15 @@ module Client.Components (..) where
 import Html exposing (form, label, input, text, div, a, Html)
 import Html.Attributes exposing (..)
 
+labelFor : String -> String -> Html
+labelFor id labelText =
+    label
+        [ for id ]
+        [ text labelText ]
+
+emailLabel = labelFor "email"
+nameLabel = labelFor "name"
+passwordLabel = labelFor "password"
 
 emailField : Html
 emailField =

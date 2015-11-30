@@ -25,6 +25,7 @@ type alias Routes =
     , signup : String
     , startTest : String
     , login : String
+    , registerUser : String
     }
 
 
@@ -34,13 +35,13 @@ type alias Assets =
     { admin : Asset
     }
 
-
 routes =
     { apply = "/apply"
     , index = "/"
     , signup = "/signup"
     , startTest = "/start-test"
     , login = "/login"
+    , registerUser = "/admin/registerUser"
     }
 
 

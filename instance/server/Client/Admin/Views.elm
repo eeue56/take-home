@@ -18,7 +18,21 @@ loginView =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ passwordField
+        [ passwordLabel "Please enter the admin password"
+        , passwordField
+        , submitField
+        ]
+
+
+registerUserView : Html
+registerUserView =
+    form
+        [ action routes.registerUser
+        , method "POST"
+        , enctype "multipart/form-data"
+        ]
+        [ emailLabel "Please enter the email for "
+        , emailField
         , submitField
         ]
 

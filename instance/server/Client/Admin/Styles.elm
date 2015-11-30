@@ -3,6 +3,8 @@ module Client.Admin.Styles (..) where
 
 import Stylesheets exposing (..)
 
+import Client.Styles exposing (..)
+
 css : String
 css =
     Stylesheets.prettyPrint 4 <|
