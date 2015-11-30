@@ -3,10 +3,14 @@ module Client.Admin.Views (..) where
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
+import Html.Helpers exposing (typedClassList)
+
 import String
 import Dict
 import Record
+
 import Client.Components exposing (..)
+import Client.Styles exposing(..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
@@ -31,11 +35,10 @@ registerUserView =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ emailLabel "Please enter the email for "
+        [ emailLabel "Please enter the email for the canidate"
         , emailField
         , submitField
         ]
-
 
 userView : User -> Html
 userView user =
@@ -45,7 +48,13 @@ userView user =
             (\( field, value ) ->
                 li [] [ text ((field) ++ " : " ++ (toString value)) ]
             )
-        |> ul []
+        |> ul
+            [ typedClassList
+                [ ( TestInProgress, hasTestInProgress user )
+                , ( TestFinishedLate, hasFinishedTest user)
+                , ( TestFinishedInTime, hasFinishedTest user)
+                , ( TestNotTaken, not (hasStartedTest user) )]
+            ]
 
 
 allUsersView : List User -> Html

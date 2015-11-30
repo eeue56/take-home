@@ -49,3 +49,19 @@ decoder =
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := decodeMaybeMoment)
+
+hasStartedTest : User -> Bool
+hasStartedTest user =
+    case user.startTime of
+        Nothing -> False
+        _ -> True
+
+hasFinishedTest : User -> Bool
+hasFinishedTest user =
+    case user.endTime of
+        Nothing -> False
+        _ -> True
+
+hasTestInProgress : User -> Bool
+hasTestInProgress user =
+    hasStartedTest user && not (hasFinishedTest user)
