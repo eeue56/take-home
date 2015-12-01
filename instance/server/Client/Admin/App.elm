@@ -14,7 +14,7 @@ import StartApp exposing (App, start)
 
 config =
     loadObject "TelateProps"
-        |> Maybe.withDefault { }
+        |> Maybe.withDefault {}
 
 
 model =
@@ -26,5 +26,5 @@ app =
     start
         { init = ( model, Effects.none )
         , update = update
-        , inputs = [ ]
+        , inputs = []
         }

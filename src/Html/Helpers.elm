@@ -8,7 +8,7 @@ class str =
 
 
 typedClassList xs =
-    List.map (\(x,y) -> (toString x, y)) xs
+    List.map (\( x, y ) -> ( toString x, y )) xs
         |> Attr.classList
 
 

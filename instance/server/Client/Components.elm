@@ -3,8 +3,8 @@ module Client.Components (..) where
 import Html exposing (form, label, input, text, div, a, Html)
 import Html.Attributes exposing (for, type', name, id, attribute)
 import Html.Helpers exposing (class)
-
 import Client.Styles exposing (..)
+
 
 labelFor : String -> String -> Html
 labelFor id labelText =
@@ -12,9 +12,18 @@ labelFor id labelText =
         [ for id ]
         [ text labelText ]
 
-emailLabel = labelFor "email"
-nameLabel = labelFor "name"
-passwordLabel = labelFor "password"
+
+emailLabel =
+    labelFor "email"
+
+
+nameLabel =
+    labelFor "name"
+
+
+passwordLabel =
+    labelFor "password"
+
 
 emailField : Html
 emailField =

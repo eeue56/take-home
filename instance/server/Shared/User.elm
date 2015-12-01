@@ -50,33 +50,45 @@ decoder =
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := decodeMaybeMoment)
 
+
 hasStartedTest : User -> Bool
 hasStartedTest user =
     case user.startTime of
-        Nothing -> False
-        _ -> True
+        Nothing ->
+            False
+
+        _ ->
+            True
+
 
 hasFinishedTest : User -> Bool
 hasFinishedTest user =
     case user.endTime of
-        Nothing -> False
-        _ -> True
+        Nothing ->
+            False
+
+        _ ->
+            True
+
 
 hasTestInProgress : User -> Bool
 hasTestInProgress user =
     hasStartedTest user && not (hasFinishedTest user)
 
+
 hasFinishedTestInTime : User -> Bool
 hasFinishedTestInTime user =
-    case (user.startTime, user.endTime) of
-        (Just endTime, Just startTime) ->
+    case ( user.startTime, user.endTime ) of
+        ( Just endTime, Just startTime ) ->
             let
                 withTwoHours =
                     Moment.add startTime { emptyMoment | hours = 2 }
             in
                 Moment.isBefore endTime (withTwoHours)
+
         _ ->
             False
+
 
 hasFinishedTestLate : User -> Bool
 hasFinishedTestLate user =

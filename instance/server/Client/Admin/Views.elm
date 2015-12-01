@@ -4,11 +4,9 @@ import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
 import Html.Helpers exposing (class)
-
 import String
 import Dict
 import Record
-
 import Client.Components exposing (..)
 import Client.Styles exposing (..)
 import Shared.Test exposing (..)
@@ -28,6 +26,7 @@ loginView =
         , submitField
         ]
 
+
 linkToRegisterView : Html
 linkToRegisterView =
     a
@@ -35,6 +34,7 @@ linkToRegisterView =
         , class Button
         ]
         [ text "Click here to register a new user" ]
+
 
 registerUserView : Html
 registerUserView =
@@ -58,6 +58,7 @@ successfulRegistrationView url user =
             [ href url ]
             [ text url ]
         ]
+
 
 userView : User -> Html
 userView user =

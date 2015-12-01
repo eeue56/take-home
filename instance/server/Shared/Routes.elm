@@ -37,6 +37,7 @@ type alias Assets =
     , main : Asset
     }
 
+
 routes =
     { apply = "/apply"
     , index = "/"

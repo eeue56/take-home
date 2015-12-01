@@ -130,7 +130,7 @@ routeGet ( req, res ) model =
             model
                 => (writeNode registerUserView res
                         |> runRouteWithErrorHandler
-                    )
+                   )
         else if url == assets.admin.route then
             model
                 => (writeCss assets.admin.css res

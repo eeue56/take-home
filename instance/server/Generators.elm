@@ -7,12 +7,10 @@ import Http.Server
 import Knox
 import Database.Nedb as Database
 import Moment
-
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 import Client.Admin.Views exposing (allUsersView, successfulRegistrationView)
-
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
@@ -35,9 +33,9 @@ andThen =
 onError =
     (flip Task.onError)
 
+
 tokenAsUrl baseUrl token =
     "http://" ++ baseUrl ++ "?token=" ++ token
-
 
 
 generateSuccessPage res req model =
@@ -237,6 +235,7 @@ generateAdminPage res req model =
             |> andThen (\_ -> User.getUsers {} model.database)
             |> andThen (\users -> writeNode (allUsersView users) res)
 
+
 generateSuccessfulRegistrationPage : Response -> Request -> Model -> Task String ()
 generateSuccessfulRegistrationPage res req model =
     let
@@ -267,6 +266,7 @@ generateSuccessfulRegistrationPage res req model =
         case getFormField "email" req.form of
             Nothing ->
                 Task.fail "Must provide email"
+
             Just email ->
                 getToken
                     |> andThen (tryInserting email)

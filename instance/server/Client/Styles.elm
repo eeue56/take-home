@@ -2,7 +2,6 @@ module Client.Styles (..) where
 
 import Stylesheets exposing (..)
 import Html.Helpers exposing (typedClassList)
-
 import Shared.User exposing (..)
 
 
@@ -14,8 +13,10 @@ type CssClasses
     | TestNotTaken
     | Button
 
-type CssIds =
-    PasswordId
+
+type CssIds
+    = PasswordId
+
 
 colors =
     { black = hex "333333"
@@ -26,14 +27,18 @@ colors =
     , purple = hex "8E62A7"
     }
 
+
 userClassesBasedOnTime user =
     let
         startedTestEver =
             hasStartedTest user
+
         inProgress =
             hasTestInProgress user
+
         finishedLate =
             hasFinishedTestLate user
+
         finishedInTime =
             hasFinishedTestInTime user
     in
@@ -44,17 +49,17 @@ userClassesBasedOnTime user =
             , ( TestNotTaken, not startedTestEver )
             ]
 
+
 css : String
 css =
-    Stylesheets.prettyPrint 4 <|
-        stylesheet
-            |%| ul
-            |.| Button
-                |-| padding 15 px
-                |-| color colors.white
-                |-| backgroundColor colors.green
-                |-| textDecoration none
-                |-| verticalAlign middle
-                |-| display inlineBlock
-                |-| attr1 "border" (\x -> x) ("none")
-
+    Stylesheets.prettyPrint 4
+        <| stylesheet
+        |%| ul
+        |.| Button
+        |-| padding 15 px
+        |-| color colors.white
+        |-| backgroundColor colors.green
+        |-| textDecoration none
+        |-| verticalAlign middle
+        |-| display inlineBlock
+        |-| attr1 "border" (\x -> x) ("none")
