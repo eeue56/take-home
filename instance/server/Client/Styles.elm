@@ -56,3 +56,5 @@ css =
                 |-| textDecoration none
                 |-| verticalAlign middle
                 |-| display inlineBlock
+                |-| attr1 "border" (\x -> x) ("none")
+

@@ -1,7 +1,10 @@
 module Client.Components (..) where
 
 import Html exposing (form, label, input, text, div, a, Html)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (for, type', name, id, attribute)
+import Html.Helpers exposing (class)
+
+import Client.Styles exposing (..)
 
 labelFor : String -> String -> Html
 labelFor id labelText =
@@ -67,6 +70,7 @@ submitField =
         [ type' "submit"
         , name "submit"
         , id "submit"
+        , class Button
         ]
         []
 

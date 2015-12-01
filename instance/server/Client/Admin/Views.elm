@@ -22,7 +22,8 @@ loginView =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ passwordLabel "Please enter the admin password"
+        [ stylesheetLink assets.main.route
+        , passwordLabel "Please enter the admin password"
         , passwordField
         , submitField
         ]
