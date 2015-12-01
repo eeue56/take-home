@@ -12,6 +12,7 @@ type CssClasses
     | TestFinishedInTime
     | TestInProgress
     | TestNotTaken
+    | Button
 
 type CssIds =
     PasswordId
@@ -42,3 +43,16 @@ userClassesBasedOnTime user =
             , ( TestFinishedInTime, finishedInTime )
             , ( TestNotTaken, not startedTestEver )
             ]
+
+css : String
+css =
+    Stylesheets.prettyPrint 4 <|
+        stylesheet
+            |%| ul
+            |.| Button
+                |-| padding 15 px
+                |-| color colors.white
+                |-| backgroundColor colors.green
+                |-| textDecoration none
+                |-| verticalAlign middle
+                |-| display inlineBlock

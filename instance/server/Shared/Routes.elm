@@ -3,6 +3,7 @@ module Shared.Routes (routes, assets) where
 {-| Static routes and assets for use with views and routing
 -}
 
+import Client.Styles
 import Client.Admin.Styles
 
 
@@ -33,6 +34,7 @@ type alias Routes =
 -}
 type alias Assets =
     { admin : Asset
+    , main : Asset
     }
 
 routes =
@@ -49,5 +51,9 @@ assets =
     { admin =
         { route = "/admin/styles.css"
         , css = Client.Admin.Styles.css
+        }
+    , main =
+        { route = "/styles.css"
+        , css = Client.Styles.css
         }
     }

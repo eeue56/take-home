@@ -136,6 +136,11 @@ routeGet ( req, res ) model =
                 => (writeCss assets.admin.css res
                         |> runRouteWithErrorHandler
                    )
+        else if url == assets.main.route then
+            model
+                => (writeCss assets.main.css res
+                        |> runRouteWithErrorHandler
+                   )
         else
             case queryPart url of
                 "" ->

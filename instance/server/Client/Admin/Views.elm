@@ -3,6 +3,7 @@ module Client.Admin.Views (..) where
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
+import Html.Helpers exposing (class)
 
 import String
 import Dict
@@ -26,6 +27,13 @@ loginView =
         , submitField
         ]
 
+linkToRegisterView : Html
+linkToRegisterView =
+    a
+        [ href routes.registerUser
+        , class Button
+        ]
+        [ text "Click here to register a new user" ]
 
 registerUserView : Html
 registerUserView =
@@ -66,7 +74,9 @@ allUsersView : List User -> Html
 allUsersView users =
     div
         []
-        [ stylesheetLink assets.admin.route
+        [ stylesheetLink assets.main.route
+        , stylesheetLink assets.admin.route
+        , linkToRegisterView
         , List.map (\user -> li [] [ userView user ]) users
             |> ul []
         ]

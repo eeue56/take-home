@@ -296,6 +296,10 @@ type alias Display =
     InheritOr (NoneOr ExplicitDisplay)
 
 
+type alias TextDecoration =
+    InheritOr (NoneOr ExplicitDisplay)
+
+
 type alias WhiteSpace =
     InheritOr (AutoOr ExplicitWhiteSpace)
 
@@ -501,6 +505,11 @@ verticalAlign =
 display : Display -> Attribute
 display =
     attr1 "display" displayToString
+
+
+textDecoration : TextDecoration -> Attribute
+textDecoration =
+    attr1 "text-decoration" displayToString
 
 
 opacity : OpacityStyle -> Attribute
