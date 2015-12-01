@@ -43,6 +43,16 @@ routeIncoming : Connection -> Model -> (Model, Effects Action)
 
 Notice how there's no longer a view. The update function is responsible for updating the model, while the router is responsible for writing replies to the client.
 
+# Future work
+
+## Create a sensible way of having global footers and headers
+
+At the moment, it's hard to link things in like stylesheets in each view without having a monolithic view function that rendered conditionally. It would be much more ideal to support a way of linking CSS in a header that was somehow included everywhere
+
+## Session data
+
+There's no way of storing session data right now.
+
 # FAQ
 
 ## Will this be used in production?
