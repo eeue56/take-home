@@ -39,6 +39,17 @@ registerUserView =
         , submitField
         ]
 
+
+successfulRegistrationView : String -> User -> Html
+successfulRegistrationView url user =
+    div
+        []
+        [ div [] [ text "Please send this url to the candidate" ]
+        , a
+            [ href url ]
+            [ text url ]
+        ]
+
 userView : User -> Html
 userView user =
     Record.asDict user

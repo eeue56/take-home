@@ -28,6 +28,3 @@ app =
         , update = update
         , inputs = [ ]
         }
-
-main =
-    Signal.map (viewTakeHome app.address) app.model

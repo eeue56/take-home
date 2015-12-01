@@ -7,10 +7,12 @@ import Http.Server
 import Knox
 import Database.Nedb as Database
 import Moment
+
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
-import Client.Admin.Views exposing (allUsersView)
+import Client.Admin.Views exposing (allUsersView, successfulRegistrationView)
+
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
@@ -33,9 +35,9 @@ andThen =
 onError =
     (flip Task.onError)
 
+tokenAsUrl baseUrl token =
+    "http://" ++ baseUrl ++ "?token=" ++ token
 
-
---generateSuccessPage : Response -> Request -> Model -> Task b ()
 
 
 generateSuccessPage res req model =
@@ -98,9 +100,6 @@ generateSignupPage res req model =
         getToken =
             randomUrl False ""
 
-        tokenAsUrl token =
-            "http://" ++ model.baseUrl ++ "?token=" ++ token
-
         tryInserting token =
             let
                 userWithToken =
@@ -114,7 +113,7 @@ generateSignupPage res req model =
                     }
 
                 url =
-                    tokenAsUrl token
+                    tokenAsUrl model.baseUrl token
             in
                 User.insertIntoDatabase userWithToken model.database
                     |> andThen
@@ -132,7 +131,7 @@ generateSignupPage res req model =
                                 |> Task.mapError (\_ -> "no such user")
 
                         existingUser :: [] ->
-                            Task.succeed (alreadySignupView (tokenAsUrl existingUser.token) existingUser)
+                            Task.succeed (alreadySignupView (tokenAsUrl model.baseUrl existingUser.token) existingUser)
 
                         _ ->
                             Task.fail "multiple users found with that name and email address"
@@ -237,3 +236,38 @@ generateAdminPage res req model =
         attemptLogin
             |> andThen (\_ -> User.getUsers {} model.database)
             |> andThen (\users -> writeNode (allUsersView users) res)
+
+generateSuccessfulRegistrationPage : Response -> Request -> Model -> Task String ()
+generateSuccessfulRegistrationPage res req model =
+    let
+        getToken =
+            randomUrl False ""
+
+        tryInserting email token =
+            let
+                userWithToken =
+                    { name = ""
+                    , email = email
+                    , token = token
+                    , role = ""
+                    , startTime = Nothing
+                    , endTime = Nothing
+                    , submissionLocation = Nothing
+                    }
+
+                url =
+                    tokenAsUrl model.baseUrl token
+            in
+                User.insertIntoDatabase userWithToken model.database
+                    |> andThen
+                        (\_ ->
+                            Task.succeed (successfulRegistrationView url userWithToken)
+                        )
+    in
+        case getFormField "email" req.form of
+            Nothing ->
+                Task.fail "Must provide email"
+            Just email ->
+                getToken
+                    |> andThen (tryInserting email)
+                    |> andThen (flip (writeNode) res)

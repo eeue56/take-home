@@ -7,7 +7,6 @@ import Moment exposing (Moment)
 
 type Action
     = Noop
-    | UpdateTime Moment
 
 
 update : Action -> Model -> ( Model, Effects.Effects Action )
