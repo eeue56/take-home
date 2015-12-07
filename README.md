@@ -2,6 +2,12 @@
 
 take-home is the world's first open-source project with all parts of the stack written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm. We went all out to write as much as we could in Elm!
 
+# How to run
+
+- Clone the repo
+- `npm install`
+- `run_prod.sh`
+
 # Interesting parts
 
 There's a lot in this project to take in. These are the important parts to look at!
