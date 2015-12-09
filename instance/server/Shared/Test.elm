@@ -27,6 +27,7 @@ emptyTestEntry =
     { name = ""
     , item = ""
     , itemType = NoTest
+    , allowedTime = ""
     }
 
 
