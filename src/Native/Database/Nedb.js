@@ -80,7 +80,7 @@ var databaseApi = function(Database) {
     };
 
     return {
-        loadConfig, loadConfig,
+        loadConfig: loadConfig,
         createClient: createClient,
         createClientFromConfigFile: createClientFromConfigFile,
         insert: insert,
