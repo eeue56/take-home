@@ -1,3 +1,5 @@
+var buffertools = require('buffertools');
+
 var COMPILED_DIR = '.comp';
 
 var writeHead = function writeHead(Task) {
@@ -86,7 +88,7 @@ var writeElm = function writeElm(fs, mime, crypto, compiler, Task){
                 res.writeHead('Content-Type', type);
 
                 fs.readFile(outFile, function (e, data) {
-                    var headClose = data.indexOf("</head>");
+                    var headClose = buffertools.indexOf(data, "</head>");
                     var outData = data;
                     if (!(typeof appendable === "undefined" || appendable === null)){
                         var extra = new Buffer("<script>" + appendable + "</script>");
