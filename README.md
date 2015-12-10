@@ -4,6 +4,8 @@ take-home is the world's first open-source project with all parts of the stack w
 
 # How to run
 
+Project requirements include  Node `4.1.2` and Elm `0.16`.
+
 - Clone the repo
 - `npm install`
 - `run_prod.sh`
