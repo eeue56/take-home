@@ -13,7 +13,7 @@ take-home is the world's first open-source project with all parts of the stack w
 
 - Clone the repo
 - `npm install`
-- `run_prod.sh`
+- `./run_prod.sh`
 
 # Interesting parts
 
