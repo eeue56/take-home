@@ -4,7 +4,9 @@
 export S3_AUTH=
 export S3_SECRET=
 export S3_BUCKET=
+# Should be an email
 export JOBS_CONTACT=
+# Should be the master admin password
 export AUTH_SECRET=
 
 export BASE_URL=localhost:8080
