@@ -12,6 +12,8 @@ type CssClasses
     | TestInProgress
     | TestNotTaken
     | Button
+    | SignupFormContainer
+    | InputField
 
 
 type CssIds
