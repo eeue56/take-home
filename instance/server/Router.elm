@@ -141,6 +141,11 @@ routeGet ( req, res ) model =
                 => (writeCss assets.main.css res
                         |> runRouteWithErrorHandler
                    )
+        else if url == assets.signup.route then
+            model
+                => (writeCss assets.signup.css res
+                        |> runRouteWithErrorHandler
+                   )
         else
             case queryPart url of
                 "" ->

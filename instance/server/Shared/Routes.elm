@@ -5,6 +5,7 @@ module Shared.Routes (routes, assets) where
 
 import Client.Styles
 import Client.Admin.Styles
+import Client.Signup.Styles
 
 
 {-| Right now, we only consider CSS assets that we care about
@@ -52,6 +53,10 @@ assets =
     { admin =
         { route = "/admin/styles.css"
         , css = Client.Admin.Styles.css
+        }
+    , signup =
+        { route = "/signup/styles.css"
+        , css = Client.Signup.Styles.css
         }
     , main =
         { route = "/styles.css"
