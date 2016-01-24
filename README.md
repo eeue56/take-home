@@ -2,7 +2,7 @@
 
 take-home is the world's first open-source project with all parts of the stack written in only Elm. The server-side code is Elm. The stylesheets are Elm. The client-side code is Elm.There's even a branch which shows how the build tools could be in Elm. We went all out to write as much as we could in Elm!
 
-# Installation 
+# Installation
 
 ## Requirements
 
@@ -78,11 +78,11 @@ Yes! We're going to use in production.
 
 Fresheyeball provided the [PoC](https://github.com/Fresheyeball/elm-http-server) HTTP server implementation that we rewrote parts of [here](https://github.com/eeue56/servelm) and then applied to production!
 
-rtfeldman provided CSS support through [elm-stylesheets](https://github.com/rtfeldman/elm-stylesheets)
+rtfeldman provided CSS support through [elm-css](https://github.com/rtfeldman/elm-css)
 
 # Awesome!
 
-If you think this is awesome, why not apply to come join us make things?
+If you think this is awesome, why not apply to come [join us](https://www.noredink.com/jobs) make things?
 
 ---
 [![NoRedInk](https://cloud.githubusercontent.com/assets/1094080/9069346/99522418-3a9d-11e5-8175-1c2bfd7a2ffe.png)][team]
