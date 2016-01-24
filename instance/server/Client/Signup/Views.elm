@@ -1,9 +1,8 @@
 module Client.Signup.Views (..) where
 
 import Html exposing (form, label, input, text, div, a, select, option, Html)
-import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
+import Html.Attributes exposing (for, type', name, action, method, enctype, value, href)
 import Html.Tags exposing (style, stylesheetLink)
-import Html.Helpers exposing (class)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
 import Shared.Routes exposing (routes, assets)

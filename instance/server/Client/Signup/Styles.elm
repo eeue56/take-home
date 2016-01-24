@@ -1,18 +1,21 @@
 module Client.Signup.Styles (..) where
 
-import Client.Styles exposing (colors)
-import Stylesheets exposing (..)
+import Css exposing (..)
+import Css.Elements exposing (..)
 import Client.Styles exposing (..)
 
 
 css : String
 css =
-    Stylesheets.prettyPrint 4
-        <| stylesheet
-            |.| SignupFormContainer
-                |-| width 300 px
-            |.| InputField
-                |-| width 100 pct
-                |-| marginTop 10 px
-                |%| input
-                    |-| width 100 pct
+    getCss
+        [ (.) SignupFormContainer
+            [ width (px 300)
+            ]
+        , (.) InputField
+            [ width (pct 100)
+            , marginTop (px 10)
+            , (with input)
+                [ width (pct 100)
+                ]
+            ]
+        ]
