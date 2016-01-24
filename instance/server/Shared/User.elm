@@ -104,3 +104,4 @@ initials user =
     String.words user.name
         |> List.map (String.left 1)
         |> String.join ""
+        |> String.toUpper
