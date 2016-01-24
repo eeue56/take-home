@@ -49,7 +49,7 @@ userSwimlane : CssClasses -> List User -> Html
 userSwimlane classType users =
     let
         usersView =
-            List.map userView users
+            List.map (\user -> div [] [ text user.name ]) users
     in
     div
         [ classList
