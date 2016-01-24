@@ -19,12 +19,21 @@ type CssClasses
     | TestFinishedInTime
     | TestInProgress
     | TestNotTaken
+
     | Button
+
     | Swimlane
     | SwimlaneContainer
+
     | SwimlaneInProgress
     | SwimlaneNotStarted
     | SwimlaneDone
+    | SwimlaneUsername
+    | SwimlaneUser
+    | SwimlaneUserBar
+
+    | SwimlaneInitials
+
     | SignupFormContainer
     | InputField
 
@@ -75,21 +84,38 @@ userClassesBasedOnTime user =
             ]
 
 swimlaneWidth =
-    250
+    450
 
 swimlaneLeft : Int -> Mixin
-swimlaneLeft n =
+swimlaneLeft number =
     let
-        number =
-            n + 1
         gap =
-            50
+            50 + (5 * number)
         shift =
-            swimlaneWidth * (number - 1)
+            swimlaneWidth * number
     in
         gap + shift
             |> px
             |> left
+
+initialsStyle : Color -> Color -> Css.StyleBlock
+initialsStyle background main =
+    (.) SwimlaneUser
+        [ children
+            [ (.) SwimlaneInitials
+                [ backgroundColor background
+                , color main
+                ]
+            , (.) SwimlaneUsername
+                [ backgroundColor background
+                , color main
+                ]
+            , (.) SwimlaneUserBar
+                [ backgroundColor main
+                ]
+            ]
+        ]
+
 
 
 css : String
@@ -104,11 +130,12 @@ css =
             , display inlineBlock
             ]
         , (.) Swimlane
-            [ height (px 500)
+            [ height (px 880)
             , position absolute
             , top (px 50)
             , px swimlaneWidth |> width
             , border2 (px 4) solid
+            , borderRadius4 (px 5) (px 5) (px 15) (px 15)
             , overflow hidden
             , boxSizing borderBox
             ]
@@ -116,15 +143,44 @@ css =
             [ backgroundColor colors.purpleLighter
             , borderColor colors.purple
             , swimlaneLeft 0
+            , children [ initialsStyle colors.purple colors.purpleLightest ]
             ]
         , (.) SwimlaneInProgress
             [ backgroundColor colors.turquoiseLighter
             , borderColor colors.turquoise
             , swimlaneLeft 1
+            , children [ initialsStyle colors.turquoise colors.turquoiseLightest ]
             ]
         , (.) SwimlaneDone
             [ backgroundColor colors.greenLighter
             , borderColor colors.green
             , swimlaneLeft 2
+            , children [ initialsStyle colors.green colors.greenLightest ]
+            ]
+        , (.) SwimlaneInitials
+            [ width (px 50)
+            , height (px 50)
+            , property "float" "left"
+            , property "font-size" "36px"
+            , property "line-height" "1.4"
+            , textAlign center
+            ]
+        , (.) SwimlaneUsername
+            [ height (px 50)
+            , property "font-size" "36px"
+            , property "line-height" "1.2"
+            , property "font-style" "italic"
+            , textAlign center
+            ]
+        , (.) SwimlaneUser
+            [ width (pct 100)
+            , height (px 50)
+            , marginBottom (px 10)
+            ]
+        , (.) SwimlaneUserBar
+            [ width (px 10)
+            , height (px 50)
+            , property "float" "left"
             ]
         ]
+

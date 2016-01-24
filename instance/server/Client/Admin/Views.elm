@@ -49,7 +49,7 @@ userSwimlane : CssClasses -> List User -> Html
 userSwimlane classType users =
     let
         usersView =
-            List.map (\user -> div [] [ text user.name ]) users
+            List.map swimlaneUserView users
     in
     div
         [ classList
@@ -93,6 +93,21 @@ successfulRegistrationView url user =
             [ text url ]
         ]
 
+swimlaneUserView : User -> Html
+swimlaneUserView user =
+    div
+        [ class SwimlaneUser
+        ]
+        [ div
+            [ class SwimlaneInitials ]
+            [ text <| initials user ]
+        , div
+            [ class SwimlaneUserBar ]
+            []
+        , div
+            [ class SwimlaneUsername ]
+            [ text user.name ]
+        ]
 
 userView : User -> Html
 userView user =
