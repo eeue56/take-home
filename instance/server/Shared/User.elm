@@ -2,6 +2,8 @@ module Shared.User (..) where
 
 import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
+import String
+
 import Converters exposing (deserialize)
 import Moment exposing (Moment, emptyMoment)
 
@@ -96,3 +98,9 @@ hasFinishedTestLate user =
         not (hasFinishedTestInTime user)
     else
         False
+
+initials : User -> String
+initials user =
+    String.words user.name
+        |> List.map (String.left 1)
+        |> String.join ""

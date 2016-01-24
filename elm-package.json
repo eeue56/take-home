@@ -6,7 +6,8 @@
     "source-directories": [
         "src/",
         "instance/server",
-        "instance/client"
+        "instance/client",
+        "elm-css/"
     ],
     "exposed-modules": [
         "Http"

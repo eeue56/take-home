@@ -10,7 +10,7 @@ import Moment
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
-import Client.Admin.Views exposing (allUsersView, successfulRegistrationView)
+import Client.Admin.Views exposing (allUsersView, successfulRegistrationView, usersSwimlanes)
 import Model exposing (Connection, Model)
 import User
 import Shared.User exposing (User)
@@ -234,6 +234,11 @@ generateAdminPage res req model =
         attemptLogin
             |> andThen (\_ -> User.getUsers {} model.database)
             |> andThen (\users -> writeNode (allUsersView users) res)
+
+generateSwimPage : Response -> Request -> Model -> Task String ()
+generateSwimPage res req model =
+    User.getUsers {} model.database
+        |> andThen (\users -> writeNode (usersSwimlanes users) res)
 
 
 generateSuccessfulRegistrationPage : Response -> Request -> Model -> Task String ()

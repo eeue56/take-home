@@ -1,8 +1,8 @@
 module Client.Components (..) where
 
 import Html exposing (form, label, input, text, div, a, Html)
-import Html.Attributes exposing (for, type', name, id, attribute)
-import Html.Helpers exposing (class)
+import Html.Attributes exposing (for, type', name, attribute, style)
+
 import Client.Styles exposing (..)
 
 
@@ -103,3 +103,17 @@ hiddenTokenField token =
         , attribute "value" token
         ]
         []
+
+swimlane : Int -> Int -> List a -> Html
+swimlane height width xs =
+    let
+        items = List.map (\item -> div [] [ text <| toString item]) xs
+    in
+        div
+            [ class Swimlane
+            , style
+                [ ( "height", (toString height) ++ "px" )
+                , ( "width", (toString width) ++ "px" )
+                ]
+            ]
+            items

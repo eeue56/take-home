@@ -3,7 +3,7 @@ module Client.Admin.Views (..) where
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
-import Html.Helpers exposing (class)
+
 import String
 import Dict
 import Record
@@ -25,6 +25,40 @@ loginView =
         , passwordField
         , submitField
         ]
+
+
+usersSwimlanes : (List User) -> Html
+usersSwimlanes users =
+    let
+        usersNotStarted =
+            List.filter (not << hasStartedTest) users
+        usersInProgress =
+            List.filter (hasTestInProgress) users
+        usersDone =
+            List.filter (hasFinishedTest) users
+    in
+        div
+            [ class SwimlaneContainer ]
+            [ stylesheetLink assets.main.route
+            , userSwimlane SwimlaneNotStarted usersNotStarted
+            , userSwimlane SwimlaneInProgress usersInProgress
+            , userSwimlane SwimlaneDone usersDone
+            ]
+
+userSwimlane : CssClasses -> List User -> Html
+userSwimlane classType users =
+    let
+        usersView =
+            List.map userView users
+    in
+    div
+        [ classList
+            [ (classType, True)
+            , (Swimlane, True)
+            ]
+        ]
+        usersView
+
 
 
 linkToRegisterView : Html

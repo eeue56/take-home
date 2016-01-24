@@ -1,9 +1,17 @@
 module Client.Styles (..) where
 
-import Stylesheets exposing (..)
-import Html.Helpers exposing (typedClassList)
+import Helpers exposing (namespace)
 import Shared.User exposing (..)
+import Css exposing (..)
+import Css.Elements exposing (..)
 
+
+globalNamespace = namespace "global"
+{ id, class, classList } = globalNamespace
+
+
+getCss =
+    (\x -> x.css) << compile << stylesheet globalNamespace
 
 type CssClasses
     = Field
@@ -12,6 +20,11 @@ type CssClasses
     | TestInProgress
     | TestNotTaken
     | Button
+    | Swimlane
+    | SwimlaneContainer
+    | SwimlaneInProgress
+    | SwimlaneNotStarted
+    | SwimlaneDone
 
 
 type CssIds
@@ -42,7 +55,7 @@ userClassesBasedOnTime user =
         finishedInTime =
             hasFinishedTestInTime user
     in
-        typedClassList
+        classList
             [ ( TestInProgress, inProgress )
             , ( TestFinishedLate, finishedLate )
             , ( TestFinishedInTime, finishedInTime )
@@ -52,14 +65,25 @@ userClassesBasedOnTime user =
 
 css : String
 css =
-    Stylesheets.prettyPrint 4
-        <| stylesheet
-        |%| ul
-        |.| Button
-        |-| padding 15 px
-        |-| color colors.white
-        |-| backgroundColor colors.green
-        |-| textDecoration none
-        |-| verticalAlign middle
-        |-| display inlineBlock
-        |-| attr1 "border" (\x -> x) ("none")
+    getCss
+        [ (.) Button
+            [ padding (px 15)
+            , color colors.white
+            , backgroundColor colors.green
+            , textDecoration none
+            , verticalAlign middle
+            , display inlineBlock
+            ]
+        , (.) Swimlane
+            [ padding (px 25)
+            , height (px 500)
+            , width (px 250)
+            , backgroundColor colors.green
+            ]
+        , (.) SwimlaneInProgress
+            [ backgroundColor colors.turquoise
+            ]
+        , (.) SwimlaneNotStarted
+            [ backgroundColor colors.purple
+            ]
+        ]

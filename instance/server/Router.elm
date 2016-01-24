@@ -6,7 +6,9 @@ import Http.Response exposing (Response)
 import Model exposing (Connection, Model)
 import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
-import Generators exposing (generateSuccessPage, generateSignupPage, generateWelcomePage, generateTestPage, generateAdminPage, generateSuccessfulRegistrationPage)
+import Generators exposing (generateSuccessPage, generateSignupPage,
+    generateWelcomePage, generateTestPage, generateAdminPage,
+    generateSuccessfulRegistrationPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
 import Shared.Routes exposing (routes, assets)
 import Task exposing (..)
@@ -141,6 +143,11 @@ routeGet ( req, res ) model =
                 => (writeCss assets.main.css res
                         |> runRouteWithErrorHandler
                    )
+        else if url == routes.swimlanes then
+            model
+                => (generateSwimPage res req model
+                        |> runRouteWithErrorHandler
+                    )
         else
             case queryPart url of
                 "" ->

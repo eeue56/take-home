@@ -27,6 +27,7 @@ type alias Routes =
     , startTest : String
     , login : String
     , registerUser : String
+    , swimlanes : String
     }
 
 
@@ -45,6 +46,7 @@ routes =
     , startTest = "/start-test"
     , login = "/login"
     , registerUser = "/admin/registerUser"
+    , swimlanes = "/swim"
     }
 
 
