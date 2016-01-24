@@ -25,6 +25,8 @@ type CssClasses
     | SwimlaneInProgress
     | SwimlaneNotStarted
     | SwimlaneDone
+    | SignupFormContainer
+    | InputField
 
 
 type CssIds

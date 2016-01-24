@@ -2,11 +2,13 @@ module Client.Signup.Views (..) where
 
 import Html exposing (form, label, input, text, div, a, select, option, Html)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, value, href)
-import Html.Tags exposing (style)
+import Html.Tags exposing (style, stylesheetLink)
+import Html.Helpers exposing (class)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
-import Shared.Routes exposing (routes)
+import Shared.Routes exposing (routes, assets)
 import Client.Components exposing (..)
+import Client.Styles exposing (..)
 
 
 signUpForTakeHomeView : TestConfig -> Html
@@ -16,11 +18,14 @@ signUpForTakeHomeView testConfig =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ style "body { background-color : 'red'; }"
-        , emailField
-        , nameField
-        , chooseRole (List.map (\test -> test.name) testConfig.tests)
-        , submitField
+        [ stylesheetLink assets.signup.route
+        , div
+            [ class SignupFormContainer ]
+            [ emailField
+            , nameField
+            , chooseRole (List.map (\test -> test.name) testConfig.tests)
+            , submitField
+            ]
         ]
 
 
@@ -56,5 +61,6 @@ chooseRole choices =
         select
             [ id "role"
             , name "role"
+            , class InputField
             ]
             roles

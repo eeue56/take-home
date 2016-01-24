@@ -28,7 +28,7 @@ passwordLabel =
 emailField : Html
 emailField =
     div
-        []
+        [ class InputField ]
         [ label
             [ for "email" ]
             [ text "Email: " ]
@@ -44,7 +44,7 @@ emailField =
 nameField : Html
 nameField =
     div
-        []
+        [ class InputField ]
         [ label
             [ for "name" ]
             [ text "Full name: " ]

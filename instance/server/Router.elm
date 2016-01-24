@@ -148,6 +148,11 @@ routeGet ( req, res ) model =
                 => (generateSwimPage res req model
                         |> runRouteWithErrorHandler
                     )
+        else if url == assets.signup.route then
+            model
+                => (writeCss assets.signup.css res
+                        |> runRouteWithErrorHandler
+                   )
         else
             case queryPart url of
                 "" ->
