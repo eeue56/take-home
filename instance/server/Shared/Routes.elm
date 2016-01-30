@@ -29,6 +29,7 @@ type alias Routes =
     , login : String
     , registerUser : String
     , swimlanes : String
+    , viewSingleUser : String
     }
 
 
@@ -48,6 +49,7 @@ routes =
     , login = "/login"
     , registerUser = "/admin/registerUser"
     , swimlanes = "/swim"
+    , viewSingleUser = "/admin/view_user"
     }
 
 

@@ -95,8 +95,10 @@ successfulRegistrationView url user =
 
 swimlaneUserView : User -> Html
 swimlaneUserView user =
-    div
+    a
         [ class SwimlaneUser
+        -- TODO: move out into helper
+        , href <| routes.viewSingleUser ++ "?id=" ++ user.token
         ]
         [ div
             [ class SwimlaneInitials ]
