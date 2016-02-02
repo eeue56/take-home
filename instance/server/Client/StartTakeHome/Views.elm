@@ -8,29 +8,29 @@ import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
 import Shared.Routes exposing (..)
+import Client.Styles exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
 import Moment exposing (emptyMoment, Moment)
 
 
-startTestButton : Html
-startTestButton =
-    button
-        []
-        [ text "Start test" ]
-
 
 beforeTestWelcome : User -> TestEntry -> Html
 beforeTestWelcome user test =
     form
-        [ action routes.startTest
+        [ class Welcome
+        , action routes.startTest
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ text <| "Welcome " ++ user.name ++ " "
-        , text <| "You signed up to take the " ++ test.name ++ " take home!"
+        [ div
+            [ class WelcomeMessageName ]
+            [ text <| "Welcome " ++ user.name ++ " " ]
+        , div
+            []
+            [ text <| "You signed up to take the " ++ test.name ++ " take home!" ]
         , hiddenTokenField user.token
-        , startTestButton
+        , submitField
         ]
 
 

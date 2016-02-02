@@ -34,6 +34,9 @@ type CssClasses
 
     | SwimlaneInitials
 
+    | Welcome
+    | WelcomeMessageName
+
     | SignupFormContainer
     | InputField
 
@@ -181,6 +184,11 @@ css =
             [ width (px 10)
             , height (px 50)
             , property "float" "left"
+            ]
+        , (.) Welcome
+            [ padding (px 50)
+            , marginLeft (px 50)
+            , marginTop (px 50)
             ]
         ]
 
