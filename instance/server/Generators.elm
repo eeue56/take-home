@@ -4,18 +4,24 @@ import Http.Response.Write exposing (writeHtml, writeJson, writeElm, writeFile, 
 import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
 import Http.Response exposing (Response)
 import Http.Server
+
 import Knox
+import Greenhouse
 import Database.Nedb as Database
 import Moment
+
 import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 import Client.Admin.Views exposing (allUsersView, successfulRegistrationView, usersSwimlanes)
+
 import Model exposing (Connection, Model)
 import User
+
 import Shared.User exposing (User)
 import Shared.Test exposing (testEntryByName)
 import Shared.Routes exposing (routes)
+
 import Utils exposing (randomUrl)
 import Debug
 import Maybe
@@ -235,9 +241,18 @@ generateAdminPage res req model =
             |> andThen (\_ -> User.getUsers {} model.database)
             |> andThen (\users -> writeNode (allUsersView users) res)
 
+
 generateSwimPage : Response -> Request -> Model -> Task String ()
 generateSwimPage res req model =
-    User.getUsers {} model.database
+    Greenhouse.getUsers "87950ac7f2f9eefc4eb9b6b381ea6013" 1 100
+        |> andThen
+            (\users ->
+                let
+                    _ =
+                        Debug.log "users" <| List.length users
+                in
+                    User.getUsers {} model.database
+            )
         |> andThen (\users -> writeNode (usersSwimlanes users) res)
 
 
