@@ -3,7 +3,7 @@ module Router (..) where
 import Http.Response.Write exposing (writeHtml, writeJson, writeCss, writeElm, writeFile, writeNode, writeRedirect)
 import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
 import Http.Response exposing (Response)
-import Model exposing (Connection, Model)
+import Model exposing (Connection, Model, Session)
 import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
 import Generators exposing (generateSuccessPage, generateSignupPage,
@@ -28,6 +28,7 @@ import Debug
 type Action
     = Incoming Connection
     | Run ()
+    | AddSession Session
     | Noop
 
 
@@ -212,6 +213,9 @@ update action model =
             routeIncoming connection model
 
         Run _ ->
+            ( model, Effects.none )
+
+        AddSession token ->
             ( model, Effects.none )
 
         Noop ->

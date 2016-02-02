@@ -49,7 +49,7 @@ routes =
     , login = "/login"
     , registerUser = "/admin/registerUser"
     , swimlanes = "/swim"
-    , viewSingleUser = "/admin/view_user"
+    , viewSingleUser = "/admin/viewUser"
     }
 
 

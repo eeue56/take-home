@@ -4,6 +4,7 @@ import Shared.Test exposing (TestConfig)
 import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 import Database.Nedb exposing (Client)
+import Dict exposing (Dict)
 
 
 type alias Model =
@@ -15,7 +16,11 @@ type alias Model =
     , testConfig : TestConfig
     , authSecret : String
     , contact : String
+    , sessions : Dict String Session
     }
+
+type alias Session =
+    { token : String }
 
 
 type alias Connection =

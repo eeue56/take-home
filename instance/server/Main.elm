@@ -53,6 +53,7 @@ model =
     , database = Database.createClientFromConfigFile myConfig.databaseConfig
     , testConfig = testConfig
     , authSecret = ""
+    , sessions = Dict.empty
     }
 
 
@@ -75,6 +76,8 @@ envToModel env =
         model.database
     , testConfig =
         model.testConfig
+    , sessions =
+        Dict.empty
     }
 
 
