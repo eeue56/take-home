@@ -5,6 +5,7 @@ import Http.Request exposing (emptyReq)
 import Http.Response exposing (emptyRes)
 import StartApp exposing (App, start)
 import Database.Nedb as Database
+import Github
 import Config exposing (loadConfig)
 import Env
 import Signal exposing (dropRepeats, Mailbox, mailbox)
@@ -41,6 +42,14 @@ testConfig =
     Test.loadConfig myConfig.testConfig
 
 
+githubConfig : GithubInfo
+githubConfig =
+    { org = ""
+    , repo = ""
+    , assignee = ""
+    , auth = Github.Token ""
+    }
+
 {-| Our server model
 -}
 model : Model
@@ -54,6 +63,7 @@ model =
     , testConfig = testConfig
     , authSecret = ""
     , sessions = Dict.empty
+    , github = githubConfig
     }
 
 
@@ -78,6 +88,15 @@ envToModel env =
         model.testConfig
     , sessions =
         Dict.empty
+    , github =
+        { org = Dict.get "org" env ? ""
+        , repo = Dict.get "repo" env ? ""
+        , assignee = Dict.get "assignee" env ? ""
+        , auth =
+            Dict.get "GITHUB_AUTH" env ? ""
+                |> Github.Token
+        }
+
     }
 
 

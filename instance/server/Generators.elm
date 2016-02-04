@@ -7,6 +7,7 @@ import Http.Server
 
 import Knox
 import Greenhouse
+import Github
 import Database.Nedb as Database
 import Moment
 
@@ -15,10 +16,10 @@ import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 import Client.Admin.Views exposing (allUsersView, successfulRegistrationView, usersSwimlanes)
 
-import Model exposing (Connection, Model)
+import Model exposing (Connection, Model, GithubInfo)
 import User
 
-import Shared.User exposing (User)
+import Shared.User exposing (User, initials)
 import Shared.Test exposing (testEntryByName)
 import Shared.Routes exposing (routes)
 
@@ -44,6 +45,7 @@ tokenAsUrl baseUrl token =
     "http://" ++ baseUrl ++ "?token=" ++ token
 
 
+generateSuccessPage : Response -> Request -> Model -> Task String ()
 generateSuccessPage res req model =
     let
         client =
@@ -60,6 +62,10 @@ generateSuccessPage res req model =
                 , email
                 , originalFilename
                 ]
+
+        token =
+            getFormField "token" req.form
+                |> Maybe.withDefault ""
 
         name =
             getFormField "name" req.form
@@ -78,8 +84,69 @@ generateSuccessPage res req model =
                     Knox.putFile x.path (newPath x.originalFilename) client
     in
         handleFiles
-            |> andThen (\url -> writeNode (successView name url) res)
+            |> andThen (\url ->
+                    User.getUsers { token = token } model.database
+                        |> Task.map (\userList -> (url, userList))
+                )
+            |> andThen
+                (\(url, userList) ->
+                    case userList of
+                        [] ->
+                            Task.fail "no users found"
+                        existingUser::_ ->
+                            let
+                                newUser =
+                                    { existingUser | submissionLocation = Just url }
+                            in
+                                User.updateUser
+                                    { token = token }
+                                    newUser
+                                    model.database
+                                    |> Task.map (\_ -> newUser)
+                )
+            |> andThen (\user ->
+                createTakehomeIssue model.github user
+                    |> Task.map (\_ -> user.submissionLocation)
+                )
+            |> andThen (\url ->
+                case url of
+                    Nothing ->
+                        Task.fail "Failed to write url"
 
+                    Just actualUrl ->
+                        writeNode (successView name actualUrl) res
+                )
+
+createTakehomeIssue : GithubInfo -> User -> Task String ()
+createTakehomeIssue info user =
+    let
+        session =
+            Github.defaultSession
+
+
+
+        text =
+            case user.submissionLocation of
+                Nothing ->
+                    "Something went wrong with the submission for the user " ++ (toString user)
+                Just url ->
+                    String.join "" [ "Please review the take home found [here]("
+                    , url
+                    , ")"
+                    , "\n\n"
+                    ]
+
+        settings =
+            { user = info.org
+            , repo = info.repo
+            , title = "Review take home for " ++ (initials user)
+            , body = Just text
+            , assignee = Just info.assignee
+            , milestone = Nothing
+            , labels = []
+            }
+    in
+        Github.createIssue session info.auth settings
 
 generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
@@ -244,14 +311,13 @@ generateAdminPage res req model =
 
 generateSwimPage : Response -> Request -> Model -> Task String ()
 generateSwimPage res req model =
-    Greenhouse.getUsers "87950ac7f2f9eefc4eb9b6b381ea6013" 1 100
-        |> andThen
-            (\users ->
-                let
-                    _ =
-                        Debug.log "users" <| List.length users
-                in
-                    User.getUsers {} model.database
+    User.getUsers {} model.database
+        |> andThen (\users ->
+            case users of
+                user::_ ->
+                    createTakehomeIssue model.github user
+                        |> andThen (\_ -> Task.succeed users)
+                _ -> Task.succeed users
             )
         |> andThen (\users -> writeNode (usersSwimlanes users) res)
 

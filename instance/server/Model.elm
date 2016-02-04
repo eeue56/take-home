@@ -5,7 +5,15 @@ import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 import Database.Nedb exposing (Client)
 import Dict exposing (Dict)
+import Github exposing (..)
 
+
+type alias GithubInfo =
+    { auth : GithubAuth
+    , org : String
+    , repo : String
+    , assignee : String
+    }
 
 type alias Model =
     { key : String
@@ -17,6 +25,7 @@ type alias Model =
     , authSecret : String
     , contact : String
     , sessions : Dict String Session
+    , github : GithubInfo
     }
 
 type alias Session =
