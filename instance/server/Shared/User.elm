@@ -19,7 +19,7 @@ type alias User =
     , role : String
     , startTime : Maybe Moment
     , endTime : Maybe Moment
-    , submissionLocation : Maybe Moment
+    , submissionLocation : Maybe String
     }
 
 
@@ -50,7 +50,7 @@ decoder =
         |: ("role" := string)
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
-        |: ("submissionLocation" := decodeMaybeMoment)
+        |: ("submissionLocation" := maybe string)
 
 
 hasStartedTest : User -> Bool
