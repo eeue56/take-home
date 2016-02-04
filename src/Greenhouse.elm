@@ -1,15 +1,34 @@
 module Greenhouse where
 
-import Task exposing (Task, andThen)
-import Json.Encode exposing (Value(..))
+import Task exposing (Task)
+import Json.Decode exposing (..)
+import Json.Decode.Extra exposing (apply, (|:))
 import Native.Greenhouse
 
 
 type alias PageIndex = Int
 
+type alias User =
+    { id : String
+    , firstName : String
+    , lastName : String
+    , applicationIds : List Int
+    }
+
+
+
+userDecoder =
+    succeed User
+        |: ("token" := string)
+        |: ("name" := string)
+        |: ("email" := string)
+        |: ("role" := list int)
+
+
 get : String -> String -> PageIndex -> Int -> Task String (List Value, PageIndex)
 get authToken url pageNumber numberPerPage =
     Native.Greenhouse.get authToken url pageNumber numberPerPage
+
 
 getUsers : String -> PageIndex -> Int -> Task String (List Value)
 getUsers authToken pageNumber numberPerPage =
@@ -26,5 +45,5 @@ getUsers authToken pageNumber numberPerPage =
 
     in
         get authToken "/v1/candidates" pageNumber numberPerPage
-            |> (flip andThen) recurse
+            |> (flip Task.andThen) recurse
 

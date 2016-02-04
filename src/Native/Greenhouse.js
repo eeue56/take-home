@@ -6,7 +6,6 @@ var get = function(Task, Tuple2, fromArray, parseHeader, https) {
     return function(authToken, url, pageNumber, perPage) {
 
         var url = createUrl(url, pageNumber, perPage);
-        console.log(url)
 
         var options = {
             host: "harvest.greenhouse.io",
@@ -25,9 +24,8 @@ var get = function(Task, Tuple2, fromArray, parseHeader, https) {
                 response.on('end', function () {
                     var asJson = JSON.parse(str);
                     var linked = parseHeader(response.headers.link);
-                    console.log(asJson);
                     var array = fromArray(asJson);
-                    console.log(array);
+
                     callback(
                         Task.succeed(
                             Tuple2(array, parseInt(linked.last.page))
@@ -56,8 +54,6 @@ var make = function make(localRuntime) {
     var Utils = Elm.Native.Utils.make(localRuntime);
     var Tuple2 = Utils['Tuple2'];
     var List = Elm.Native.List.make(localRuntime);
-
-
 
     var https = require('https');
     var parseHeader = require('parse-link-header');
