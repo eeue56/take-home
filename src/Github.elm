@@ -1,13 +1,16 @@
 module Github where
 
 import Json.Encode as Json exposing (string, object)
+import Json.Encode.Extra exposing (maybe, objectFromList)
 import Task exposing (Task)
 
 import Native.Github
 
 type Protocol = Https | Http
 
-type alias GithubSession =
+type Session = Session
+
+type alias SessionConfig =
     { version : String
     , debug : Bool
     , protocol : String -- TODO: use Protocol type instead
@@ -35,7 +38,13 @@ type alias IssueCreationSettings =
     , labels : List String
     }
 
-type GithubAuth
+type alias Team =
+    { name : String
+    , id : Int
+    , slug : String
+    }
+
+type Auth
     = KeySecret String String
     | Token String
     | Basic String String
@@ -53,44 +62,17 @@ encodeIssueCreationSettings settings =
                     |> Json.list
               )
             ]
-
-        assigneeItem assignee =
-            ( "assignee", string assignee)
-
-        bodyItem body =
-            ( "body", string body)
-
-
-        maybeStringItems =
-            case (settings.body, settings.assignee) of
-                (Nothing, Nothing) ->
-                    []
-                (Just body, Nothing) ->
-                    [ bodyItem body ]
-                (Nothing, Just assignee) ->
-                    [ assigneeItem assignee ]
-                (Just body, Just assignee ) ->
-                    [ assigneeItem assignee
-                    , bodyItem body
-                    ]
-
-        maybeMilestone =
-            case settings.milestone of
-                Nothing ->
-                    []
-                Just milestone ->
-                    [ ("milestone", Json.int milestone) ]
     in
         [ gatheredSettings
-        , maybeStringItems
-        , maybeMilestone
+        , maybe string "assignee" settings.assignee
+        , maybe string "body" settings.body
+        , maybe Json.int "milestone" settings.milestone
         ]
-            |> List.concat
-            |> Json.object
+            |> objectFromList
 
 
-encodeGithubAuth : GithubAuth -> Json.Value
-encodeGithubAuth auth =
+encodeAuth : Auth -> Json.Value
+encodeAuth auth =
     let
         createField name value =
             (name, Json.string value)
@@ -117,9 +99,31 @@ encodeGithubAuth auth =
         Json.object fields
 
 
-createIssue : GithubSession -> GithubAuth -> IssueCreationSettings -> Task String ()
-createIssue session auth settings =
+createSession : SessionConfig -> Session
+createSession =
+    Native.Github.createSession
+
+authenticate : Auth -> Session -> Session
+authenticate auth session =
+    Native.Github.authenticate (encodeAuth auth) session
+
+createIssue : IssueCreationSettings -> Session -> Task String ()
+createIssue settings session =
     Native.Github.createIssue
-        session
-        (encodeGithubAuth auth)
         (encodeIssueCreationSettings settings)
+        session
+
+getTeams : String -> Maybe Int -> Maybe Int -> Session -> Task String (List Team)
+getTeams org pageNumber perPage session =
+    let
+        encodedObject =
+            [ [ ( "org", string org ) ]
+            , maybe Json.int "page" pageNumber
+            , maybe Json.int "per_page" perPage
+            ]
+                |> objectFromList
+    in
+        Native.Github.getTeams encodedObject session
+
+getTeamMembers : Int -> Session -> Task String (List String)
+getTeamMembers teamId session = Debug.crash "not done yet"
