@@ -20,6 +20,7 @@ type alias TestEntry =
     , item : String
     , itemType : TestType
     , allowedTime : String
+    , assessmentGroup : String
     }
 
 
@@ -28,6 +29,7 @@ emptyTestEntry =
     , item = ""
     , itemType = NoTest
     , allowedTime = ""
+    , assessmentGroup = ""
     }
 
 

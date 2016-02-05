@@ -4,13 +4,15 @@
             "name" : "Frontend developer",
             "item" : "tests/README.md",
             "itemType" : "file",
-            "allowedTime" : "2h"
+            "allowedTime" : "2h",
+            "assessmentGroup" : "frontend"
         },
         {
             "name" : "Backend developer",
             "item" : "http://github.com",
             "itemType" : "link",
-            "allowedTime" : "2h"
+            "allowedTime" : "2h",
+            "assessmentGroup" : "backend"
         }
     ]
 }
