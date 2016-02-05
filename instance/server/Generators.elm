@@ -15,6 +15,7 @@ import Client.App exposing (successView, genericErrorView)
 import Client.Signup.Views exposing (successfulSignupView, alreadySignupView)
 import Client.StartTakeHome.Views exposing (beforeTestWelcome, viewTakeHome)
 import Client.Admin.Views exposing (allUsersView, successfulRegistrationView, usersSwimlanes)
+import Tasks exposing (..)
 
 import Model exposing (Connection, Model, GithubInfo)
 import User
@@ -35,7 +36,6 @@ import String
 
 andThen =
     (flip Task.andThen)
-
 
 onError =
     (flip Task.onError)
@@ -117,36 +117,6 @@ generateSuccessPage res req model =
                         writeNode (successView name actualUrl) res
                 )
 
-createTakehomeIssue : GithubInfo -> User -> Task String ()
-createTakehomeIssue info user =
-    let
-        session =
-            Github.defaultSession
-
-
-
-        text =
-            case user.submissionLocation of
-                Nothing ->
-                    "Something went wrong with the submission for the user " ++ (toString user)
-                Just url ->
-                    String.join "" [ "Please review the take home found [here]("
-                    , url
-                    , ")"
-                    , "\n\n"
-                    ]
-
-        settings =
-            { user = info.org
-            , repo = info.repo
-            , title = "Review take home for " ++ (initials user)
-            , body = Just text
-            , assignee = Just info.assignee
-            , milestone = Nothing
-            , labels = []
-            }
-    in
-        Github.createIssue session info.auth settings
 
 generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
@@ -311,14 +281,8 @@ generateAdminPage res req model =
 
 generateSwimPage : Response -> Request -> Model -> Task String ()
 generateSwimPage res req model =
-    User.getUsers {} model.database
-        |> andThen (\users ->
-            case users of
-                user::_ ->
-                    createTakehomeIssue model.github user
-                        |> andThen (\_ -> Task.succeed users)
-                _ -> Task.succeed users
-            )
+    getTeams model.github
+        |> andThen (\_ -> User.getUsers {} model.database)
         |> andThen (\users -> writeNode (usersSwimlanes users) res)
 
 
