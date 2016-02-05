@@ -5,11 +5,11 @@ import Http.Request exposing (Request)
 import Http.Response exposing (Response)
 import Database.Nedb exposing (Client)
 import Dict exposing (Dict)
-import Github exposing (..)
+import Github
 
 
 type alias GithubInfo =
-    { auth : GithubAuth
+    { auth : Github.Auth
     , org : String
     , repo : String
     , assignee : String

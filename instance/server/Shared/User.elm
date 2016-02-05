@@ -22,7 +22,6 @@ type alias User =
     , submissionLocation : Maybe String
     }
 
-
 emptyUser =
     { token = ""
     , name = ""
