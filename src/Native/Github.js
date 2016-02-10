@@ -2,8 +2,6 @@ var createSession = function(githubApi){
     return function(session) {
         var github = new githubApi(session);
 
-        console.log("github", github);
-
         return {
             ctor : 'Session',
             github: github
@@ -51,6 +49,25 @@ var getTeams = function(Task, List) {
     };
 };
 
+var getTeamMembers = function(Task, List) {
+    return function(settings, session) {
+        return Task.asyncFunction(function(callback){
+            session.github.orgs.getTeamMembers(settings, function(err, data){
+                if (err){
+                    callback(Task.fail(err));
+                }
+
+                // hacks to ignore the meta properties
+                var members = data.map(function(v){
+                    return v;
+                });
+
+                callback(Task.succeed(List.fromArray(members)));
+            });
+        });
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Github = localRuntime.Native.Github || {};
@@ -70,7 +87,8 @@ var make = function make(localRuntime) {
         createSession: createSession(githubApi),
         authenticate: F2(authenticate()),
         createIssue: F2(createIssue(Utils['Tuple0'], Task)),
-        getTeams: F2(getTeams(Task, List))
+        getTeams: F2(getTeams(Task, List)),
+        getTeamMembers: F2(getTeamMembers(Task, List))
     };
 };
 

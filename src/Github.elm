@@ -3,6 +3,7 @@ module Github where
 import Json.Encode as Json exposing (string, object)
 import Json.Encode.Extra exposing (maybe, objectFromList)
 import Task exposing (Task)
+import Dict exposing (Dict)
 
 import Native.Github
 
@@ -113,7 +114,7 @@ createIssue settings session =
         (encodeIssueCreationSettings settings)
         session
 
-getTeams : String -> Maybe Int -> Maybe Int -> Session -> Task String (List Team)
+getTeams : String -> Maybe Int -> Maybe Int -> Session -> Task String (Dict String Team)
 getTeams org pageNumber perPage session =
     let
         encodedObject =
@@ -122,8 +123,21 @@ getTeams org pageNumber perPage session =
             , maybe Json.int "per_page" perPage
             ]
                 |> objectFromList
+
+        nativeGetTeams : Json.Value -> Session -> Task String (List Team)
+        nativeGetTeams =
+            Native.Github.getTeams
     in
-        Native.Github.getTeams encodedObject session
+        nativeGetTeams encodedObject session
+            |> Task.map (List.map (\team -> (team.name, team)))
+            |> Task.map (Dict.fromList)
+
 
 getTeamMembers : Int -> Session -> Task String (List String)
-getTeamMembers teamId session = Debug.crash "not done yet"
+getTeamMembers teamId session =
+    let
+        encodedObject =
+            [ [ ("id", Json.int teamId) ] ]
+                |> objectFromList
+    in
+        Native.Github.getTeamMembers encodedObject session
