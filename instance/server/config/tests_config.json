@@ -5,14 +5,16 @@
             "item" : "tests/README.md",
             "itemType" : "file",
             "allowedTime" : "2h",
-            "assessmentGroup" : "frontend"
+            "assessmentGroup" : "frontend",
+            "checklist" : "FRONTEND_CHECKLIST"
         },
         {
             "name" : "Backend developer",
             "item" : "http://github.com",
             "itemType" : "link",
             "allowedTime" : "2h",
-            "assessmentGroup" : "backend"
+            "assessmentGroup" : "backend",
+            "checklist" : "BACKEND_CHECKLIST"
         }
     ]
 }

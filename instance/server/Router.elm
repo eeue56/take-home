@@ -49,7 +49,7 @@ handleError res errTask =
 -}
 runRoute task =
     task
-        |> Task.map Run
+        |> Task.map (\_ -> AddSession { token = "hello" } )
         |> Effects.task
 
 
@@ -154,6 +154,20 @@ routeGet ( req, res ) model =
                 => (writeCss assets.signup.css res
                         |> runRouteWithErrorHandler
                    )
+        else if url == assets.start.route then
+            model
+                => (writeCss assets.start.css res
+                        |> runRouteWithErrorHandler
+                    )
+        else if url == assets.noredinkLogo.route then
+            let
+                _ =
+                    Debug.log "noredink logo requestd " assets.noredinkLogo
+            in
+                model
+                    => (writeFile assets.noredinkLogo.file res
+                            |> runRouteWithErrorHandler
+                        )
         else
             case queryPart url of
                 "" ->

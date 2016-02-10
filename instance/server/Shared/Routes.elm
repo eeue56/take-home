@@ -6,6 +6,7 @@ module Shared.Routes (routes, assets) where
 import Client.Styles
 import Client.Admin.Styles
 import Client.Signup.Styles
+import Client.StartTakeHome.Styles
 
 
 {-| Right now, we only consider CSS assets that we care about
@@ -15,6 +16,11 @@ CSS should be the CSS, as a string
 type alias Asset =
     { route : String
     , css : String
+    }
+
+type alias Image =
+    { route : String
+    , file : String
     }
 
 
@@ -38,6 +44,9 @@ type alias Routes =
 type alias Assets =
     { admin : Asset
     , main : Asset
+    , signup : Asset
+    , start : Asset
+    , noredinkLogo : Image
     }
 
 
@@ -62,8 +71,16 @@ assets =
         { route = "/signup/styles.css"
         , css = Client.Signup.Styles.css
         }
+    , start =
+        { route = "/start/styles.css"
+        , css = Client.StartTakeHome.Styles.css
+        }
     , main =
         { route = "/styles.css"
         , css = Client.Styles.css
+        }
+    , noredinkLogo =
+        { route ="/images/noredink.svg"
+        , file = "/Client/images/noredink.svg"
         }
     }

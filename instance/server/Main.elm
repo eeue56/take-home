@@ -7,15 +7,18 @@ import StartApp exposing (App, start)
 import Database.Nedb as Database
 import Github
 import Config exposing (loadConfig)
-import Env
+import Env exposing (Env)
 import Signal exposing (dropRepeats, Mailbox, mailbox)
 import Dict
 import Task exposing (..)
 import Effects exposing (Effects)
-import Shared.Test exposing (TestConfig)
+import Shared.Test exposing (TestConfig, TestEntry)
 import Router exposing (..)
 import Model exposing (..)
 import Test
+
+-- uncomment for elm-reactor
+import ServerReporter exposing (stealNotify)
 
 
 -- TODO use Maybe.Extra for this
@@ -64,7 +67,20 @@ model =
     , authSecret = ""
     , sessions = Dict.empty
     , github = githubConfig
+    , checklists = Dict.empty
     }
+
+loadChecklist : Env -> TestEntry -> (String, String)
+loadChecklist env test =
+    case Dict.get test.checklist env  of
+        Nothing ->
+            let
+                _ =
+                    Debug.log "No checklist found for " test.checklist
+            in
+                (test.name, "")
+        Just checklist ->
+            Debug.log "checklist matched here -> " (test.name, checklist)
 
 
 {-| Grab properties from ENV for use in our model
@@ -96,7 +112,10 @@ envToModel env =
             Dict.get "GITHUB_AUTH" env ? ""
                 |> Github.Token
         }
-
+    , checklists =
+        (testConfig.tests
+            |> List.map (loadChecklist env)
+            |> Dict.fromList)
     }
 
 
@@ -156,6 +175,9 @@ port serve =
         server.address
         myConfig.myPort
         ("Listening on " ++ (toString myConfig.myPort))
+
+        |> stealNotify
+
 
 
 {-| Standard port for running tasks with StartApp
