@@ -21,6 +21,7 @@ type alias TestEntry =
     , itemType : TestType
     , allowedTime : String
     , assessmentGroup : String
+    , checklist : String
     }
 
 
@@ -30,6 +31,7 @@ emptyTestEntry =
     , itemType = NoTest
     , allowedTime = ""
     , assessmentGroup = ""
+    , checklist = ""
     }
 
 
@@ -67,6 +69,8 @@ testEntryDecoder =
         |: ("item" := string)
         |: ("itemType" := testTypeDecoder)
         |: ("allowedTime" := string)
+        |: ("assessmentGroup" := string)
+        |: ("checklist" := string)
 
 
 testConfigDecoder : Decoder TestConfig

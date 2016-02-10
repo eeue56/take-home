@@ -26,6 +26,7 @@ type alias Model =
     , contact : String
     , sessions : Dict String Session
     , github : GithubInfo
+    , checklists : Dict String String
     }
 
 type alias Session =

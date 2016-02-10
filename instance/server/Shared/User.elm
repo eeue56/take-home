@@ -4,6 +4,8 @@ import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value
 import Json.Decode.Extra exposing (apply)
 import String
 
+import Shared.Test exposing (..)
+
 import Converters exposing (deserialize)
 import Moment exposing (Moment, emptyMoment)
 
@@ -20,6 +22,7 @@ type alias User =
     , startTime : Maybe Moment
     , endTime : Maybe Moment
     , submissionLocation : Maybe String
+    , test : Maybe TestEntry
     }
 
 emptyUser =
@@ -30,6 +33,7 @@ emptyUser =
     , startTime = Nothing
     , endTime = Nothing
     , submissionLocation = Nothing
+    , test = Nothing
     }
 
 
@@ -50,6 +54,7 @@ decoder =
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := maybe string)
+        |: ("test" := maybe testEntryDecoder)
 
 
 hasStartedTest : User -> Bool
