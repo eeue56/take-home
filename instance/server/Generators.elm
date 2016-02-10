@@ -105,8 +105,13 @@ generateSuccessPage res req model =
                                     |> Task.map (\_ -> newUser)
                 )
             |> andThen (\user ->
-                createTakehomeIssue model.github user
-                    |> Task.map (\_ -> user.submissionLocation)
+                let
+                    checklist =
+                        Dict.get "frontend" model.checklists
+                            |> Maybe.withDefault ""
+                in
+                    createTakehomeIssue checklist model.github user
+                        |> Task.map (\_ -> user.submissionLocation)
                 )
             |> andThen (\url ->
                 case url of
@@ -141,6 +146,11 @@ generateSignupPage res req model =
         getToken =
             randomUrl False ""
 
+        test =
+            testEntryByName role model.testConfig
+                |> List.head
+                |> Debug.log "test found -> :"
+
         tryInserting token =
             let
                 userWithToken =
@@ -151,6 +161,7 @@ generateSignupPage res req model =
                     , startTime = Nothing
                     , endTime = Nothing
                     , submissionLocation = Nothing
+                    , test = test
                     }
 
                 url =
@@ -281,10 +292,9 @@ generateAdminPage res req model =
 
 generateSwimPage : Response -> Request -> Model -> Task String ()
 generateSwimPage res req model =
-    getTeams model.github
+    getTeamMembers "frontend" model.github
         |> andThen (\_ -> User.getUsers {} model.database)
         |> andThen (\users -> writeNode (usersSwimlanes users) res)
-
 
 generateSuccessfulRegistrationPage : Response -> Request -> Model -> Task String ()
 generateSuccessfulRegistrationPage res req model =
@@ -302,6 +312,7 @@ generateSuccessfulRegistrationPage res req model =
                     , startTime = Nothing
                     , endTime = Nothing
                     , submissionLocation = Nothing
+                    , test = Nothing
                     }
 
                 url =
