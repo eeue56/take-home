@@ -1,4 +1,4 @@
-module Env (getCurrent) where
+module Env (getCurrent, Env) where
 
 {-| Get environment variables!
 
@@ -10,6 +10,9 @@ import Task exposing (Task)
 import Converters
 import Native.Env
 
+
+type alias Env =
+    Dict String String
 
 {-| Get the current env settings as a dict of string string
 -}
