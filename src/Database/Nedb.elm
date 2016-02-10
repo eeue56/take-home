@@ -39,7 +39,7 @@ type alias UpdateOperation a b =
 -}
 createClient : Config -> Client
 createClient =
-    Native.Database.Nedb.createClient
+    Native.Database.Nedb.createClientConfig
 
 
 {-| Create a client using the given filename for a json file
@@ -47,7 +47,7 @@ as an options object
 -}
 createClientFromConfigFile : String -> Client
 createClientFromConfigFile =
-    Native.Database.Nedb.createClientFromConfigFile
+    Native.Database.Nedb.createClientConfigFromConfigFile
 
 
 {-| Insert documents into the client database

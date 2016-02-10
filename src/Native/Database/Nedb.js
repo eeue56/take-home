@@ -24,6 +24,12 @@ var databaseApi = function(Database) {
         };
     };
 
+    var createClientConfig = function() {
+        return function(config) {
+            return config;
+        };
+    };
+
     var createClientFromConfigFile = function() {
         return function(fileName) {
             var config = require(fileName);
@@ -31,11 +37,20 @@ var databaseApi = function(Database) {
         };
     };
 
+    var createClientConfigFromConfigFile = function() {
+        return function(fileName) {
+            var config = require(fileName);
+            return config;
+        };
+    };
+
     // note: insert will timeout if you haven't first called loadDatabase!
     // not really much I can do about this
     var insert = function(toArray, Task) {
-        return function(docsCollection, client) {
+        return function(docsCollection, config) {
             var docs = toArray(docsCollection);
+
+            var client = createClient()(config);
 
             return Task.asyncFunction(function(callback){
                 client.insert(docs, function(err, newDoc){
@@ -50,7 +65,9 @@ var databaseApi = function(Database) {
     };
 
     var find = function(toArray, toList, Task) {
-        return function(queryRecord, client){
+        return function(queryRecord, config){
+            var client = createClient()(config);
+
             return Task.asyncFunction(function(callback){
                 client.find(queryRecord, function(err, docs){
                     if (err){
@@ -64,7 +81,8 @@ var databaseApi = function(Database) {
     };
 
     var update = function(Task) {
-        return function(queryRecord, replacement, client){
+        return function(queryRecord, replacement, config){
+            var client = createClient()(config);
 
             return Task.asyncFunction(function(callback){
                 client.update(queryRecord, replacement, function(err, docs){
@@ -82,7 +100,9 @@ var databaseApi = function(Database) {
     return {
         loadConfig: loadConfig,
         createClient: createClient,
+        createClientConfig: createClientConfig,
         createClientFromConfigFile: createClientFromConfigFile,
+        createClientConfigFromConfigFile: createClientConfigFromConfigFile,
         insert: insert,
         find: find,
         update: update,
@@ -112,8 +132,8 @@ var make = function make(localRuntime) {
 
     return {
         loadConfig: nedbApi.loadConfig(jsObjectToElmDict, Task),
-        createClient: nedbApi.createClient(),
-        createClientFromConfigFile: nedbApi.createClientFromConfigFile(),
+        createClientConfig: nedbApi.createClientConfig(),
+        createClientConfigFromConfigFile: nedbApi.createClientConfigFromConfigFile(),
         insert: F2(nedbApi.insert(List.toArray, Task)),
         find: F2(nedbApi.find(List.toArray, List.fromArray, Task)),
         update: F3(nedbApi.update(Task)),
