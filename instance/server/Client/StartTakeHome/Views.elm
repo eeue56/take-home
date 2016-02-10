@@ -1,7 +1,7 @@
 module Client.StartTakeHome.Views (..) where
 
-import Html exposing (a, div, form, label, input, text, button, Html)
-import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
+import Html exposing (..)
+import Html.Attributes exposing (src, for, id, type', name, action, method, enctype, attribute, href)
 import Html.Tags exposing (style, stylesheetLink)
 import String
 import Client.Components exposing (..)
@@ -17,22 +17,30 @@ import Moment exposing (emptyMoment, Moment)
 
 beforeTestWelcome : User -> TestEntry -> Html
 beforeTestWelcome user test =
-    form
-        [ class Welcome
-        , action routes.startTest
-        , method "POST"
-        , enctype "multipart/form-data"
-        ]
-        [ div
-            [ class WelcomeMessageName ]
-            [ text <| "Welcome " ++ user.name ++ " " ]
-        , div
+    div
+        []
+        [ stylesheetLink assets.start.route
+        , img
+            [ src assets.noredinkLogo.route ]
             []
-            [ text <| "You signed up to take the " ++ test.name ++ " take home!" ]
-        , hiddenTokenField user.token
-        , submitField
+        , form
+            [ class Welcome
+            , action routes.startTest
+            , method "POST"
+            , enctype "multipart/form-data"
+            ]
+            [ div
+                [ class WelcomeMessageName ]
+                [ text user.name ]
+            , div
+                [ class WelcomeTestName ]
+                [ text <| test.name ]
+            , hiddenTokenField user.token
+            , button
+                [ class Button ]
+                [ text "Start the take home" ]
+            ]
         ]
-
 
 viewTestLink : TestEntry -> Html
 viewTestLink test =
@@ -119,7 +127,7 @@ viewTakeHome address model =
     in
         div
             []
-            [ stylesheetLink "/styles.css"
+            [ stylesheetLink assets.main.route
             , testView
             , viewUploadSolution model.user
             , viewTimeStarted model.currentTime model.user
