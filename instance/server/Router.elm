@@ -10,7 +10,7 @@ import Generators exposing (generateSuccessPage, generateSignupPage,
     generateWelcomePage, generateTestPage, generateAdminPage,
     generateSuccessfulRegistrationPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
-import Shared.Routes exposing (routes, assets)
+import Shared.Routes exposing (Route(..), routes, assets)
 import Task exposing (..)
 import Signal exposing (..)
 import Json.Encode as Json
@@ -23,6 +23,7 @@ import String
 import Env
 import Converters
 import Debug
+import RouteParser exposing (match)
 
 
 type Action
@@ -77,8 +78,8 @@ routePost ( req, res ) model =
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
 
-        url =
-            req.url
+        possibleRoute =
+            match routes req.url
 
         generate generator =
             (setForm req
@@ -86,27 +87,29 @@ routePost ( req, res ) model =
                 |> runRouteWithErrorHandler
             )
     in
-        if url == routes.apply then
-            model
-                => generate generateSuccessPage
-        else if url == routes.signup then
-            model
-                => generate generateSignupPage
-        else if url == routes.startTest then
-            model
-                => generate generateTestPage
-        else if url == routes.login then
-            model
-                => generate generateAdminPage
-        else if url == routes.registerUser then
-            model
-                => generate generateSuccessfulRegistrationPage
-        else
-            model
-                => (handleError res (Task.fail "Route not found")
-                        |> runRouteWithErrorHandler
-                   )
-
+        case possibleRoute of
+            Just route ->
+                case route of
+                    Apply ->
+                        model
+                            => generate generateSuccessPage
+                    SignUp ->
+                        model
+                            => generate generateSignupPage
+                    StartTest ->
+                        model
+                            => generate generateTestPage
+                    Login ->
+                        model
+                            => generate generateAdminPage
+                    RegisterUser ->
+                        model
+                            => generate generateSuccessfulRegistrationPage
+            Nothing ->
+                model
+                    => (handleError res (Task.fail "Route not found")
+                            |> runRouteWithErrorHandler
+                       )
 
 {-| Route any `GET` requests
 -}
@@ -116,87 +119,90 @@ routeGet ( req, res ) model =
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
 
-        url =
-            req.url
+        possibleRoute =
+            match routes req.url
     in
-        if url == routes.index then
-            model
-                => (writeNode (signUpForTakeHomeView model.testConfig) res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == routes.login then
-            model
-                => (writeNode loginView res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == routes.registerUser then
-            model
-                => (writeNode registerUserView res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == assets.admin.route then
-            model
-                => (writeCss assets.admin.css res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == assets.main.route then
-            model
-                => (writeCss assets.main.css res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == routes.swimlanes then
-            model
-                => (generateSwimPage res req model
-                        |> runRouteWithErrorHandler
-                    )
-        else if url == assets.signup.route then
-            model
-                => (writeCss assets.signup.css res
-                        |> runRouteWithErrorHandler
-                   )
-        else if url == assets.start.route then
-            model
-                => (writeCss assets.start.css res
-                        |> runRouteWithErrorHandler
-                    )
-        else if url == assets.noredinkLogo.route then
-            let
-                _ =
-                    Debug.log "noredink logo requestd " assets.noredinkLogo
-            in
-                model
-                    => (writeFile assets.noredinkLogo.file res
-                            |> runRouteWithErrorHandler
-                        )
-        else
-            case queryPart url of
-                "" ->
+        case possibleRoute of
+            Just route ->
+                Index ->
                     model
-                        => (writeFile url res
+                        => (writeNode (signUpForTakeHomeView model.testConfig) res
+                                |> runRouteWithErrorHandler
+
+                Login ->
+                    model
+                        => (writeNode loginView res
                                 |> runRouteWithErrorHandler
                            )
-
-                query ->
-                    case parseQuery query of
-                        Err _ ->
+                RegisterUser ->
+                    model
+                        => (writeNode registerUserView res
+                                |> runRouteWithErrorHandler
+                           )
+            Nothing ->
+                else if url == assets.admin.route then
+                    model
+                        => (writeCss assets.admin.css res
+                                |> runRouteWithErrorHandler
+                           )
+                else if url == assets.main.route then
+                    model
+                        => (writeCss assets.main.css res
+                                |> runRouteWithErrorHandler
+                           )
+                else if url == routes.swimlanes then
+                    model
+                        => (generateSwimPage res req model
+                                |> runRouteWithErrorHandler
+                            )
+                else if url == assets.signup.route then
+                    model
+                        => (writeCss assets.signup.css res
+                                |> runRouteWithErrorHandler
+                           )
+                else if url == assets.start.route then
+                    model
+                        => (writeCss assets.start.css res
+                                |> runRouteWithErrorHandler
+                            )
+                else if url == assets.noredinkLogo.route then
+                    let
+                        _ =
+                            Debug.log "noredink logo requestd " assets.noredinkLogo
+                    in
+                        model
+                            => (writeFile assets.noredinkLogo.file res
+                                    |> runRouteWithErrorHandler
+                                )
+                else
+                    case queryPart url of
+                        "" ->
                             model
-                                => (Task.fail "failed to parse"
+                                => (writeFile url res
                                         |> runRouteWithErrorHandler
                                    )
 
-                        Ok bag ->
-                            case getQueryField "token" bag of
-                                Nothing ->
+                        query ->
+                            case parseQuery query of
+                                Err _ ->
                                     model
-                                        => (Task.fail ("Failed to find anything " ++ url)
+                                        => (Task.fail "failed to parse"
                                                 |> runRouteWithErrorHandler
                                            )
 
-                                Just token ->
-                                    model
-                                        => (generateWelcomePage token res model
-                                                |> runRouteWithErrorHandler
-                                           )
+                                Ok bag ->
+                                    case getQueryField "token" bag of
+                                        Nothing ->
+                                            model
+                                                => (Task.fail ("Failed to find anything " ++ url)
+                                                        |> runRouteWithErrorHandler
+                                                   )
+
+                                        Just token ->
+                                            model
+                                                => (generateWelcomePage token res model
+                                                        |> runRouteWithErrorHandler
+                                                   )
 
 
 {-| route each request/response pair and write a response

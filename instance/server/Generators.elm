@@ -22,7 +22,7 @@ import User
 
 import Shared.User exposing (User, initials)
 import Shared.Test exposing (testEntryByName)
-import Shared.Routes exposing (routes)
+import Shared.Routes exposing (Route(..), toPath)
 
 import Utils exposing (randomUrl)
 import Debug
@@ -198,7 +198,7 @@ generateWelcomePage token res model =
             (\userList ->
                 case userList of
                     [] ->
-                        writeRedirect routes.index res
+                        writeRedirect (toPath Index) res
 
                     existingUser :: [] ->
                         case testEntryByName existingUser.role model.testConfig of
@@ -231,7 +231,7 @@ generateTestPage res req model =
                 (\userList ->
                     case userList of
                         [] ->
-                            writeRedirect routes.index res
+                            writeRedirect (toPath Index) res
 
                         existingUser :: [] ->
                             case testEntryByName existingUser.role model.testConfig of
