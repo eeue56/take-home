@@ -105,6 +105,11 @@ routePost ( req, res ) model =
                     RegisterUser ->
                         model
                             => generate generateSuccessfulRegistrationPage
+                    _ ->
+                        model
+                            => (handleError res (Task.fail "Route not found")
+                                    |> runRouteWithErrorHandler
+                               )
             Nothing ->
                 model
                     => (handleError res (Task.fail "Route not found")
@@ -127,26 +132,32 @@ routeGet ( req, res ) model =
     in
         case possibleRoute of
             Just route ->
-                Index ->
-                    model
-                        => (writeNode (signUpForTakeHomeView model.testConfig) res
-                                |> runRouteWithErrorHandler
-
-                Login ->
-                    model
-                        => (writeNode loginView res
-                                |> runRouteWithErrorHandler
-                           )
-                RegisterUser ->
-                    model
-                        => (writeNode registerUserView res
-                                |> runRouteWithErrorHandler
-                           )
-                Swimlanes ->
-                    model
-                        => (generateSwimPage res req model
-                                |> runRouteWithErrorHandler
-                            )
+                case route of
+                    Index ->
+                        model
+                            => (writeNode (signUpForTakeHomeView model.testConfig) res
+                                    |> runRouteWithErrorHandler
+                               )
+                    Login ->
+                        model
+                            => (writeNode loginView res
+                                    |> runRouteWithErrorHandler
+                               )
+                    RegisterUser ->
+                        model
+                            => (writeNode registerUserView res
+                                    |> runRouteWithErrorHandler
+                               )
+                    Swimlanes ->
+                        model
+                            => (generateSwimPage res req model
+                                    |> runRouteWithErrorHandler
+                                )
+                    _ ->
+                        model
+                            => (handleError res (Task.fail "Route not found")
+                                    |> runRouteWithErrorHandler
+                               )
             Nothing ->
                 if url == assets.admin.route then
                     model

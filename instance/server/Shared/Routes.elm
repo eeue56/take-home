@@ -1,10 +1,9 @@
-module Shared.Routes (Route(..), routes, assets) where
-
-import RouteParser exposing (Matcher, static)
+module Shared.Routes (Route(..), toPath, routes, assets) where
 
 {-| Static routes and assets for use with views and routing
 -}
 
+import RouteParser exposing (Matcher, static)
 import Client.Styles
 import Client.Admin.Styles
 import Client.Signup.Styles
