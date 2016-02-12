@@ -119,8 +119,11 @@ routeGet ( req, res ) model =
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
 
+        url =
+            req.url
+
         possibleRoute =
-            match routes req.url
+            match routes url
     in
         case possibleRoute of
             Just route ->
@@ -139,8 +142,13 @@ routeGet ( req, res ) model =
                         => (writeNode registerUserView res
                                 |> runRouteWithErrorHandler
                            )
+                Swimlanes ->
+                    model
+                        => (generateSwimPage res req model
+                                |> runRouteWithErrorHandler
+                            )
             Nothing ->
-                else if url == assets.admin.route then
+                if url == assets.admin.route then
                     model
                         => (writeCss assets.admin.css res
                                 |> runRouteWithErrorHandler
@@ -150,11 +158,6 @@ routeGet ( req, res ) model =
                         => (writeCss assets.main.css res
                                 |> runRouteWithErrorHandler
                            )
-                else if url == routes.swimlanes then
-                    model
-                        => (generateSwimPage res req model
-                                |> runRouteWithErrorHandler
-                            )
                 else if url == assets.signup.route then
                     model
                         => (writeCss assets.signup.css res
