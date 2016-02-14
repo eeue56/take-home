@@ -16,7 +16,22 @@ type alias User =
     }
 
 
+type alias Job =
+    { id : Int
+    , name : String
+    }
 
+
+
+type alias Application =
+    { id : Int
+    , candidateId : Int
+    , prospect : Bool
+    , status : String
+    , jobs : List Job
+    }
+
+userDecoder : Decoder User
 userDecoder =
     succeed User
         |: ("token" := string)
@@ -24,45 +39,97 @@ userDecoder =
         |: ("email" := string)
         |: ("role" := list int)
 
+jobDecoder : Decoder Job
+jobDecoder =
+    succeed Job
+        |: ("id" := int)
+        |: ("name" := string)
+
+applicationDecoder : Decoder Application
+applicationDecoder =
+    succeed Application
+        |: ("id" := int)
+        |: ("candidateId" := int)
+        |: ("prospect" := bool)
+        |: ("status" := string)
+        |: ("jobs" := list jobDecoder)
+
+
+tolerantDecodeAll : Decoder a -> List Json.Value -> List a
+tolerantDecodeAll decoder items =
+    List.foldl
+        (\item acc ->
+            case Json.decodeValue decoder item of
+                Ok actualItem ->
+                    actualItem :: acc
+
+                Err _ ->
+                    acc
+        )
+        []
+        items
 
 {-|
 Attempt to decode a list of json values into users
 If any user fails to decode, drop it
 -}
 decodeUsers : List Json.Value -> List User
-decodeUsers users =
-    List.foldl
-        (\user acc ->
-            case Json.decodeValue userDecoder user of
-                Ok actualUser ->
-                    actualUser :: acc
+decodeUsers =
+    tolerantDecodeAll userDecoder
 
-                Err _ ->
-                    acc
-        )
-        []
-        users
+decodeApplications : List Json.Value -> List Application
+decodeApplications =
+    tolerantDecodeAll applicationDecoder
 
 
 get : String -> String -> PageIndex -> Int -> Task String (List Value, PageIndex)
 get authToken url pageNumber numberPerPage =
     Native.Greenhouse.get authToken url pageNumber numberPerPage
 
+pageRecurse : (PageIndex -> Task String (List a, PageIndex)) -> (List a, PageIndex) -> PageIndex -> Task String (List a, PageIndex)
+pageRecurse fn (collection, endNumber) pageNumber =
+    if pageNumber < endNumber then
+        fn (pageNumber + 1)
+            |> Task.map (\(newItems, _) ->
+                    (newItems ++ collection, endNumber)
+                )
+            |> (flip Task.andThen) (\stage -> pageRecurse fn stage (pageNumber + 1))
+    else
+        Task.succeed (collection, pageNumber)
 
-getUsers : String -> PageIndex -> Int -> Task String (List User)
-getUsers authToken pageNumber numberPerPage =
+
+getUsers : String -> Int -> PageIndex -> Task String (List User)
+getUsers authToken numberPerPage pageNumber =
     let
-        nextPageNumber =
-            pageNumber + 1
-
-        recurse : (List User, PageIndex) -> Task String (List User)
-        recurse (users, endNumber) =
-            if endNumber == pageNumber then
-                Task.succeed users
-            else
-                Task.map (\newUsers -> newUsers ++ users) (getUsers authToken nextPageNumber numberPerPage)
-
+        fn =
+            (\pageNumber ->
+                get authToken "/v1/candidates" pageNumber numberPerPage
+            )
     in
-        get authToken "/v1/candidates" pageNumber numberPerPage
-            |> (flip Task.andThen) (\(users, index) -> recurse (decodeUsers users, index) )
+        pageRecurse (fn) ([], pageNumber) 0
+            |> Task.map fst
+            |> Task.map decodeUsers
+
+
+getApplication : String -> String -> Task String (List Application)
+getApplication authToken applicationId =
+    let
+        fn =
+            (\pageNumber ->
+                get authToken ("v1/applications/" ++ applicationId) pageNumber 1
+            )
+    in
+        pageRecurse fn ([], 1) 0
+            |> Task.map fst
+            |> Task.map decodeApplications
+
+getCandidate : String -> PageIndex -> Int -> String -> Task String Value
+getCandidate authToken pageNumber numberPerPage candidateId =
+    let
+        fn =
+            (\pageNumber ->
+                get authToken ("v1/candidates/" ++ candidateId) pageNumber numberPerPage
+            )
+    in
+        Debug.crash "not implemented yet"
 
