@@ -21,8 +21,7 @@ signUpForTakeHomeView testConfig =
         , div
             [ class SignupFormContainer ]
             [ emailField
-            , nameField
-            , chooseRole (List.map (\test -> test.name) testConfig.tests)
+            , applicationIdField
             , submitField
             ]
         ]
