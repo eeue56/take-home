@@ -4,7 +4,7 @@ import String
 import Task exposing (Task)
 import Dict exposing (Dict)
 
---import Greenhouse
+import Greenhouse exposing (Candidate, Application)
 import Github
 import Database.Nedb exposing (Client)
 
@@ -91,3 +91,28 @@ getUser query database =
                     _ -> Task.fail "Too many matches"
             )
 
+
+getCandidateByApplication : String -> Int -> Task String (Candidate, Application)
+getCandidateByApplication authToken applicationId =
+    Greenhouse.getApplication authToken applicationId
+        |> andThen (\applications ->
+            case applications of
+                [ application ] ->
+                    Task.succeed application
+                _ ->
+                    Task.fail "Invalid id"
+            )
+        |> andThen (\application ->
+            Greenhouse.getCandidate authToken application.candidateId
+                |> andThen (\candidates ->
+                    case candidates of
+                        [ candidate ] ->
+                            Task.succeed ( candidate, application )
+                        _ ->
+                            Task.fail "Invalid email"
+                    )
+            )
+
+isValidGreenhouseCandidate : (Candidate, Application) -> String -> Int -> Bool
+isValidGreenhouseCandidate (candidate, application) email applicationId =
+    application.id == applicationId && Greenhouse.candidateHasEmail candidate email

@@ -9,7 +9,7 @@ import Native.Greenhouse
 type alias PageIndex = Int
 
 type alias Candidate =
-    { id : String
+    { id : Int
     , firstName : String
     , lastName : String
     , applicationIds : List Int
@@ -37,7 +37,7 @@ type alias Application =
 candidateDecoder : Decoder Candidate
 candidateDecoder =
     succeed Candidate
-        |: ("token" := string)
+        |: ("token" := int)
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := list int)
@@ -121,28 +121,31 @@ getCandidates authToken numberPerPage pageNumber =
             |> Task.map decodeCandidates
 
 
-getApplication : String -> String -> Task String (List Application)
+getApplication : String -> Int -> Task String (List Application)
 getApplication authToken applicationId =
     let
+
         fn =
             (\pageNumber ->
-                get authToken ("v1/applications/" ++ applicationId) pageNumber 1
+                get authToken ("v1/applications/" ++ (toString applicationId)) pageNumber 1
             )
     in
         pageRecurse fn ([], 1) 0
             |> Task.map fst
             |> Task.map decodeApplications
 
-
-getCandidate : String -> PageIndex -> Int -> String -> Task String (List Candidate)
-getCandidate authToken pageNumber numberPerPage candidateId =
+getCandidate : String -> Int -> Task String (List Candidate)
+getCandidate authToken candidateId =
     let
         fn =
             (\pageNumber ->
-                get authToken ("v1/candidates/" ++ candidateId) pageNumber numberPerPage
+                get authToken ("v1/candidates/" ++ (toString candidateId)) pageNumber 1
             )
     in
         pageRecurse fn ([], 1) 0
             |> Task.map fst
             |> Task.map decodeCandidates
 
+candidateHasEmail : Candidate -> String -> Bool
+candidateHasEmail candidate email =
+    List.any (\singleEmail -> singleEmail.value == email) candidate.emailAddresses
