@@ -3,12 +3,9 @@ module Generators (..) where
 import Http.Response.Write exposing (writeHtml, writeJson, writeElm, writeFile, writeNode, writeRedirect)
 import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
 import Http.Response exposing (Response)
-import Http.Server
 
 import Knox
-import Greenhouse
-import Github
-import Database.Nedb as Database
+import Greenhouse exposing (Application, Candidate)
 import Moment
 
 import Client.App exposing (successView, genericErrorView)
@@ -22,13 +19,11 @@ import User
 
 import Shared.User exposing (User, initials)
 import Shared.Test exposing (testEntryByName)
-import Shared.Routes exposing (routes)
 
 import Utils exposing (randomUrl)
 import Debug
 import Maybe
 import Result exposing (Result)
-import Effects exposing (Effects, Never(..))
 import Dict
 import Task exposing (Task)
 import String
@@ -44,7 +39,16 @@ onError =
 tokenAsUrl baseUrl token =
     "http://" ++ baseUrl ++ "?token=" ++ token
 
+{-
+Used for generating the response to a take-home submission
+Does the following, in order, depentant on each step:
 
+    - Uploads file to S3
+    - Creates an issue on Github linking the S3
+    - Stores the user details in the database
+    - Then generates the successful submission page
+
+-}
 generateSuccessPage : Response -> Request -> Model -> Task String ()
 generateSuccessPage res req model =
     let
@@ -55,11 +59,10 @@ generateSuccessPage res req model =
                 , bucket = model.bucket
                 }
 
-        newPath originalFilename =
+        newPath user originalFilename =
             String.join
                 "/"
-                [ name
-                , email
+                [ user.token
                 , originalFilename
                 ]
 
@@ -67,101 +70,106 @@ generateSuccessPage res req model =
             getFormField "token" req.form
                 |> Maybe.withDefault ""
 
-        name =
-            getFormField "name" req.form
-                |> Maybe.withDefault "anon"
-
-        email =
-            getFormField "email" req.form
-                |> Maybe.withDefault "anon"
-
-        handleFiles =
+        handleFiles : User -> Task String User
+        handleFiles user =
             case getFormFiles req.form of
                 [] ->
-                    Debug.log "no files" <| Task.fail "failed"
+                    Task.fail "failed"
 
                 x :: _ ->
-                    Knox.putFile x.path (newPath x.originalFilename) client
+                    Knox.putFile x.path (newPath user x.originalFilename) client
+                        |> Task.map (\url -> { user | submissionLocation = Just url })
     in
-        handleFiles
-            |> andThen (\url ->
-                    User.getUsers { token = token } model.database
-                        |> Task.map (\userList -> (url, userList))
-                )
+        Tasks.getUser { token = token } model.database
+            |> andThen handleFiles
             |> andThen
-                (\(url, userList) ->
-                    case userList of
-                        [] ->
-                            Task.fail "no users found"
-                        existingUser::_ ->
-                            let
-                                newUser =
-                                    { existingUser | submissionLocation = Just url }
-                            in
-                                User.updateUser
-                                    { token = token }
-                                    newUser
-                                    model.database
-                                    |> Task.map (\_ -> newUser)
+                (\user ->
+                    User.updateUser
+                        { token = token }
+                        user
+                        model.database
+                        |> Task.map (\_ -> user)
                 )
             |> andThen (\user ->
                 let
                     checklist =
-                        Dict.get "frontend" model.checklists
+                        Dict.get user.role model.checklists
                             |> Maybe.withDefault ""
                 in
                     createTakehomeIssue checklist model.github user
-                        |> Task.map (\_ -> user.submissionLocation)
+                        |> Task.map (\_ -> user)
                 )
-            |> andThen (\url ->
-                case url of
+            |> andThen (\user ->
+                case user.submissionLocation of
                     Nothing ->
                         Task.fail "Failed to write url"
 
                     Just actualUrl ->
-                        writeNode (successView name actualUrl) res
+                        writeNode (successView user.name actualUrl) res
                 )
 
+{-
+Used for handling when a user tries to signup and take their take home
+Does the following:
 
+    - Takes the email address + application ID from the user
+    - if the user already exists, take them to their test page
+    - checks this against Greenhouse. If it doesn't match any, fails
+    - otherwise, insert the user into the database
+-}
 generateSignupPage : Response -> Request -> Model -> Task String ()
 generateSignupPage res req model =
     let
-        name =
-            getFormField "name" req.form
-                |> Maybe.withDefault "anon"
+        applicationId =
+            getFormField "applicationId" req.form
+                |> Maybe.withDefault "-1"
+                |> String.toInt
+                |> Result.withDefault -1
 
         email =
             getFormField "email" req.form
-                |> Maybe.withDefault "anon"
-
-        role =
-            getFormField "role" req.form
-                |> Maybe.withDefault "none"
+                |> Maybe.withDefault ""
 
         searchUser =
-            { name = name
+            { applicationId = applicationId
             , email = email
             }
 
         getToken =
             randomUrl False ""
 
-        test =
-            testEntryByName role model.testConfig
+        test : String -> Maybe Shared.Test.TestEntry
+        test jobs =
+            testEntryByName jobs model.testConfig
                 |> List.head
-                |> Debug.log "test found -> :"
 
-        tryInserting token =
+        jobs : Application -> String
+        jobs application =
+            List.map (\job -> job.name) application.jobs
+                |> String.join ","
+
+        checkValidity : (Candidate, Application) -> Task String (Candidate, Application)
+        checkValidity union =
+            if isValidGreenhouseCandidate union email applicationId then
+                Task.succeed union
+            else
+                Task.fail "invalid email"
+
+        tryInserting token candidate application =
             let
+                role =
+                    jobs application
+
                 userWithToken =
-                    { name = name
+                    { name = candidate.firstName ++ " " ++ candidate.lastName
                     , email = email
                     , token = token
+                    , applicationId = application.id
                     , role = role
                     , startTime = Nothing
                     , endTime = Nothing
                     , submissionLocation = Nothing
-                    , test = test
+                    , test = test role
                     }
 
                 url =
@@ -173,13 +181,20 @@ generateSignupPage res req model =
                             Task.succeed (successfulSignupView url userWithToken)
                         )
     in
-        User.getUsers { name = name, email = email } model.database
+        User.getUsers searchUser model.database
             |> andThen
                 (\userList ->
                     case userList of
                         [] ->
-                            getToken
-                                |> andThen tryInserting
+                            getCandidateByApplication model.authSecret applicationId
+                                |> andThen checkValidity
+                                |> andThen (\union ->
+                                    getToken
+                                        |> andThen (\token -> Task.succeed (union, token))
+                                    )
+                                |> andThen (\((candidate, application), token) ->
+                                    tryInserting token candidate application
+                                    )
                                 |> Task.mapError (\_ -> "no such user")
 
                         existingUser :: [] ->
@@ -193,24 +208,17 @@ generateSignupPage res req model =
 
 generateWelcomePage : String -> Response -> Model -> Task String ()
 generateWelcomePage token res model =
-    User.getUsers { token = token } model.database
+    Tasks.getUser { token = token } model.database
         |> andThen
-            (\userList ->
-                case userList of
+            (\user ->
+                case testEntryByName user.role model.testConfig of
                     [] ->
-                        writeRedirect routes.index res
+                        Task.fail ("No matching roles! Please message " ++ model.contact)
 
-                    existingUser :: [] ->
-                        case testEntryByName existingUser.role model.testConfig of
-                            [] ->
-                                Task.fail ("No matching roles! Please message " ++ model.contact)
-
-                            testEntry :: _ ->
-                                writeNode (beforeTestWelcome existingUser testEntry) res
-
-                    _ ->
-                        Debug.crash "This should be impossible!"
+                    testEntry :: _ ->
+                        writeNode (beforeTestWelcome user testEntry) res
             )
+
 
 
 generateTestPage : Response -> Request -> Model -> Task String ()
@@ -226,49 +234,41 @@ generateTestPage res req model =
         app obj =
             writeElm "/Client/StartTakeHome/App" (Just obj) res
     in
-        User.getUsers { token = token } model.database
+        Tasks.getUser { token = token } model.database
             |> andThen
-                (\userList ->
-                    case userList of
+                (\user ->
+                    case testEntryByName user.role model.testConfig of
                         [] ->
-                            writeRedirect routes.index res
+                            Task.fail "No matching roles!"
 
-                        existingUser :: [] ->
-                            case testEntryByName existingUser.role model.testConfig of
-                                [] ->
-                                    Task.fail "No matching roles!"
+                        testEntry :: _ ->
+                            case user.startTime of
+                                Nothing ->
+                                    let
+                                        updatedUser =
+                                            { user
+                                                | startTime = Just startTime
+                                            }
 
-                                testEntry :: _ ->
-                                    case existingUser.startTime of
-                                        Nothing ->
-                                            let
-                                                updatedUser =
-                                                    { existingUser
-                                                        | startTime = Just startTime
-                                                    }
-
-                                                obj =
-                                                    { name = "TelateProps"
-                                                    , val =
-                                                        { user = updatedUser
-                                                        , test = testEntry
-                                                        }
-                                                    }
-                                            in
-                                                User.updateUser { token = token } updatedUser model.database
-                                                    |> andThen (\_ -> app obj)
-
-                                        Just time ->
-                                            app
-                                                { name = "TelateProps"
-                                                , val =
-                                                    { user = existingUser
-                                                    , test = testEntry
-                                                    }
+                                        obj =
+                                            { name = "TelateProps"
+                                            , val =
+                                                { user = updatedUser
+                                                , test = testEntry
                                                 }
+                                            }
+                                    in
+                                        User.updateUser { token = token } updatedUser model.database
+                                            |> andThen (\_ -> app obj)
 
-                        _ ->
-                            Debug.crash "This should be impossible"
+                                Just time ->
+                                    app
+                                        { name = "TelateProps"
+                                        , val =
+                                            { user = user
+                                            , test = testEntry
+                                            }
+                                        }
                 )
 
 
@@ -296,39 +296,3 @@ generateSwimPage res req model =
         |> andThen (\_ -> User.getUsers {} model.database)
         |> andThen (\users -> writeNode (usersSwimlanes users) res)
 
-generateSuccessfulRegistrationPage : Response -> Request -> Model -> Task String ()
-generateSuccessfulRegistrationPage res req model =
-    let
-        getToken =
-            randomUrl False ""
-
-        tryInserting email token =
-            let
-                userWithToken =
-                    { name = ""
-                    , email = email
-                    , token = token
-                    , role = ""
-                    , startTime = Nothing
-                    , endTime = Nothing
-                    , submissionLocation = Nothing
-                    , test = Nothing
-                    }
-
-                url =
-                    tokenAsUrl model.baseUrl token
-            in
-                User.insertIntoDatabase userWithToken model.database
-                    |> andThen
-                        (\_ ->
-                            Task.succeed (successfulRegistrationView url userWithToken)
-                        )
-    in
-        case getFormField "email" req.form of
-            Nothing ->
-                Task.fail "Must provide email"
-
-            Just email ->
-                getToken
-                    |> andThen (tryInserting email)
-                    |> andThen (flip (writeNode) res)

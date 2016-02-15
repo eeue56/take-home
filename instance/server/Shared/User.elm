@@ -1,6 +1,6 @@
 module Shared.User (..) where
 
-import Json.Decode exposing (Value, Decoder, succeed, (:=), string, maybe, value, customDecoder)
+import Json.Decode exposing (Value, Decoder, succeed, (:=), string, int, maybe, value, customDecoder)
 import Json.Decode.Extra exposing (apply)
 import String
 
@@ -18,7 +18,7 @@ type alias User =
     { token : String
     , name : String
     , email : String
-    , applicationId : String
+    , applicationId : Int
     , role : String
     , startTime : Maybe Moment
     , endTime : Maybe Moment
@@ -26,11 +26,12 @@ type alias User =
     , test : Maybe TestEntry
     }
 
+emptyUser : User
 emptyUser =
     { token = ""
     , name = ""
     , email = ""
-    , applicationId = ""
+    , applicationId = -1
     , role = ""
     , startTime = Nothing
     , endTime = Nothing
@@ -52,8 +53,8 @@ decoder =
         |: ("token" := string)
         |: ("name" := string)
         |: ("email" := string)
+        |: ("applicationId" := int)
         |: ("role" := string)
-        |: ("applicationId" := string)
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := maybe string)
