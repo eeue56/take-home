@@ -6,19 +6,19 @@ import Dict exposing (Dict)
 
 --import Greenhouse
 import Github
+import Database.Nedb exposing (Client)
 
 import Shared.User exposing (User, initials)
 import Model exposing (GithubInfo)
+import User
 
 andThen =
     (flip Task.andThen)
 
---getUsersFromGreenhouse : Task String (List Greenhouse.User)
---getUsersFromGreenhouse =
---    Greenhouse.getUsers "" 1 100
 
-
-
+{-|
+Creates the issue on github, using the checklist, the github info, and the user
+-}
 createTakehomeIssue : String -> GithubInfo -> User -> Task String ()
 createTakehomeIssue checkList info user =
     let
@@ -48,12 +48,18 @@ createTakehomeIssue checkList info user =
             |> Github.authenticate info.auth
             |> Github.createIssue settings
 
+{-|
+Gets teams from github for a certain organiation
+-}
 getTeams : GithubInfo -> Task String (Dict String Github.Team)
 getTeams info =
     Github.createSession Github.defaultSession
         |> Github.authenticate info.auth
         |> Github.getTeams info.org Nothing Nothing
 
+{-|
+Get the team members from a given team
+-}
 getTeamMembers : String -> GithubInfo -> Task String (List String)
 getTeamMembers teamName info =
     getTeams info
@@ -70,3 +76,18 @@ getTeamMembers teamName info =
                 |> Github.authenticate info.auth
                 |> Github.getTeamMembers id
         )
+
+{-|
+Finds a single user in the database
+-}
+getUser : a -> Client -> Task String User
+getUser query database =
+    User.getUsers query database
+        |> andThen
+            (\userList ->
+                case userList of
+                    [] -> Task.fail "No such user"
+                    [x] -> Task.succeed x
+                    _ -> Task.fail "Too many matches"
+            )
+
