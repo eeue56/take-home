@@ -7,7 +7,7 @@ import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (..)
+import Shared.Routes exposing (Route(..), toPath, assets)
 import Client.Styles exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
@@ -25,7 +25,7 @@ beforeTestWelcome user test =
             []
         , form
             [ class Welcome
-            , action routes.startTest
+            , action (toPath StartTest)
             , method "POST"
             , enctype "multipart/form-data"
             ]
@@ -76,7 +76,7 @@ viewTestFile test =
 viewUploadSolution : User -> Html
 viewUploadSolution user =
     form
-        [ action routes.apply
+        [ action (toPath Apply)
         , method "POST"
         , enctype "multipart/form-data"
         ]

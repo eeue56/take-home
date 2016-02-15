@@ -2,7 +2,6 @@ module Client.Admin.App (..) where
 
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (..)
 import Client.Admin.Model exposing (Model)
 import Client.Admin.Update exposing (update, Action(..))
 import Client.Admin.Views exposing (..)

@@ -5,7 +5,7 @@ import Html.Attributes exposing (for, type', name, action, method, enctype, valu
 import Html.Tags exposing (style, stylesheetLink)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
-import Shared.Routes exposing (routes, assets)
+import Shared.Routes exposing (Route(..), toPath, assets)
 import Client.Components exposing (..)
 import Client.Styles exposing (..)
 
@@ -13,7 +13,7 @@ import Client.Styles exposing (..)
 signUpForTakeHomeView : TestConfig -> Html
 signUpForTakeHomeView testConfig =
     form
-        [ action routes.signup
+        [ action (toPath SignUp)
         , method "POST"
         , enctype "multipart/form-data"
         ]

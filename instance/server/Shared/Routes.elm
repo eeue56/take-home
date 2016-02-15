@@ -1,8 +1,9 @@
-module Shared.Routes (routes, assets) where
+module Shared.Routes (Route(..), toPath, routes, assets) where
 
 {-| Static routes and assets for use with views and routing
 -}
 
+import RouteParser exposing (Matcher, static)
 import Client.Styles
 import Client.Admin.Styles
 import Client.Signup.Styles
@@ -27,17 +28,15 @@ type alias Image =
 {-| These routes allow you to keep all your paths in one place
 and use them elsewhere, and be reminded when you delete them!
 -}
-type alias Routes =
-    { apply : String
-    , index : String
-    , signup : String
-    , startTest : String
-    , login : String
-    , registerUser : String
-    , swimlanes : String
-    , viewSingleUser : String
-    }
-
+type Route
+    = Index
+    | Apply
+    | SignUp
+    | StartTest
+    | Login
+    | RegisterUser
+    | Swimlanes
+    | ViewSingleUser
 
 {-| Let's take the routes approach, but also store our CSS in there!
 -}
@@ -49,18 +48,29 @@ type alias Assets =
     , noredinkLogo : Image
     }
 
-
+routes : List (Matcher Route)
 routes =
-    { apply = "/apply"
-    , index = "/"
-    , signup = "/signup"
-    , startTest = "/start-test"
-    , login = "/login"
-    , registerUser = "/admin/registerUser"
-    , swimlanes = "/swim"
-    , viewSingleUser = "/admin/viewUser"
-    }
+    [ static Index "/"
+    , static Apply "/apply"
+    , static SignUp "/signup"
+    , static StartTest "/start-test"
+    , static Login "/login"
+    , static RegisterUser "/admin/registerUser"
+    , static Swimlanes "/swim"
+    , static ViewSingleUser "/admin/viewUser"
+    ]
 
+toPath : Route -> String
+toPath route =
+    case route of
+        Index -> "/"
+        Apply -> "/apply"
+        SignUp -> "/signup"
+        StartTest -> "/start-test"
+        Login -> "/login"
+        RegisterUser -> "/admin/registerUser"
+        Swimlanes -> "/swim"
+        ViewSingleUser -> "/admin/viewUser"
 
 assets =
     { admin =

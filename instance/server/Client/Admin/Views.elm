@@ -11,12 +11,12 @@ import Client.Components exposing (..)
 import Client.Styles exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (..)
+import Shared.Routes exposing (Route(..), toPath, assets)
 
 
 loginView =
     form
-        [ action routes.login
+        [ action (toPath Login)
         , method "POST"
         , enctype "multipart/form-data"
         ]
@@ -64,7 +64,7 @@ userSwimlane classType users =
 linkToRegisterView : Html
 linkToRegisterView =
     a
-        [ href routes.registerUser
+        [ href (toPath RegisterUser)
         , class Button
         ]
         [ text "Click here to register a new user" ]
@@ -73,7 +73,7 @@ linkToRegisterView =
 registerUserView : Html
 registerUserView =
     form
-        [ action routes.registerUser
+        [ action (toPath RegisterUser)
         , method "POST"
         , enctype "multipart/form-data"
         ]
@@ -98,7 +98,7 @@ swimlaneUserView user =
     a
         [ class SwimlaneUser
         -- TODO: move out into helper
-        , href <| routes.viewSingleUser ++ "?id=" ++ user.token
+        , href <| (toPath ViewSingleUser) ++ "?id=" ++ user.token
         ]
         [ div
             [ class SwimlaneInitials ]

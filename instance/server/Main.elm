@@ -18,7 +18,7 @@ import Model exposing (..)
 import Test
 
 -- uncomment for elm-reactor
-import ServerReporter exposing (stealNotify)
+--import ServerReporter exposing (stealNotify)
 
 
 -- TODO use Maybe.Extra for this
@@ -176,7 +176,7 @@ port serve =
         myConfig.myPort
         ("Listening on " ++ (toString myConfig.myPort))
 
-        |> stealNotify
+        --|> stealNotify
 
 
 

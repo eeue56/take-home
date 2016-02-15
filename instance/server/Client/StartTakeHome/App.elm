@@ -6,7 +6,6 @@ import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (..)
 import Client.StartTakeHome.Model exposing (Model)
 import Client.StartTakeHome.Update exposing (update, Action(..))
 import Client.StartTakeHome.Views exposing (..)
