@@ -18,6 +18,7 @@ type alias User =
     { token : String
     , name : String
     , email : String
+    , applicationId : String
     , role : String
     , startTime : Maybe Moment
     , endTime : Maybe Moment
@@ -29,6 +30,7 @@ emptyUser =
     { token = ""
     , name = ""
     , email = ""
+    , applicationId = ""
     , role = ""
     , startTime = Nothing
     , endTime = Nothing
@@ -51,6 +53,7 @@ decoder =
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := string)
+        |: ("applicationId" := string)
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := maybe string)
