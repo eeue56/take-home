@@ -8,20 +8,23 @@ import Native.Greenhouse
 
 type alias PageIndex = Int
 
-type alias User =
+type alias Candidate =
     { id : String
     , firstName : String
     , lastName : String
     , applicationIds : List Int
+    , emailAddresses : List EmailAddress
     }
-
 
 type alias Job =
     { id : Int
     , name : String
     }
 
-
+type alias EmailAddress =
+    { type' : String
+    , value : String
+    }
 
 type alias Application =
     { id : Int
@@ -31,19 +34,26 @@ type alias Application =
     , jobs : List Job
     }
 
-userDecoder : Decoder User
-userDecoder =
-    succeed User
+candidateDecoder : Decoder Candidate
+candidateDecoder =
+    succeed Candidate
         |: ("token" := string)
         |: ("name" := string)
         |: ("email" := string)
         |: ("role" := list int)
+        |: ("emailAddresses" := list emailDecoder)
 
 jobDecoder : Decoder Job
 jobDecoder =
     succeed Job
         |: ("id" := int)
         |: ("name" := string)
+
+emailDecoder : Decoder EmailAddress
+emailDecoder =
+    succeed EmailAddress
+        |: ("type" := string)
+        |: ("value" := string)
 
 applicationDecoder : Decoder Application
 applicationDecoder =
@@ -73,9 +83,9 @@ tolerantDecodeAll decoder items =
 Attempt to decode a list of json values into users
 If any user fails to decode, drop it
 -}
-decodeUsers : List Json.Value -> List User
-decodeUsers =
-    tolerantDecodeAll userDecoder
+decodeCandidates : List Json.Value -> List Candidate
+decodeCandidates =
+    tolerantDecodeAll candidateDecoder
 
 decodeApplications : List Json.Value -> List Application
 decodeApplications =
@@ -98,8 +108,8 @@ pageRecurse fn (collection, endNumber) pageNumber =
         Task.succeed (collection, pageNumber)
 
 
-getUsers : String -> Int -> PageIndex -> Task String (List User)
-getUsers authToken numberPerPage pageNumber =
+getCandidates : String -> Int -> PageIndex -> Task String (List Candidate)
+getCandidates authToken numberPerPage pageNumber =
     let
         fn =
             (\pageNumber ->
@@ -108,7 +118,7 @@ getUsers authToken numberPerPage pageNumber =
     in
         pageRecurse (fn) ([], pageNumber) 0
             |> Task.map fst
-            |> Task.map decodeUsers
+            |> Task.map decodeCandidates
 
 
 getApplication : String -> String -> Task String (List Application)
@@ -123,7 +133,8 @@ getApplication authToken applicationId =
             |> Task.map fst
             |> Task.map decodeApplications
 
-getCandidate : String -> PageIndex -> Int -> String -> Task String Value
+
+getCandidate : String -> PageIndex -> Int -> String -> Task String (List Candidate)
 getCandidate authToken pageNumber numberPerPage candidateId =
     let
         fn =
@@ -131,5 +142,7 @@ getCandidate authToken pageNumber numberPerPage candidateId =
                 get authToken ("v1/candidates/" ++ candidateId) pageNumber numberPerPage
             )
     in
-        Debug.crash "not implemented yet"
+        pageRecurse fn ([], 1) 0
+            |> Task.map fst
+            |> Task.map decodeCandidates
 
