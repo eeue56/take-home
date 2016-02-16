@@ -2,7 +2,59 @@ var createUrl = function(basePath, page, perPage){
     return basePath + "?page=" + page + "&per_page=" + perPage;
 };
 
-var get = function(Task, Tuple2, fromArray, parseHeader, https) {
+var getManyCallback = function(Task, Tuple2, fromArray, parseHeader, https){
+    return function(options, callback){
+        https.get(options, function(response){
+            var str = '';
+
+            response.on('data', function (chunk) {
+                str += chunk;
+            });
+
+            response.on('end', function () {
+                var asJson = JSON.parse(str);
+                var linked = parseHeader(response.headers.link);
+                var array = fromArray(asJson);
+
+                callback(
+                    Task.succeed(
+                        Tuple2(array, parseInt(linked.last.page))
+                    )
+                );
+            });
+
+            response.on('error', function(err){
+                callback(Task.fail(err.message));
+            });
+        });
+    };
+};
+
+var getOneCallback = function(Task, https){
+    return function(options, callback){
+        https.get(options, function(response){
+            var str = '';
+
+            response.on('data', function (chunk) {
+                str += chunk;
+            });
+
+            response.on('end', function () {
+                var asJson = JSON.parse(str);
+
+                callback(
+                    Task.succeed(asJson)
+                );
+            });
+
+            response.on('error', function(err){
+                callback(Task.fail(err.message));
+            });
+        });
+    };
+};
+
+var getMany = function(Task, Tuple2, fromArray, parseHeader, https) {
     return function(authToken, url, pageNumber, perPage) {
 
         var url = createUrl(url, pageNumber, perPage);
@@ -13,31 +65,19 @@ var get = function(Task, Tuple2, fromArray, parseHeader, https) {
             auth: authToken + ':'
         };
 
-        return Task.asyncFunction(function(callback){
-            https.get(options, function(response){
-                var str = '';
+        return Task.asyncFunction(getManyCallback(Task, Tuple2, fromArray, parseHeader, https).bind(null, options));
+    };
+};
 
-                response.on('data', function (chunk) {
-                    str += chunk;
-                });
+var getOne = function(Task, https) {
+    return function(authToken, url) {
+        var options = {
+            host: "harvest.greenhouse.io",
+            path: url,
+            auth: authToken + ':'
+        };
 
-                response.on('end', function () {
-                    var asJson = JSON.parse(str);
-                    var linked = parseHeader(response.headers.link);
-                    var array = fromArray(asJson);
-
-                    callback(
-                        Task.succeed(
-                            Tuple2(array, parseInt(linked.last.page))
-                        )
-                    );
-                });
-
-                response.on('error', function(err){
-                    callback(Task.fail(err.message));
-                });
-            });
-        });
+        return Task.asyncFunction(getOneCallback(Task, https).bind(null, options));
     };
 };
 
@@ -59,7 +99,8 @@ var make = function make(localRuntime) {
     var parseHeader = require('parse-link-header');
 
     return {
-        get: F4(get(Task, Tuple2, List.fromArray, parseHeader, https))
+        getMany: F4(getMany(Task, Tuple2, List.fromArray, parseHeader, https)),
+        getOne: F2(getOne(Task, https))
     };
 };
 

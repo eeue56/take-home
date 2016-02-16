@@ -37,11 +37,11 @@ type alias Application =
 candidateDecoder : Decoder Candidate
 candidateDecoder =
     succeed Candidate
-        |: ("token" := int)
-        |: ("name" := string)
-        |: ("email" := string)
-        |: ("role" := list int)
-        |: ("emailAddresses" := list emailDecoder)
+        |: ("id" := int)
+        |: ("first_name" := string)
+        |: ("last_name" := string)
+        |: ("application_ids" := list int)
+        |: ("email_addresses" := list emailDecoder)
 
 jobDecoder : Decoder Job
 jobDecoder =
@@ -59,7 +59,7 @@ applicationDecoder : Decoder Application
 applicationDecoder =
     succeed Application
         |: ("id" := int)
-        |: ("candidateId" := int)
+        |: ("candidate_id" := int)
         |: ("prospect" := bool)
         |: ("status" := string)
         |: ("jobs" := list jobDecoder)
@@ -92,9 +92,13 @@ decodeApplications =
     tolerantDecodeAll applicationDecoder
 
 
-get : String -> String -> PageIndex -> Int -> Task String (List Value, PageIndex)
-get authToken url pageNumber numberPerPage =
-    Native.Greenhouse.get authToken url pageNumber numberPerPage
+getMany : String -> String -> PageIndex -> Int -> Task String (List Value, PageIndex)
+getMany authToken url pageNumber numberPerPage =
+    Native.Greenhouse.getMany authToken url pageNumber numberPerPage
+
+getOne : String -> String -> Task String Value
+getOne =
+    Native.Greenhouse.getOne
 
 pageRecurse : (PageIndex -> Task String (List a, PageIndex)) -> (List a, PageIndex) -> PageIndex -> Task String (List a, PageIndex)
 pageRecurse fn (collection, endNumber) pageNumber =
@@ -113,38 +117,24 @@ getCandidates authToken numberPerPage pageNumber =
     let
         fn =
             (\pageNumber ->
-                get authToken "/v1/candidates" pageNumber numberPerPage
+                getMany authToken "/v1/candidates" pageNumber numberPerPage
             )
     in
         pageRecurse (fn) ([], pageNumber) 0
             |> Task.map fst
             |> Task.map decodeCandidates
 
+--/" ++ (toString applicationId)
 
-getApplication : String -> Int -> Task String (List Application)
+getApplication : String -> Int -> Task String (Maybe Application)
 getApplication authToken applicationId =
-    let
+    getOne authToken ("/v1/applications/" ++ (toString applicationId))
+        |> Task.map (Json.decodeValue applicationDecoder >> Result.toMaybe)
 
-        fn =
-            (\pageNumber ->
-                get authToken ("v1/applications/" ++ (toString applicationId)) pageNumber 1
-            )
-    in
-        pageRecurse fn ([], 1) 0
-            |> Task.map fst
-            |> Task.map decodeApplications
-
-getCandidate : String -> Int -> Task String (List Candidate)
+getCandidate : String -> Int -> Task String (Maybe Candidate)
 getCandidate authToken candidateId =
-    let
-        fn =
-            (\pageNumber ->
-                get authToken ("v1/candidates/" ++ (toString candidateId)) pageNumber 1
-            )
-    in
-        pageRecurse fn ([], 1) 0
-            |> Task.map fst
-            |> Task.map decodeCandidates
+    getOne authToken ("/v1/candidates/" ++ (toString candidateId))
+        |> Task.map (Json.decodeValue candidateDecoder >> Result.toMaybe)
 
 candidateHasEmail : Candidate -> String -> Bool
 candidateHasEmail candidate email =
