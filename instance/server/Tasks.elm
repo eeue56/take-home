@@ -95,24 +95,26 @@ getUser query database =
 getCandidateByApplication : String -> Int -> Task String (Candidate, Application)
 getCandidateByApplication authToken applicationId =
     Greenhouse.getApplication authToken applicationId
-        |> andThen (\applications ->
-            case applications of
-                [ application ] ->
+        |> andThen (\maybeApplication ->
+            case maybeApplication of
+                Just application ->
                     Task.succeed application
-                _ ->
-                    Task.fail "Invalid id"
+                Nothing ->
+
+                    Task.fail <| Debug.log "here" "Invalid id"
             )
         |> andThen (\application ->
             Greenhouse.getCandidate authToken application.candidateId
-                |> andThen (\candidates ->
-                    case candidates of
-                        [ candidate ] ->
+                |> andThen (\maybeCandidate ->
+                    case maybeCandidate of
+                        Just candidate ->
                             Task.succeed ( candidate, application )
-                        _ ->
+                        Nothing ->
                             Task.fail "Invalid email"
                     )
             )
 
 isValidGreenhouseCandidate : (Candidate, Application) -> String -> Int -> Bool
 isValidGreenhouseCandidate (candidate, application) email applicationId =
-    application.id == applicationId && Greenhouse.candidateHasEmail candidate email
+    application.id == applicationId &&
+        Greenhouse.candidateHasEmail candidate

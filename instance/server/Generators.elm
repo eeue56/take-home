@@ -129,6 +129,8 @@ generateSignupPage res req model =
         email =
             getFormField "email" req.form
                 |> Maybe.withDefault ""
+                |> String.trim
+                |> String.toLower
 
         searchUser =
             { applicationId = applicationId
@@ -195,7 +197,11 @@ generateSignupPage res req model =
                                 |> andThen (\((candidate, application), token) ->
                                     tryInserting token candidate application
                                     )
-                                |> Task.mapError (\_ -> "no such user")
+                                |> Task.mapError (\a ->
+                                    let
+                                        _ = Debug.log "a" a
+                                    in
+                                        "no such user")
 
                         existingUser :: [] ->
                             Task.succeed (alreadySignupView (tokenAsUrl model.baseUrl existingUser.token) existingUser)
