@@ -132,6 +132,11 @@ generateSignupPage res req model =
                 |> String.trim
                 |> String.toLower
 
+        role =
+            getFormField "role" req.form
+                |> Maybe.withDefault ""
+                |> String.trim
+
         searchUser =
             { applicationId = applicationId
             , email = email
@@ -140,9 +145,9 @@ generateSignupPage res req model =
         getToken =
             randomUrl False ""
 
-        test : String -> Maybe Shared.Test.TestEntry
-        test jobs =
-            testEntryByName jobs model.testConfig
+        getTest : String -> Maybe Shared.Test.TestEntry
+        getTest role =
+            testEntryByName role model.testConfig
                 |> List.head
 
         jobs : Application -> String
@@ -159,7 +164,7 @@ generateSignupPage res req model =
 
         tryInserting token candidate application =
             let
-                role =
+                jobTitle =
                     jobs application
 
                 userWithToken =
@@ -168,10 +173,11 @@ generateSignupPage res req model =
                     , token = token
                     , applicationId = application.id
                     , role = role
+                    , jobTitle = jobTitle
                     , startTime = Nothing
                     , endTime = Nothing
                     , submissionLocation = Nothing
-                    , test = test role
+                    , test = getTest role
                     }
 
                 url =

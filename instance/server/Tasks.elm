@@ -117,4 +117,4 @@ getCandidateByApplication authToken applicationId =
 isValidGreenhouseCandidate : (Candidate, Application) -> String -> Int -> Bool
 isValidGreenhouseCandidate (candidate, application) email applicationId =
     application.id == applicationId &&
-        Greenhouse.candidateHasEmail candidate
+        Greenhouse.candidateHasEmail candidate email

@@ -20,6 +20,7 @@ type alias User =
     , email : String
     , applicationId : Int
     , role : String
+    , jobTitle : String
     , startTime : Maybe Moment
     , endTime : Maybe Moment
     , submissionLocation : Maybe String
@@ -33,6 +34,7 @@ emptyUser =
     , email = ""
     , applicationId = -1
     , role = ""
+    , jobTitle = ""
     , startTime = Nothing
     , endTime = Nothing
     , submissionLocation = Nothing
@@ -55,6 +57,7 @@ decoder =
         |: ("email" := string)
         |: ("applicationId" := int)
         |: ("role" := string)
+        |: ("jobTitle" := string)
         |: ("startTime" := decodeMaybeMoment)
         |: ("endTime" := decodeMaybeMoment)
         |: ("submissionLocation" := maybe string)
