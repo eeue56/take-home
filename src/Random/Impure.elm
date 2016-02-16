@@ -11,13 +11,9 @@ get _ =
 
 withinRange : Int -> Int -> Task String Int
 withinRange lower upper =
-    let
-        _ = Debug.log "here" lower
-    in
-        get ()
-            |> Task.map (\x ->
-                x * (toFloat <| upper - lower)
-                    |> floor
-                    |> Debug.log "got here too"
-                    |> (\y -> y + lower)
-                )
+    get ()
+        |> Task.map (\x ->
+            x * (toFloat <| upper - lower)
+                |> floor
+                |> (\y -> y + lower)
+            )
