@@ -19,7 +19,7 @@ andThen =
 {-|
 Creates the issue on github, using the checklist, the github info, and the user
 -}
-createTakehomeIssue : String -> GithubInfo -> User -> Task String ()
+createTakehomeIssue : String -> GithubInfo -> User -> Task String String
 createTakehomeIssue checkList info user =
     let
         text =
@@ -47,6 +47,18 @@ createTakehomeIssue checkList info user =
         Github.createSession Github.defaultSession
             |> Github.authenticate info.auth
             |> Github.createIssue settings
+
+createTakehomeNote : String -> Int -> Int -> String -> Task String ()
+createTakehomeNote authToken userId candidateId githubUrl =
+    let
+        note =
+            { userId = userId
+            , body = "Github issue for takehome: " ++ githubUrl
+            , visibility = "public"
+            }
+    in
+        Greenhouse.addNote authToken userId note candidateId
+            |> Task.map (\_ -> ())
 
 {-|
 Gets teams from github for a certain organiation

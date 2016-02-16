@@ -10,6 +10,7 @@ import Config exposing (loadConfig)
 import Env exposing (Env)
 import Signal exposing (dropRepeats, Mailbox, mailbox)
 import Dict
+import String
 import Task exposing (..)
 import Effects exposing (Effects)
 import Shared.Test exposing (TestConfig, TestEntry)
@@ -65,6 +66,7 @@ model =
     , database = Database.createClientFromConfigFile myConfig.databaseConfig
     , testConfig = testConfig
     , authSecret = ""
+    , greenhouseId = -1
     , sessions = Dict.empty
     , github = githubConfig
     , checklists = Dict.empty
@@ -96,6 +98,10 @@ envToModel env =
         Dict.get myConfig.baseUrl env ? ""
     , authSecret =
         Dict.get myConfig.authSecret env ? ""
+    , greenhouseId =
+        Dict.get myConfig.greenhouseId env ? "-1"
+            |> String.toInt
+            |> Result.withDefault -1
     , contact =
         Dict.get myConfig.contact env ? ""
     , database =

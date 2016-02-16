@@ -23,6 +23,7 @@ type alias Model =
     , database : Client
     , testConfig : TestConfig
     , authSecret : String
+    , greenhouseId : Int
     , contact : String
     , sessions : Dict String Session
     , github : GithubInfo
@@ -46,5 +47,6 @@ type alias SiteConfig =
     , bucket : String
     , baseUrl : String
     , authSecret : String
+    , greenhouseId : String
     , contact : String
     }

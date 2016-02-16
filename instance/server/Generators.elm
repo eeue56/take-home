@@ -97,6 +97,8 @@ generateSuccessPage res req model =
                             |> Maybe.withDefault ""
                 in
                     createTakehomeIssue checklist model.github user
+                        |> andThen
+                            ( createTakehomeNote model.authSecret model.greenhouseId user.candidateId )
                         |> Task.map (\_ -> user)
                 )
             |> andThen (\user ->
@@ -172,6 +174,7 @@ generateSignupPage res req model =
                     , email = email
                     , token = token
                     , applicationId = application.id
+                    , candidateId = candidate.id
                     , role = role
                     , jobTitle = jobTitle
                     , startTime = Nothing

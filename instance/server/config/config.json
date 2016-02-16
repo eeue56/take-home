@@ -6,6 +6,7 @@
     "secret" : "S3_SECRET",
     "bucket" : "S3_BUCKET",
     "authSecret" : "AUTH_SECRET",
+    "greenhouseId" : "GREENHOUSE_USER_ID",
     "baseUrl" : "BASE_URL",
     "contact" : "JOBS_CONTACT"
 }
