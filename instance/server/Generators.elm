@@ -59,11 +59,22 @@ generateSuccessPage res req model =
                 , bucket = model.bucket
                 }
 
+        extension filename =
+            String.split "." filename
+                |> List.drop 1
+                |> (\bits ->
+                    case bits of
+                        [] -> ""
+                        [x] -> "." ++ x
+                        xs ->
+                            "." ++ (String.join "." xs)
+                    )
+
         newPath user originalFilename =
             String.join
                 "/"
                 [ user.token
-                , String.words originalFilename |> String.join ""
+                , (toString user.candidateId) ++ (extension originalFilename)
                 ]
 
 
