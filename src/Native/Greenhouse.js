@@ -54,6 +54,33 @@ var getOneCallback = function(Task, https){
     };
 };
 
+var postOneCallback = function(Task, https){
+    return function(options, args, callback){
+        var req = https.request(options, function(response){
+            var str = '';
+
+            response.on('data', function (chunk) {
+                str += chunk;
+            });
+
+            response.on('end', function () {
+                var asJson = JSON.parse(str);
+
+                callback(
+                    Task.succeed(asJson)
+                );
+            });
+
+            response.on('error', function(err){
+                callback(Task.fail(err.message));
+            });
+        });
+
+        req.write(args);
+        req.end();
+    };
+};
+
 var getMany = function(Task, Tuple2, fromArray, parseHeader, https) {
     return function(authToken, url, pageNumber, perPage) {
 
@@ -81,6 +108,22 @@ var getOne = function(Task, https) {
     };
 };
 
+var postOne = function(Task, https){
+    return function(authToken, user, args, url) {
+        var options = {
+            host: "harvest.greenhouse.io",
+            path: url,
+            auth: authToken + ':',
+            headers: {
+                'On-Behalf-Of': user
+            },
+            method: 'POST'
+        };
+
+        return Task.asyncFunction(postOneCallback(Task, https).bind(null, options, args));
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Greenhouse = localRuntime.Native.Greenhouse || {};
@@ -100,7 +143,8 @@ var make = function make(localRuntime) {
 
     return {
         getMany: F4(getMany(Task, Tuple2, List.fromArray, parseHeader, https)),
-        getOne: F2(getOne(Task, https))
+        getOne: F2(getOne(Task, https)),
+        postOne: F4(postOne(Task, https))
     };
 };
 

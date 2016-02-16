@@ -2,6 +2,7 @@ module Greenhouse where
 
 import Task exposing (Task)
 import Json.Decode as Json exposing (..)
+import Json.Encode as Encode
 import Json.Decode.Extra exposing (apply, (|:))
 import Native.Greenhouse
 
@@ -25,6 +26,20 @@ type alias EmailAddress =
     { type' : String
     , value : String
     }
+
+type alias NotePost =
+    { userId : Int
+    , body : String
+    , visibility : String
+    }
+
+nodePostEncoder : NotePost -> String
+nodePostEncoder post =
+    (Encode.encode 0 << Encode.object)
+        [ ("user_id", Encode.int post.userId )
+        , ("body", Encode.string post.body)
+        , ("visibility", Encode.string post.visibility)
+        ]
 
 type alias Application =
     { id : Int
@@ -100,6 +115,10 @@ getOne : String -> String -> Task String Value
 getOne =
     Native.Greenhouse.getOne
 
+postOne : String -> Int -> String -> String -> Task String Value
+postOne authToken userId args url =
+    Native.Greenhouse.postOne authToken userId args url
+
 pageRecurse : (PageIndex -> Task String (List a, PageIndex)) -> (List a, PageIndex) -> PageIndex -> Task String (List a, PageIndex)
 pageRecurse fn (collection, endNumber) pageNumber =
     if pageNumber < endNumber then
@@ -135,6 +154,16 @@ getCandidate : String -> Int -> Task String (Maybe Candidate)
 getCandidate authToken candidateId =
     getOne authToken ("/v1/candidates/" ++ (toString candidateId))
         |> Task.map (Json.decodeValue candidateDecoder >> Result.toMaybe)
+
+addNote : String -> Int -> NotePost -> Int -> Task String (Value)
+addNote authToken userId note candidateId =
+    let
+        url =
+            ("https://harvest.greenhouse.io/v1/candidates/" ++ (toString candidateId) ++ "/activity_feed/notes")
+        body =
+            nodePostEncoder note
+    in
+        postOne authToken userId body url
 
 candidateHasEmail : Candidate -> String -> Bool
 candidateHasEmail candidate email =
