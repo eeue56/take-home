@@ -32,7 +32,7 @@ alreadySignupView : String -> User -> Html
 alreadySignupView url user =
     div
         []
-        [ text "You've already signed up!"
+        [ text "You've already signed up! "
         , a
             [ href url ]
             [ text url ]
@@ -45,7 +45,7 @@ successfulSignupView url user =
         []
         [ a
             [ href url ]
-            [ text ("You have successfully signed up," ++ user.name) ]
+            [ text ("You have successfully signed up, " ++ user.name) ]
         ]
 
 
