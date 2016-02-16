@@ -1,8 +1,10 @@
 module Github where
 
-import Json.Decode as Decode exposing ((:=))
+import Json.Decode as Decode exposing ((:=), Decoder, succeed)
 import Json.Encode as Json exposing (string, object)
 import Json.Encode.Extra exposing (maybe, objectFromList)
+import Json.Decode.Extra exposing (apply, (|:))
+
 import Task exposing (Task)
 import Dict exposing (Dict)
 
@@ -46,6 +48,15 @@ type alias Team =
     , id : Int
     , slug : String
     }
+
+type alias Member =
+    { login: String
+    }
+
+memberDecoder : Decoder Member
+memberDecoder =
+    succeed Member
+        |: ("login" := Decode.string)
 
 type Auth
     = KeySecret String String
@@ -143,3 +154,4 @@ getTeamMembers teamId session =
                 |> objectFromList
     in
         Native.Github.getTeamMembers encodedObject session
+            |> Task.map (List.map (\x -> x.login))
