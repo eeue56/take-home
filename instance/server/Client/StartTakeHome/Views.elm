@@ -81,7 +81,7 @@ viewUploadSolution user =
         , enctype "multipart/form-data"
         ]
         [ fileField
-        , hiddenTokenField user.token
+        , hiddenTokenField <| Debug.log "user token" user.token
         , submitField
         ]
 

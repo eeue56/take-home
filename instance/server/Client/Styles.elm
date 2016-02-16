@@ -40,6 +40,8 @@ type CssClasses
 
     | SignupFormContainer
     | InputField
+    | InitialsField
+    | ApplicationIdField
 
 
 type CssIds

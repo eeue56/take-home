@@ -40,6 +40,35 @@ emailField =
             []
         ]
 
+initialsField : Html
+initialsField =
+    div
+        [ class InitialsField ]
+        [ label
+            [ for "initials" ]
+            [ text "Initials: " ]
+        , input
+            [ type' "text"
+            , name "initials"
+            , id "initials"
+            ]
+            []
+        ]
+
+applicationIdField : Html
+applicationIdField =
+    div
+        [ class ApplicationIdField ]
+        [ label
+            [ for "applicationId" ]
+            [ text "Application ID: " ]
+        , input
+            [ type' "text"
+            , name "applicationId"
+            , id "applicationId"
+            ]
+            []
+        ]
 
 nameField : Html
 nameField =

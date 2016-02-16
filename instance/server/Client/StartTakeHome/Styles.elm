@@ -8,14 +8,21 @@ import Client.Styles exposing (..)
 fontSizing =
     property "font-size" "76px"
 
+flexCenter =
+    (.) Welcome
+        [ children
+            [ selector "*"
+                [ property "display" "flex"
+                , property "justify-content" "center"
+                , property "align-items" "center"
+                ]
+            ]
+        ]
+
 css : String
 css =
     getCss
-        [ (.) Welcome
-            [ padding (px 50)
-            , marginLeft (px 50)
-            , marginTop (px 50)
-            ]
+        [ flexCenter
         , (.) WelcomeTestName
             [ fontSizing
             , property "line-height" "1.4"
