@@ -7,8 +7,7 @@ import Model exposing (Connection, Model, Session)
 import Client.App exposing (index, genericErrorView)
 import Client.Signup.Views exposing (signUpForTakeHomeView)
 import Generators exposing (generateSuccessPage, generateSignupPage,
-    generateWelcomePage, generateTestPage, generateAdminPage,
-    generateSuccessfulRegistrationPage, generateSwimPage)
+    generateWelcomePage, generateTestPage, generateAdminPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
 import Shared.Routes exposing (routes, assets)
 import Task exposing (..)
@@ -98,9 +97,6 @@ routePost ( req, res ) model =
         else if url == routes.login then
             model
                 => generate generateAdminPage
-        else if url == routes.registerUser then
-            model
-                => generate generateSuccessfulRegistrationPage
         else
             model
                 => (handleError res (Task.fail "Route not found")
