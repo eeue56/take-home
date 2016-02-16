@@ -24,7 +24,7 @@ var createIssue = function(Tuple0, Task) {
                     callback(Task.fail(err));
                 }
 
-                callback(Task.succeed(Tuple0));
+                callback(Task.succeed(data));
             });
         });
     };

@@ -1,5 +1,6 @@
 module Github where
 
+import Json.Decode as Decode exposing ((:=))
 import Json.Encode as Json exposing (string, object)
 import Json.Encode.Extra exposing (maybe, objectFromList)
 import Task exposing (Task)
@@ -20,6 +21,7 @@ type alias SessionConfig =
     , timeout : Int
     }
 
+defaultSession : SessionConfig
 defaultSession =
     { version = "3.0.0"
     , debug = True
@@ -108,11 +110,11 @@ authenticate : Auth -> Session -> Session
 authenticate auth session =
     Native.Github.authenticate (encodeAuth auth) session
 
-createIssue : IssueCreationSettings -> Session -> Task String ()
+createIssue : IssueCreationSettings -> Session -> Task String String
 createIssue settings session =
-    Native.Github.createIssue
-        (encodeIssueCreationSettings settings)
-        session
+    Native.Github.createIssue (encodeIssueCreationSettings settings) session
+        |> (flip Task.andThen)
+            (Decode.decodeValue ("html_url" := Decode.string) >> Task.fromResult)
 
 getTeams : String -> Maybe Int -> Maybe Int -> Session -> Task String (Dict String Team)
 getTeams org pageNumber perPage session =
