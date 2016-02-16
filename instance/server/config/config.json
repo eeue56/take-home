@@ -8,5 +8,6 @@
     "authSecret" : "AUTH_SECRET",
     "greenhouseId" : "GREENHOUSE_USER_ID",
     "baseUrl" : "BASE_URL",
-    "contact" : "JOBS_CONTACT"
+    "contact" : "JOBS_CONTACT",
+    "excluded" : "EXCLUDED"
 }
