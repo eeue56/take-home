@@ -30,8 +30,6 @@ decodeUsers users =
 getUsers : Database.Operation a (List User)
 getUsers user database =
     Database.find user database
-        |> Task.map decodeUsers
-
 
 {-| Takes a record, returns true if any records in database
 have matching fields

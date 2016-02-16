@@ -156,14 +156,10 @@ routeGet ( req, res ) model =
                         |> runRouteWithErrorHandler
                     )
         else if url == assets.noredinkLogo.route then
-            let
-                _ =
-                    Debug.log "noredink logo requestd " assets.noredinkLogo
-            in
-                model
-                    => (writeFile assets.noredinkLogo.file res
-                            |> runRouteWithErrorHandler
-                        )
+            model
+                => (writeFile assets.noredinkLogo.file res
+                        |> runRouteWithErrorHandler
+                    )
         else
             case queryPart url of
                 "" ->

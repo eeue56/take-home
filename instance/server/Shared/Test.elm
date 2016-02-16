@@ -24,7 +24,7 @@ type alias TestEntry =
     , checklist : String
     }
 
-
+emptyTestEntry : TestEntry
 emptyTestEntry =
     { name = ""
     , item = ""

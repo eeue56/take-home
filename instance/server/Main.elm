@@ -70,6 +70,7 @@ model =
     , sessions = Dict.empty
     , github = githubConfig
     , checklists = Dict.empty
+    , excluded = []
     }
 
 loadChecklist : Env -> TestEntry -> (String, String)
@@ -110,6 +111,9 @@ envToModel env =
         model.testConfig
     , sessions =
         Dict.empty
+    , excluded =
+        Dict.get myConfig.excluded env ? ""
+            |> String.split ","
     , github =
         { org = Dict.get "org" env ? ""
         , repo = Dict.get "repo" env ? ""

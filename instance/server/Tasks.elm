@@ -12,6 +12,10 @@ import Shared.User exposing (User, initials)
 import Model exposing (GithubInfo)
 import User
 
+import Array
+import Random.Impure exposing (withinRange)
+
+
 andThen =
     (flip Task.andThen)
 
@@ -19,8 +23,8 @@ andThen =
 {-|
 Creates the issue on github, using the checklist, the github info, and the user
 -}
-createTakehomeIssue : String -> GithubInfo -> User -> Task String String
-createTakehomeIssue checkList info user =
+createTakehomeIssue : String -> String -> GithubInfo -> User -> Task String String
+createTakehomeIssue checkList assignee info user =
     let
         text =
             case user.submissionLocation of
@@ -39,7 +43,7 @@ createTakehomeIssue checkList info user =
             , repo = info.repo
             , title = "Review take home for " ++ (initials user)
             , body = Just text
-            , assignee = Just info.assignee
+            , assignee = Just assignee
             , milestone = Nothing
             , labels = []
             }
@@ -88,6 +92,20 @@ getTeamMembers teamName info =
                 |> Github.authenticate info.auth
                 |> Github.getTeamMembers id
         )
+
+chooseTeamMember : List String -> Task String (Maybe String)
+chooseTeamMember teamMembers =
+    Array.fromList teamMembers
+        |> (\team ->
+            let
+                max =
+                    Array.length team
+                min =
+                    0
+            in
+                withinRange min max
+                    |> andThen (\index -> Task.succeed <| Array.get index team)
+            )
 
 {-|
 Finds a single user in the database

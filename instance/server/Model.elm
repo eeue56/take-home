@@ -28,6 +28,7 @@ type alias Model =
     , sessions : Dict String Session
     , github : GithubInfo
     , checklists : Dict String String
+    , excluded : List String
     }
 
 type alias Session =
@@ -49,4 +50,5 @@ type alias SiteConfig =
     , authSecret : String
     , greenhouseId : String
     , contact : String
+    , excluded : String
     }

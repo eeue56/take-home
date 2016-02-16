@@ -1,7 +1,7 @@
 module Generators (..) where
 
 import Http.Response.Write exposing (writeHtml, writeJson, writeElm, writeFile, writeNode, writeRedirect)
-import Http.Request exposing (emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
+import Http.Request exposing (encodeUri, emptyReq, Request, Method(..), parseQuery, getQueryField, getFormField, getFormFiles, setForm)
 import Http.Response exposing (Response)
 
 import Knox
@@ -63,8 +63,9 @@ generateSuccessPage res req model =
             String.join
                 "/"
                 [ user.token
-                , originalFilename
+                , String.words originalFilename |> String.join ""
                 ]
+
 
         token =
             getFormField "token" req.form
@@ -92,11 +93,20 @@ generateSuccessPage res req model =
                 )
             |> andThen (\user ->
                 let
+                    assessmentGroup =
+                        case user.test of
+                            Nothing -> ""
+                            Just test -> test.assessmentGroup
+
                     checklist =
                         Dict.get user.role model.checklists
                             |> Maybe.withDefault ""
                 in
-                    createTakehomeIssue checklist model.github user
+                    getTeamMembers assessmentGroup model.github
+                        |> Task.map (List.filter (\x -> not (List.member x model.excluded)))
+                        |> andThen chooseTeamMember
+                        |> Task.map (Maybe.withDefault model.github.assignee)
+                        |> andThen (\assignee -> createTakehomeIssue checklist assignee model.github user)
                         |> andThen
                             ( createTakehomeNote model.authSecret model.greenhouseId user.candidateId )
                         |> Task.map (\_ -> user)
