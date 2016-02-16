@@ -152,6 +152,14 @@ var getFormFiles = function(toList) {
     };
 };
 
+var fixedEncodeURIComponent = function() {
+    return function(str) {
+        return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+            return '%' + c.charCodeAt(0).toString(16);
+        });
+    };
+};
+
 var make = function make(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Http = localRuntime.Native.Http || {};
@@ -192,7 +200,8 @@ var make = function make(localRuntime) {
         'getQueryField': F2(getQueryField(Just, Nothing)),
         'getFormField': F2(getFormField(Just, Nothing)),
         'getFormFiles': getFormFiles(List.fromArray),
-        'setForm': setForm(multiparty, fs, Task)
+        'setForm': setForm(multiparty, fs, Task),
+        'encodeUri': fixedEncodeURIComponent()
     };
 };
 Elm.Native.Http = {};

@@ -1,4 +1,4 @@
-module Http.Request (Method(..), Query(..), Form, FormFile, Request, emptyReq, onCloseReq, parseQuery, getQueryField, getFormFiles, getFormField, setForm) where
+module Http.Request (Method(..), Query(..), Form, FormFile, Request, encodeUri, emptyReq, onCloseReq, parseQuery, getQueryField, getFormFiles, getFormField, setForm) where
 
 {-| Stuff for dealing with requests
 # Handle Requests
@@ -11,9 +11,10 @@ module Http.Request (Method(..), Query(..), Form, FormFile, Request, emptyReq, o
 @docs onCloseReq
 -}
 
-import Native.Http
-import Http.Listeners exposing (on)
 import Task exposing (Task)
+import Http.Listeners exposing (on)
+
+import Native.Http
 
 
 {-| Standard Http Methods, useful for routing
@@ -72,6 +73,9 @@ onCloseReq : Request -> Signal ()
 onCloseReq =
     on "close"
 
+encodeUri : String -> String
+encodeUri =
+    Native.Http.encodeUri
 
 parseQuery : String -> Result String Query
 parseQuery =
