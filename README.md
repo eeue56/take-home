@@ -70,7 +70,7 @@ There's no way of storing session data right now.
 
 ## Should I use this in production?
 
-No! This project was an experiment and a proof of concept. A lot of the ideas in this project are really cool. But being cool doesn't make for a production-ready system. Let's talk about a day in the life of a server-side Elm programmer. 
+*No!* This project was an experiment and a proof of concept. A lot of the ideas in this project are really cool. But being cool doesn't make for a production-ready system. Let's talk about a day in the life of a server-side Elm programmer. 
 
 - Write some business logic in Elm
 - Realise that you need some library support that doesn't exist in Elm
