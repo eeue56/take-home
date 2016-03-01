@@ -68,10 +68,17 @@ There's no way of storing session data right now.
 
 # FAQ
 
-## Will this be used in production?
+## Should I use this in production?
 
-Yes! We're going to use in production.
+No! This project was an experiment and a proof of concept. A lot of the ideas in this project are really cool. But being cool doesn't make for a production-ready system. Let's talk about a day in the life of a server-side Elm programmer. 
 
+- Write some business logic in Elm
+- Realise that you need some library support that doesn't exist in Elm
+- Spend the rest of the day fighting Node
+
+As an Elm programmer, I like to write Elm! As a server-side Elm programmer, I hate writing yet another integration library that wraps around a Node library that uses mutable objects and callbacks in a weird way. There are a lot of battles that you have to face everyday writing libraries that work with Node. Sometimes there just isn't a way to make Node libraries play nicely with Elm. This does not make for a stable runtime, nor a stable platform. 
+
+The tl;dr here is that Node is not the ideal platform for server-side Elm. An alternate platform to base itself on would be great, but is unlikely to happen "soon". Please take away some of the ideas here and think about them! But if you value your sanity, your stability and your users, don't use this proof of concept for anything more than interest!
 
 
 # Credit
