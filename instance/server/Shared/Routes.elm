@@ -60,16 +60,6 @@ match url =
         |> Maybe.withDefault (NotFound url)
 
 
-{-| Let's take the routes approach, but also store our CSS in there!
--}
-type alias Assets =
-    { admin : Style
-    , main : Style
-    , signup : Style
-    , start : Style
-    , noredinkLogo : File
-    }
-
 {-| Right now, we only consider CSS assets that we care about
 The route should be the path refered to in the view, the
 CSS should be the CSS, as a string
@@ -79,18 +69,11 @@ type alias Style =
     , css : String
     }
 
-type alias File =
-    { route : String
-    , file : String
-    }
-
 type Styles
     = AdminStyle
     | SignupStyle
     | StartStyle
     | MainStyle
-
-type Files = LogoFile
 
 styles : List Style
 styles =
@@ -114,6 +97,13 @@ matchStyle url =
     List.filter (\style -> style.route == url) styles
         |> List.head
 
+
+type alias File =
+    { route : String
+    , file : String
+    }
+
+type Files = LogoFile
 
 files : List File
 files =
