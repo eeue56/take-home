@@ -2,12 +2,12 @@ module Client.StartTakeHome.Views (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (src, for, id, type', name, action, method, enctype, attribute, href)
-import Html.Tags exposing (style, stylesheetLink, actionLink)
+import Html.Tags exposing (style, stylesheetLink, actionLink, srcLink)
 import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (Route(..), assets)
+import Shared.Routes exposing (Route(..), Styles(..), Files(..))
 import Client.Styles exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)
@@ -19,9 +19,9 @@ beforeTestWelcome : User -> TestEntry -> Html
 beforeTestWelcome user test =
     div
         []
-        [ stylesheetLink assets.start.route
+        [ stylesheetLink StartStyle
         , img
-            [ src assets.noredinkLogo.route ]
+            [ srcLink LogoFile ]
             []
         , form
             [ class Welcome
@@ -127,7 +127,7 @@ viewTakeHome address model =
     in
         div
             []
-            [ stylesheetLink assets.main.route
+            [ stylesheetLink MainStyle
             , testView
             , viewUploadSolution model.user
             , viewTimeStarted model.currentTime model.user

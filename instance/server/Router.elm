@@ -10,7 +10,7 @@ import Generators exposing (generateSuccessPage, generateSignupPage,
     generateWelcomePage, generateTestPage, generateAdminPage,
     generateSuccessfulRegistrationPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
-import Shared.Routes exposing (Route(..), match, assets)
+import Shared.Routes exposing (Route(..), match, matchStyle, matchFile)
 import Task exposing (..)
 import Signal exposing (..)
 import Json.Encode as Json
@@ -112,11 +112,8 @@ routeGet ( req, res ) model =
     let
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
-
-        url =
-            req.url
     in
-        case match url of
+        case match req.url of
             Index ->
                 model
                     => (writeNode (signUpForTakeHomeView model.testConfig) res
@@ -137,65 +134,59 @@ routeGet ( req, res ) model =
                     => (generateSwimPage res req model
                             |> runRouteWithErrorHandler
                         )
-            _ ->
-                if url == assets.admin.route then
-                    model
-                        => (writeCss assets.admin.css res
-                                |> runRouteWithErrorHandler
-                           )
-                else if url == assets.main.route then
-                    model
-                        => (writeCss assets.main.css res
-                                |> runRouteWithErrorHandler
-                           )
-                else if url == assets.signup.route then
-                    model
-                        => (writeCss assets.signup.css res
-                                |> runRouteWithErrorHandler
-                           )
-                else if url == assets.start.route then
-                    model
-                        => (writeCss assets.start.css res
+            StyleAsset path ->
+                case matchStyle path of
+                    Just style ->
+                        model =>
+                            (writeCss style.css res
                                 |> runRouteWithErrorHandler
                             )
-                else if url == assets.noredinkLogo.route then
-                    let
-                        _ =
-                            Debug.log "noredink logo requestd " assets.noredinkLogo
-                    in
+                    Nothing ->
                         model
-                            => (writeFile assets.noredinkLogo.file res
+                            => (handleError res (Task.fail "Style not found")
                                     |> runRouteWithErrorHandler
-                                )
-                else
-                    case queryPart url of
-                        "" ->
-                            model
-                                => (writeFile url res
-                                        |> runRouteWithErrorHandler
-                                   )
+                               )
+            FileAsset path ->
+                case matchFile path of
+                    Just file ->
+                        model =>
+                            (writeFile file.file res
+                                |> runRouteWithErrorHandler
+                            )
+                    Nothing ->
+                        model
+                            => (handleError res (Task.fail "File not found")
+                                    |> runRouteWithErrorHandler
+                               )
+            _ ->
+                case queryPart req.url of
+                    "" ->
+                        model
+                            => (writeFile req.url res
+                                    |> runRouteWithErrorHandler
+                               )
 
-                        query ->
-                            case parseQuery query of
-                                Err _ ->
-                                    model
-                                        => (Task.fail "failed to parse"
-                                                |> runRouteWithErrorHandler
-                                           )
+                    query ->
+                        case parseQuery query of
+                            Err _ ->
+                                model
+                                    => (Task.fail "failed to parse"
+                                            |> runRouteWithErrorHandler
+                                       )
 
-                                Ok bag ->
-                                    case getQueryField "token" bag of
-                                        Nothing ->
-                                            model
-                                                => (Task.fail ("Failed to find anything " ++ url)
-                                                        |> runRouteWithErrorHandler
-                                                   )
+                            Ok bag ->
+                                case getQueryField "token" bag of
+                                    Nothing ->
+                                        model
+                                            => (Task.fail ("Failed to find anything " ++ req.url)
+                                                    |> runRouteWithErrorHandler
+                                               )
 
-                                        Just token ->
-                                            model
-                                                => (generateWelcomePage token res model
-                                                        |> runRouteWithErrorHandler
-                                                   )
+                                    Just token ->
+                                        model
+                                            => (generateWelcomePage token res model
+                                                    |> runRouteWithErrorHandler
+                                               )
 
 
 {-| route each request/response pair and write a response

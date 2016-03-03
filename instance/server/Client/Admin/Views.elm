@@ -11,7 +11,7 @@ import Client.Components exposing (..)
 import Client.Styles exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (Route(..), routePath, assets)
+import Shared.Routes exposing (Route(..), routePath, Styles(..))
 
 
 loginView =
@@ -20,7 +20,7 @@ loginView =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ stylesheetLink assets.main.route
+        [ stylesheetLink MainStyle
         , passwordLabel "Please enter the admin password"
         , passwordField
         , submitField
@@ -39,7 +39,7 @@ usersSwimlanes users =
     in
         div
             [ class SwimlaneContainer ]
-            [ stylesheetLink assets.main.route
+            [ stylesheetLink MainStyle
             , userSwimlane SwimlaneNotStarted usersNotStarted
             , userSwimlane SwimlaneInProgress usersInProgress
             , userSwimlane SwimlaneDone usersDone
@@ -127,8 +127,8 @@ allUsersView : List User -> Html
 allUsersView users =
     div
         []
-        [ stylesheetLink assets.main.route
-        , stylesheetLink assets.admin.route
+        [ stylesheetLink MainStyle
+        , stylesheetLink AdminStyle
         , linkToRegisterView
         , List.map (\user -> li [] [ userView user ]) users
             |> ul []

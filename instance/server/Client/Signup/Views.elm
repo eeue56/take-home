@@ -5,7 +5,7 @@ import Html.Attributes exposing (for, type', name, action, method, enctype, valu
 import Html.Tags exposing (style, stylesheetLink, actionLink)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
-import Shared.Routes exposing (Route(..), assets)
+import Shared.Routes exposing (Route(..), Styles(..))
 import Client.Components exposing (..)
 import Client.Styles exposing (..)
 
@@ -17,7 +17,7 @@ signUpForTakeHomeView testConfig =
         , method "POST"
         , enctype "multipart/form-data"
         ]
-        [ stylesheetLink assets.signup.route
+        [ stylesheetLink SignupStyle
         , div
             [ class SignupFormContainer ]
             [ emailField
