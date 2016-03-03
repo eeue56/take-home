@@ -1,4 +1,4 @@
-module Shared.Routes (Route(..), toPath, routes, assets) where
+module Shared.Routes (Route(..), match, toPath, routes, assets) where
 
 {-| Static routes and assets for use with views and routing
 -}
@@ -8,21 +8,6 @@ import Client.Styles
 import Client.Admin.Styles
 import Client.Signup.Styles
 import Client.StartTakeHome.Styles
-
-
-{-| Right now, we only consider CSS assets that we care about
-The route should be the path refered to in the view, the
-CSS should be the CSS, as a string
--}
-type alias Asset =
-    { route : String
-    , css : String
-    }
-
-type alias Image =
-    { route : String
-    , file : String
-    }
 
 
 {-| These routes allow you to keep all your paths in one place
@@ -37,16 +22,7 @@ type Route
     | RegisterUser
     | Swimlanes
     | ViewSingleUser
-
-{-| Let's take the routes approach, but also store our CSS in there!
--}
-type alias Assets =
-    { admin : Asset
-    , main : Asset
-    , signup : Asset
-    , start : Asset
-    , noredinkLogo : Image
-    }
+    | NotFound String
 
 routes : List (Matcher Route)
 routes =
@@ -71,7 +47,40 @@ toPath route =
         RegisterUser -> "/admin/registerUser"
         Swimlanes -> "/swim"
         ViewSingleUser -> "/admin/viewUser"
+        -- This should never happen
+        _ -> "/404"
 
+match : String -> Route
+match url =
+    RouteParser.match routes url
+        |> Maybe.withDefault (NotFound url)
+
+
+{-| Let's take the routes approach, but also store our CSS in there!
+-}
+type alias Assets =
+    { admin : Style
+    , main : Style
+    , signup : Style
+    , start : Style
+    , noredinkLogo : File
+    }
+
+{-| Right now, we only consider CSS assets that we care about
+The route should be the path refered to in the view, the
+CSS should be the CSS, as a string
+-}
+type alias Style =
+    { route : String
+    , css : String
+    }
+
+type alias File =
+    { route : String
+    , file : String
+    }
+
+assets : Assets
 assets =
     { admin =
         { route = "/admin/styles.css"

@@ -2,7 +2,7 @@ module Client.StartTakeHome.Views (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (src, for, id, type', name, action, method, enctype, attribute, href)
-import Html.Tags exposing (style, stylesheetLink)
+import Html.Tags exposing (style, stylesheetLink, actionLink)
 import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
@@ -25,7 +25,7 @@ beforeTestWelcome user test =
             []
         , form
             [ class Welcome
-            , action (toPath StartTest)
+            , actionLink StartTest
             , method "POST"
             , enctype "multipart/form-data"
             ]
@@ -76,7 +76,7 @@ viewTestFile test =
 viewUploadSolution : User -> Html
 viewUploadSolution user =
     form
-        [ action (toPath Apply)
+        [ actionLink Apply
         , method "POST"
         , enctype "multipart/form-data"
         ]

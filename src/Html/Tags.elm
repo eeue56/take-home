@@ -2,8 +2,9 @@ module Html.Tags (..) where
 
 import Json.Encode exposing (string)
 import VirtualDom exposing (Node, property)
-import Html.Attributes exposing (attribute)
+import Html.Attributes exposing (attribute, href, action)
 import Html exposing (div, Html)
+import Shared.Routes exposing (Route, toPath)
 
 
 style : String -> Html
@@ -25,3 +26,9 @@ stylesheetLink url =
         , property "href" (string url)
         ]
         []
+
+hrefLink =
+    href << toPath
+
+actionLink =
+    action << toPath

@@ -2,7 +2,7 @@ module Client.Admin.Views (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type', name, action, method, enctype, attribute, href)
-import Html.Tags exposing (style, stylesheetLink)
+import Html.Tags exposing (style, stylesheetLink, actionLink, hrefLink)
 
 import String
 import Dict
@@ -16,7 +16,7 @@ import Shared.Routes exposing (Route(..), toPath, assets)
 
 loginView =
     form
-        [ action (toPath Login)
+        [ actionLink Login
         , method "POST"
         , enctype "multipart/form-data"
         ]
@@ -64,7 +64,7 @@ userSwimlane classType users =
 linkToRegisterView : Html
 linkToRegisterView =
     a
-        [ href (toPath RegisterUser)
+        [ hrefLink RegisterUser
         , class Button
         ]
         [ text "Click here to register a new user" ]
@@ -73,7 +73,7 @@ linkToRegisterView =
 registerUserView : Html
 registerUserView =
     form
-        [ action (toPath RegisterUser)
+        [ actionLink RegisterUser
         , method "POST"
         , enctype "multipart/form-data"
         ]

@@ -10,7 +10,7 @@ import Generators exposing (generateSuccessPage, generateSignupPage,
     generateWelcomePage, generateTestPage, generateAdminPage,
     generateSuccessfulRegistrationPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
-import Shared.Routes exposing (Route(..), routes, assets)
+import Shared.Routes exposing (Route(..), match, assets)
 import Task exposing (..)
 import Signal exposing (..)
 import Json.Encode as Json
@@ -23,7 +23,6 @@ import String
 import Env
 import Converters
 import Debug
-import RouteParser exposing (match)
 
 
 type Action
@@ -78,39 +77,29 @@ routePost ( req, res ) model =
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
 
-        possibleRoute =
-            match routes req.url
-
         generate generator =
             (setForm req
                 |> (flip andThen) (\req -> generator res req model)
                 |> runRouteWithErrorHandler
             )
     in
-        case possibleRoute of
-            Just route ->
-                case route of
-                    Apply ->
-                        model
-                            => generate generateSuccessPage
-                    SignUp ->
-                        model
-                            => generate generateSignupPage
-                    StartTest ->
-                        model
-                            => generate generateTestPage
-                    Login ->
-                        model
-                            => generate generateAdminPage
-                    RegisterUser ->
-                        model
-                            => generate generateSuccessfulRegistrationPage
-                    _ ->
-                        model
-                            => (handleError res (Task.fail "Route not found")
-                                    |> runRouteWithErrorHandler
-                               )
-            Nothing ->
+        case match req.url of
+            Apply ->
+                model
+                    => generate generateSuccessPage
+            SignUp ->
+                model
+                    => generate generateSignupPage
+            StartTest ->
+                model
+                    => generate generateTestPage
+            Login ->
+                model
+                    => generate generateAdminPage
+            RegisterUser ->
+                model
+                    => generate generateSuccessfulRegistrationPage
+            _ ->
                 model
                     => (handleError res (Task.fail "Route not found")
                             |> runRouteWithErrorHandler
@@ -126,39 +115,29 @@ routeGet ( req, res ) model =
 
         url =
             req.url
-
-        possibleRoute =
-            match routes url
     in
-        case possibleRoute of
-            Just route ->
-                case route of
-                    Index ->
-                        model
-                            => (writeNode (signUpForTakeHomeView model.testConfig) res
-                                    |> runRouteWithErrorHandler
-                               )
-                    Login ->
-                        model
-                            => (writeNode loginView res
-                                    |> runRouteWithErrorHandler
-                               )
-                    RegisterUser ->
-                        model
-                            => (writeNode registerUserView res
-                                    |> runRouteWithErrorHandler
-                               )
-                    Swimlanes ->
-                        model
-                            => (generateSwimPage res req model
-                                    |> runRouteWithErrorHandler
-                                )
-                    _ ->
-                        model
-                            => (handleError res (Task.fail "Route not found")
-                                    |> runRouteWithErrorHandler
-                               )
-            Nothing ->
+        case match url of
+            Index ->
+                model
+                    => (writeNode (signUpForTakeHomeView model.testConfig) res
+                            |> runRouteWithErrorHandler
+                       )
+            Login ->
+                model
+                    => (writeNode loginView res
+                            |> runRouteWithErrorHandler
+                       )
+            RegisterUser ->
+                model
+                    => (writeNode registerUserView res
+                            |> runRouteWithErrorHandler
+                       )
+            Swimlanes ->
+                model
+                    => (generateSwimPage res req model
+                            |> runRouteWithErrorHandler
+                        )
+            _ ->
                 if url == assets.admin.route then
                     model
                         => (writeCss assets.admin.css res

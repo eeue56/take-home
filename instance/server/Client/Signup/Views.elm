@@ -2,7 +2,7 @@ module Client.Signup.Views (..) where
 
 import Html exposing (form, label, input, text, div, a, select, option, Html)
 import Html.Attributes exposing (for, type', name, action, method, enctype, value, href)
-import Html.Tags exposing (style, stylesheetLink)
+import Html.Tags exposing (style, stylesheetLink, actionLink)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
 import Shared.Routes exposing (Route(..), toPath, assets)
@@ -13,7 +13,7 @@ import Client.Styles exposing (..)
 signUpForTakeHomeView : TestConfig -> Html
 signUpForTakeHomeView testConfig =
     form
-        [ action (toPath SignUp)
+        [ actionLink SignUp
         , method "POST"
         , enctype "multipart/form-data"
         ]
