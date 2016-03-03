@@ -7,7 +7,7 @@ import String
 import Client.Components exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (Route(..), Styles(..), Files(..))
+import Shared.Routes exposing (Route(..), Style(..), File(..))
 import Client.Styles exposing (..)
 import Client.StartTakeHome.Update exposing (Action)
 import Client.StartTakeHome.Model exposing (Model)

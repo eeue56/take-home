@@ -3,8 +3,8 @@ module Html.Tags (..) where
 import Json.Encode exposing (string)
 import VirtualDom exposing (Node, property)
 import Html.Attributes exposing (attribute, href, action, src)
-import Html exposing (div, Html)
-import Shared.Routes exposing (Route, routePath, Styles, stylePath, filePath)
+import Html exposing (div, Html, Attribute)
+import Shared.Routes exposing (Route, routePath, Style, File, stylePath, filePath)
 
 
 style : String -> Html
@@ -17,7 +17,7 @@ style text =
         []
 
 
-stylesheetLink : Styles -> Html
+stylesheetLink : Style -> Html
 stylesheetLink tag =
     VirtualDom.node
         "link"
@@ -27,11 +27,14 @@ stylesheetLink tag =
         ]
         []
 
+hrefLink : Route -> Attribute
 hrefLink =
     href << routePath
 
+actionLink : Route -> Attribute
 actionLink =
     action << routePath
 
+srcLink : File -> Attribute
 srcLink =
     src << filePath

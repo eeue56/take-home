@@ -10,19 +10,13 @@ import Generators exposing (generateSuccessPage, generateSignupPage,
     generateWelcomePage, generateTestPage, generateAdminPage,
     generateSuccessfulRegistrationPage, generateSwimPage)
 import Client.Admin.Views exposing (loginView, registerUserView)
-import Shared.Routes exposing (Route(..), match, matchStyle, matchFile)
+import Shared.Routes exposing (Route(..), matchRoute, matchStyle, matchFile)
 import Task exposing (..)
-import Signal exposing (..)
 import Json.Encode as Json
 import Maybe
 import Result exposing (Result)
 import Effects exposing (Effects)
-import Dict
-import Regex
 import String
-import Env
-import Converters
-import Debug
 
 
 type Action
@@ -83,7 +77,7 @@ routePost ( req, res ) model =
                 |> runRouteWithErrorHandler
             )
     in
-        case match req.url of
+        case matchRoute req.url of
             Apply ->
                 model
                     => generate generateSuccessPage
@@ -113,7 +107,7 @@ routeGet ( req, res ) model =
         runRouteWithErrorHandler =
             (handleError res) >> runRoute
     in
-        case match req.url of
+        case matchRoute req.url of
             Index ->
                 model
                     => (writeNode (signUpForTakeHomeView model.testConfig) res

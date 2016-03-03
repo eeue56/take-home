@@ -1,4 +1,4 @@
-module Shared.Routes (Route(..), match, routePath, routes, matchStyle, matchFile, Styles(..), Files(..), stylePath, filePath) where
+module Shared.Routes (Route(..), matchRoute, routePath, routes, matchStyle, matchFile, Style(..), File(..), stylePath, filePath) where
 
 {-| Static routes and assets for use with views and routing
 -}
@@ -54,8 +54,8 @@ routePath route =
         -- This should never happen
         _ -> "/404"
 
-match : String -> Route
-match url =
+matchRoute : String -> Route
+matchRoute url =
     RouteParser.match routes url
         |> Maybe.withDefault (NotFound url)
 
@@ -64,18 +64,18 @@ match url =
 The route should be the path refered to in the view, the
 CSS should be the CSS, as a string
 -}
-type alias Style =
+type alias StyleConfig =
     { route : String
     , css : String
     }
 
-type Styles
+type Style
     = AdminStyle
     | SignupStyle
     | StartStyle
     | MainStyle
 
-styles : List Style
+styles : List StyleConfig
 styles =
     [ { route = "admin.css", css = Client.Admin.Styles.css }
     , { route = "signup.css", css = Client.Signup.Styles.css }
@@ -83,7 +83,7 @@ styles =
     , { route = "styles.css", css = Client.Styles.css }
     ]
 
-stylePath : Styles -> String
+stylePath : Style -> String
 stylePath tag =
     "/styles/" ++
         case tag of
@@ -92,31 +92,31 @@ stylePath tag =
             StartStyle -> "start.css"
             MainStyle -> "main.css"
 
-matchStyle : String -> Maybe Style
+matchStyle : String -> Maybe StyleConfig
 matchStyle url =
     List.filter (\style -> style.route == url) styles
         |> List.head
 
 
-type alias File =
+type alias FileConfig =
     { route : String
     , file : String
     }
 
-type Files = LogoFile
+type File = LogoFile
 
-files : List File
+files : List FileConfig
 files =
     [ { route = "noredink.svg", file = "/Client/images/noredink.svg" }
     ]
 
-filePath : Files -> String
+filePath : File -> String
 filePath tag =
     "/files/" ++
         case tag of
             LogoFile -> "noredink.svg"
 
-matchFile : String -> Maybe File
+matchFile : String -> Maybe FileConfig
 matchFile url =
     List.filter (\style -> style.route == url) files
         |> List.head

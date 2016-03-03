@@ -11,7 +11,7 @@ import Client.Components exposing (..)
 import Client.Styles exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (Route(..), routePath, Styles(..))
+import Shared.Routes exposing (Route(..), routePath, Style(..))
 
 
 loginView =
