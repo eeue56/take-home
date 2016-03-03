@@ -11,7 +11,7 @@ import Client.Components exposing (..)
 import Client.Styles exposing (..)
 import Shared.Test exposing (..)
 import Shared.User exposing (..)
-import Shared.Routes exposing (Route(..), toPath, assets)
+import Shared.Routes exposing (Route(..), routePath, assets)
 
 
 loginView =
@@ -98,7 +98,7 @@ swimlaneUserView user =
     a
         [ class SwimlaneUser
         -- TODO: move out into helper
-        , href <| (toPath ViewSingleUser) ++ "?id=" ++ user.token
+        , href <| (routePath ViewSingleUser) ++ "?id=" ++ user.token
         ]
         [ div
             [ class SwimlaneInitials ]

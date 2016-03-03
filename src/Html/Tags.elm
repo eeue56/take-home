@@ -4,7 +4,7 @@ import Json.Encode exposing (string)
 import VirtualDom exposing (Node, property)
 import Html.Attributes exposing (attribute, href, action)
 import Html exposing (div, Html)
-import Shared.Routes exposing (Route, toPath)
+import Shared.Routes exposing (Route, routePath)
 
 
 style : String -> Html
@@ -28,7 +28,7 @@ stylesheetLink url =
         []
 
 hrefLink =
-    href << toPath
+    href << routePath
 
 actionLink =
-    action << toPath
+    action << routePath

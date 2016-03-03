@@ -1,4 +1,4 @@
-module Shared.Routes (Route(..), match, toPath, routes, assets) where
+module Shared.Routes (Route(..), match, routePath, routes, assets) where
 
 {-| Static routes and assets for use with views and routing
 -}
@@ -36,8 +36,8 @@ routes =
     , static ViewSingleUser "/admin/viewUser"
     ]
 
-toPath : Route -> String
-toPath route =
+routePath : Route -> String
+routePath route =
     case route of
         Index -> "/"
         Apply -> "/apply"

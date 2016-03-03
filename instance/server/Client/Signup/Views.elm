@@ -5,7 +5,7 @@ import Html.Attributes exposing (for, type', name, action, method, enctype, valu
 import Html.Tags exposing (style, stylesheetLink, actionLink)
 import Shared.User exposing (User)
 import Shared.Test exposing (TestConfig)
-import Shared.Routes exposing (Route(..), toPath, assets)
+import Shared.Routes exposing (Route(..), assets)
 import Client.Components exposing (..)
 import Client.Styles exposing (..)
 
